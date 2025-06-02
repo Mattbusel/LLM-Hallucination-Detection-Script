@@ -537,9 +537,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ##  Support
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/llm-hallucination-detector/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/llm-hallucination-detector/discussions)
-- **Email**: your.email@domain.com
+- **Email**: mattbusel@gmail.com
 
 ##  Roadmap
 
