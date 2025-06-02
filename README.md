@@ -1,4 +1,4 @@
-# LLM Hallucination Detector 🔍
+# LLM Hallucination Detector 
 
 [![Python](https://img.shields.io/badge/python-3.7%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -71,7 +71,7 @@ cd llm-hallucination-detector
 - Python 3.7+
 - No additional dependencies required
 
-## 📖 Usage
+##  Usage
 
 ### Basic Usage
 
@@ -298,7 +298,7 @@ detector.overconfidence_phrases.extend([
 ])
 ```
 
-## 📊 API Reference
+##  API Reference
 
 ### Classes
 
@@ -337,7 +337,7 @@ Returns just the hallucination probability score.
 #### `analyze_with_recommendations(response, context=None)` → `Dict`
 Full analysis with actionable recommendations.
 
-## 📈 Performance Benchmarks
+##  Performance Benchmarks
 
 ### Speed Benchmarks
 - **Average processing time**: 0.1-0.5 seconds per response
