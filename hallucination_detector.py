@@ -1,14 +1,3 @@
-"""
-LLM Hallucination Detection Script
-A comprehensive toolkit for detecting potential hallucinations in LLM responses.
-Compatible with any LLM API (OpenAI, Anthropic, local models, etc.)
-
-Usage:
-    detector = HallucinationDetector()
-    result = detector.analyze_response(response_text, context=context, confidence_threshold=0.7)
-    print(f"Hallucination probability: {result['hallucination_probability']:.2f}")
-"""
-
 import re
 import json
 import math
