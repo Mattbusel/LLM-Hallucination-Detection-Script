@@ -310,4 +310,26 @@ impl Renderer for MarkdownRenderer {
                 let desc = flag.description.as_deref().unwrap_or("No description");
                 
                 md.push_str(&format!("- **[{}]** \"{}\" (tokens {}-{}): {}\n", 
-                    flag
+                    flag.flag, token_text, flag.start, flag.end - 1, desc));
+            }
+        }
+        
+        if config.verbose && config.show_confidence_scores {
+            md.push_str("\n## 📋 Detailed Token Information\n\n");
+            md.push_str("| Index | Token | Confidence | Flags |\n");
+            md.push_str("|-------|-------|------------|-------|\n");
+            
+            for (i, token) in analysis.tokens.iter().enumerate() {
+                let flags = analysis.get_flags_for_token(i);
+                let flag_str = if flags.is_empty() {
+                    "None".to_string()
+                } else {
+                    flags.iter().map(|f| f.flag.as_str()).collect::<Vec<_>>().join(", ")
+                };
+                md.push_str(&format!("| {} | `{}` | {:.3} | {} |\n", i, token.text, token.confidence, flag_str));
+            }
+        }
+        
+        Ok(md)
+    }
+}
