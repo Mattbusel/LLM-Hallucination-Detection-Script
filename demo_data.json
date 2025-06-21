@@ -1,1 +1,76 @@
-
+{
+  "tokens": [
+    {"text": "The", "confidence": 0.95},
+    {"text": " Eiffel", "confidence": 0.92},
+    {"text": " Tower", "confidence": 0.94},
+    {"text": " was", "confidence": 0.88},
+    {"text": " built", "confidence": 0.85},
+    {"text": " in", "confidence": 0.91},
+    {"text": " 1889", "confidence": 0.97},
+    {"text": " and", "confidence": 0.89},
+    {"text": " stands", "confidence": 0.86},
+    {"text": " exactly", "confidence": 0.45},
+    {"text": " 324", "confidence": 0.98},
+    {"text": " meters", "confidence": 0.96},
+    {"text": " tall", "confidence": 0.87},
+    {"text": ".", "confidence": 0.99},
+    {"text": " It", "confidence": 0.93},
+    {"text": " was", "confidence": 0.91},
+    {"text": " originally", "confidence": 0.82},
+    {"text": " painted", "confidence": 0.78},
+    {"text": " bright", "confidence": 0.23},
+    {"text": " purple", "confidence": 0.15},
+    {"text": " to", "confidence": 0.67},
+    {"text": " match", "confidence": 0.28},
+    {"text": " the", "confidence": 0.71},
+    {"text": " French", "confidence": 0.88},
+    {"text": " flag", "confidence": 0.35},
+    {"text": ".", "confidence": 0.99},
+    {"text": " The", "confidence": 0.91},
+    {"text": " tower", "confidence": 0.88},
+    {"text": " has", "confidence": 0.85},
+    {"text": " three", "confidence": 0.93},
+    {"text": " observation", "confidence": 0.89},
+    {"text": " levels", "confidence": 0.91},
+    {"text": " and", "confidence": 0.87},
+    {"text": " receives", "confidence": 0.84},
+    {"text": " approximately", "confidence": 0.79},
+    {"text": " 7", "confidence": 0.82},
+    {"text": " million", "confidence": 0.86},
+    {"text": " visitors", "confidence": 0.88},
+    {"text": " annually", "confidence": 0.85},
+    {"text": ".", "confidence": 0.99}
+  ],
+  "flags": [
+    {
+      "start": 6,
+      "end": 7,
+      "flag": "fact",
+      "description": "Historical construction date - verifiable fact"
+    },
+    {
+      "start": 10,
+      "end": 13,
+      "flag": "fact",
+      "description": "Physical measurement - well-documented specification"
+    },
+    {
+      "start": 18,
+      "end": 25,
+      "flag": "hallucination",
+      "description": "Completely false claim - Eiffel Tower was never purple and has no connection to flag colors"
+    },
+    {
+      "start": 29,
+      "end": 32,
+      "flag": "fact",
+      "description": "Architectural feature - three public levels"
+    },
+    {
+      "start": 34,
+      "end": 39,
+      "flag": "uncertain",
+      "description": "Visitor statistics - approximate numbers that change yearly"
+    }
+  ]
+}
