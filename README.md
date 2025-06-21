@@ -1,10 +1,78 @@
-# LLM Hallucination Detector 
+# LLM Hallucination Detector
 
 [![Python](https://img.shields.io/badge/python-3.7%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code Quality](https://img.shields.io/badge/code%20quality-A-brightgreen.svg)](.)
 
 A comprehensive, framework-agnostic toolkit for detecting potential hallucinations in Large Language Model (LLM) responses. Works with any LLM API including OpenAI GPT, Anthropic Claude, local models, and more.
+
+---
+
+##  New: Token-by-Token Visualizer (Rust MVP)
+
+A production-grade Rust MVP that color-codes and visualizes token-level confidence for LLM output.
+
+###  Features
+
+* Terminal, HTML, and Markdown renderers
+* Color-coded hallucination flags and confidence gradients
+* Built-in demo mode with realistic hallucination examples
+* Modular trait-based renderers
+* JSON input/output support for cross-language use
+* Library mode for integration into Python or C++ pipelines
+
+###  Quick Start
+
+```bash
+cd rust_visualizer
+cargo run -- --demo
+
+# Custom run
+cargo run -- --text-file sample.txt --confidence-file analysis.json
+
+# Generate HTML
+cargo run -- --demo --format html --output report.html
+```
+
+###  Library Usage
+
+```rust
+use llm_token_visualizer::quick_analyze;
+let html = quick_analyze("Your text", "html")?;
+```
+
+---
+
+##  Repository Structure
+
+```
+/
+├── hallucination_detector.py        # Python detector core
+├── factgraph/                       # C++ DAG-based fact verifier
+├── rust_visualizer/                # Rust-based token confidence renderer
+├── examples/                        # Sample texts and demo inputs
+└── README.md
+```
+
+---
+
+##  Python LLM Hallucination Detector
+
+```python
+from hallucination_detector import HallucinationDetector, quick_hallucination_check
+
+# Quick boolean check
+response = "The Eiffel Tower was definitely built in 1887..."
+is_suspicious = quick_hallucination_check(response, threshold=0.7)
+
+# Detailed analysis
+detector = HallucinationDetector()
+result = detector.analyze_response(response)
+print(f"Hallucination probability: {result.hallucination_probability:.2f}")
+```
+
+
+
 
 ##  Quick Start
 
