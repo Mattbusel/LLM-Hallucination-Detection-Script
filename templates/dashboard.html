@@ -1,0 +1,215 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Hallucination Detector Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background-color: #2196F3; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .analyzer { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .chart-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        textarea { width: 100%; height: 100px; margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background-color: #2196F3; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #1976D2; }
+        .result { margin-top: 20px; padding: 15px; border-radius: 4px; }
+        .result.low { background-color: #E8F5E8; border-left: 4px solid #4CAF50; }
+        .result.medium { background-color: #FFF3E0; border-left: 4px solid #FF9800; }
+        .result.high { background-color: #FFEBEE; border-left: 4px solid #F44336; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 LLM Hallucination Detector Dashboard</h1>
+            <p>Real-time analysis and monitoring of AI response reliability</p>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Analyses</h3>
+                <div id="total-analyses" style="font-size: 2em; font-weight: bold; color: #2196F3;">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Average Hallucination Rate</h3>
+                <div id="avg-hallucination" style="font-size: 2em; font-weight: bold; color: #FF9800;">0.0%</div>
+            </div>
+            <div class="stat-card">
+                <h3>Analyses per Minute</h3>
+                <div id="analyses-per-minute" style="font-size: 2em; font-weight: bold; color: #4CAF50;">0.0</div>
+            </div>
+        </div>
+        
+        <div class="analyzer">
+            <h3>🧪 Live Analysis</h3>
+            <textarea id="text-input" placeholder="Enter text to analyze for hallucinations..."></textarea>
+            <button onclick="analyzeText()">Analyze Text</button>
+            <div id="analysis-result"></div>
+        </div>
+        
+        <div class="charts">
+            <div class="chart-container">
+                <h3>Confidence Distribution</h3>
+                <canvas id="confidence-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Hallucination Trends</h3>
+                <canvas id="trend-chart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let confidenceChart, trendChart;
+        
+        // Initialize charts
+        function initCharts() {
+            const ctx1 = document.getElementById('confidence-chart').getContext('2d');
+            confidenceChart = new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Very High', 'High', 'Medium', 'Low', 'Very Low'],
+                    datasets: [{
+                        data: [0, 0, 0, 0, 0],
+                        backgroundColor: ['#4CAF50', '#8BC34A', '#FFEB3B', '#FF9800', '#F44336']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            
+            const ctx2 = document.getElementById('trend-chart').getContext('2d');
+            trendChart = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Hallucination Rate',
+                        data: [],
+                        borderColor: '#2196F3',
+                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 1.0
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Analyze text function
+        async function analyzeText() {
+            const text = document.getElementById('text-input').value;
+            if (!text.trim()) return;
+            
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: text })
+                });
+                
+                const result = await response.json();
+                displayResult(result);
+                updateStats();
+            } catch (error) {
+                console.error('Analysis failed:', error);
+            }
+        }
+        
+        // Display analysis result
+        function displayResult(result) {
+            const resultDiv = document.getElementById('analysis-result');
+            const probability = result.hallucination_probability;
+            
+            let resultClass = 'low';
+            let riskLevel = 'Low Risk';
+            
+            if (probability > 0.7) {
+                resultClass = 'high';
+                riskLevel = 'High Risk';
+            } else if (probability > 0.4) {
+                resultClass = 'medium';
+                riskLevel = 'Medium Risk';
+            }
+            
+            resultDiv.innerHTML = `
+                <div class="result ${resultClass}">
+                    <h4>Analysis Result: ${riskLevel}</h4>
+                    <p><strong>Hallucination Probability:</strong> ${(probability * 100).toFixed(1)}%</p>
+                    <p><strong>Confidence Score:</strong> ${(result.confidence_score * 100).toFixed(1)}%</p>
+                    ${result.detected_issues.length > 0 ? `
+                        <p><strong>Issues Detected:</strong></p>
+                        <ul>${result.detected_issues.map(issue => `<li>${issue}</li>`).join('')}</ul>
+                    ` : ''}
+                    ${result.recommendations.length > 0 ? `
+                        <p><strong>Recommendations:</strong></p>
+                        <ul>${result.recommendations.map(rec => `<li>${rec}</li>`).join('')}</ul>
+                    ` : ''}
+                </div>
+            `;
+        }
+        
+        // Update dashboard stats
+        async function updateStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const stats = await response.json();
+                
+                document.getElementById('total-analyses').textContent = stats.total_analyses;
+                document.getElementById('avg-hallucination').textContent = (stats.average_hallucination_rate * 100).toFixed(1) + '%';
+                document.getElementById('analyses-per-minute').textContent = stats.analyses_per_minute.toFixed(1);
+                
+                // Update confidence chart
+                if (confidenceChart) {
+                    const distribution = stats.confidence_distribution;
+                    confidenceChart.data.datasets[0].data = [
+                        distribution['Very High'] || 0,
+                        distribution['High'] || 0,
+                        distribution['Medium'] || 0,
+                        distribution['Low'] || 0,
+                        distribution['Very Low'] || 0
+                    ];
+                    confidenceChart.update();
+                }
+            } catch (error) {
+                console.error('Failed to update stats:', error);
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+            updateStats();
+            
+            // Auto-refresh stats every 30 seconds
+            setInterval(updateStats, 30000);
+        });
+        
+        // Allow Enter key to trigger analysis
+        document.getElementById('text-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                analyzeText();
+            }
+        });
+    </script>
+</body>
+</html>
