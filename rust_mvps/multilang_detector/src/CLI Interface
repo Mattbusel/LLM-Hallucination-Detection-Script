@@ -1,0 +1,13 @@
+pub fn run_multilang_detector(text: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let detector = MultiLanguageDetector::new();
+    let result = detector.analyze_multilingual(text)?;
+    
+    println!("🌍 Multi-Language Detection Results:");
+    println!("Detected Language: {} ({})", result.language, result.language_code);
+    println!("Hallucination Probability: {:.3}", result.hallucination_probability);
+    println!("Uncertainty Score: {:.3}", result.uncertainty_score);
+    println!("Overconfidence Score: {:.3}", result.overconfidence_score);
+    println!("Contradiction Score: {:.3}", result.contradiction_score);
+    
+    Ok(())
+}
