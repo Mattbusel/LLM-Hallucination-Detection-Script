@@ -1,0 +1,41 @@
+use warp::Filter;
+use warp::ws::{Message, WebSocket};
+use futures::{SinkExt, StreamExt};
+
+pub async fn start_websocket_server(port: u16) -> Result<(), Box<dyn std::error::Error>> {
+    let ws_route = warp::path("analyze")
+        .and(warp::ws())
+        .map(|ws: warp::ws::Ws| {
+            ws.on_upgrade(handle_websocket)
+        });
+    
+    println!("🔄 Starting WebSocket server on port {}", port);
+    warp::serve(ws_route)
+        .run(([127, 0, 0, 1], port))
+        .await;
+    
+    Ok(())
+}
+
+async fn handle_websocket(websocket: WebSocket) {
+    let (mut ws_tx, mut ws_rx) = websocket.split();
+    let mut detector = StreamingHallucinationDetector::new();
+    
+    while let Some(msg) = ws_rx.next().await {
+        if let Ok(msg) = msg {
+            if let Ok(text) = msg.to_str() {
+                if let Ok(chunk) = serde_json::from_str::<StreamingChunk>(text) {
+                    let (tx, rx) = mpsc::channel(1);
+                    tx.send(chunk).await.unwrap();
+                    
+                    let mut result_rx = detector.process_stream(rx).await;
+                    
+                    if let Some(result) = result_rx.recv().await {
+                        let response = serde_json::to_string(&result).unwrap();
+                        let _ = ws_tx.send(Message::text(response)).await;
+                    }
+                }
+            }
+        }
+    }
+}
