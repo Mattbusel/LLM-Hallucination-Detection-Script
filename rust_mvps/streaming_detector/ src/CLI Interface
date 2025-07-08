@@ -1,0 +1,48 @@
+pub async fn run_streaming_detector() -> Result<(), Box<dyn std::error::Error>> {
+    let (tx, rx) = mpsc::channel(100);
+    let mut detector = StreamingHallucinationDetector::new();
+    
+    // Simulate streaming chunks
+    tokio::spawn(async move {
+        let chunks = vec![
+            "The Eiffel Tower",
+            " was definitely built",
+            " in 1887 and cost",
+            " exactly $1.2 million",
+            " to construct.",
+        ];
+        
+        for (i, chunk) in chunks.iter().enumerate() {
+            let streaming_chunk = StreamingChunk {
+                id: format!("chunk_{}", i),
+                text: chunk.to_string(),
+                timestamp: std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_secs(),
+                is_complete: i == chunks.len() - 1,
+            };
+            
+            tx.send(streaming_chunk).await.unwrap();
+            tokio::time::sleep(Duration::from_millis(500)).await;
+        }
+    });
+    
+    let mut result_rx = detector.process_stream(rx).await;
+    
+    println!("🔄 Streaming Analysis Results:");
+    while let Some(result) = result_rx.recv().await {
+        println!("Chunk: {} | Probability: {:.3} | Words: {} | Time: {}ms", 
+            result.chunk_id, 
+            result.hallucination_probability,
+            result.word_count,
+            result.processing_time_ms
+        );
+        
+        if result.confidence_trend.len() > 1 {
+            println!("Confidence Trend: {:?}", result.confidence_trend);
+        }
+    }
+    
+    Ok(())
+}
