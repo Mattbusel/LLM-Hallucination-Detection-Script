@@ -9,6 +9,16 @@ Python License: MIT Code Quality
 
 A comprehensive, framework-agnostic toolkit for detecting potential hallucinations in Large Language Model (LLM) responses. Works with any LLM API including OpenAI GPT, Anthropic Claude, local models, and more.
 
+> ** 7+ GitHub Stars • 100s of Repo Clones • Trusted by Early Builders**
+
+This toolkit isn’t just another hallucination detector — it's a production-grade firewall for LLM outputs, built from scratch in Python, Rust, and C++.
+
+ **Note**: Model weights + trained binaries are not currently available — only the full framework and interfaces. If you want to build your own models, everything you need is here.  
+ Model drops may come in future versions, but are currently held for evaluation and security reasons.
+
+**Fork it. Clone it. Integrate it.** This repo is just getting started.
+
+
 ##  New: Token-by-Token Visualizer (Rust MVP)
 A production-grade Rust MVP that color-codes and visualizes token-level confidence for LLM output.
 
