@@ -1,0 +1,11 @@
+pub fn run_neural_detector(text: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let detector = NeuralHallucinationDetector::new("models/hallucination_bert")?;
+    let result = detector.detect_hallucination(text)?;
+    
+    println!("🧠 Neural Detection Results:");
+    println!("Hallucination Probability: {:.3}", result.hallucination_probability);
+    println!("Confidence Score: {:.3}", result.confidence_score);
+    println!("Feature Weights: {:?}", result.feature_weights);
+    
+    Ok(())
+}
