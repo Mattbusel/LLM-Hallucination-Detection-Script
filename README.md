@@ -914,8 +914,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Support
 
 - **Email**: mattbusel@gmail.com
-- **Issues**: [GitHub Issues](https://github.com/yourusername/llm-hallucination-detector/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/llm-hallucination-detector/discussions)
+
 
 ## Roadmap
 
@@ -941,7 +940,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-**Help make AI more reliable, one response at a time.** 🚀
+**Help make AI more reliable, one response at a time.** 
 
 
 
