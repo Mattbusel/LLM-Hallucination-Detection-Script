@@ -117,7 +117,7 @@ Simply copy the `hallucination_detector.py` file into your project directory.
 
 ### Option 2: Clone Repository
 ```bash
-git clone https://github.com/yourusername/llm-hallucination-detector.git
+git clone https://github.com/Mattbusel/llm-hallucination-detector.git
 cd llm-hallucination-detector
 ```
 
@@ -421,7 +421,7 @@ sudo apt-get install -y pkg-config libssl-dev
 
 #### Build All MVPs
 ```bash
-git clone https://github.com/yourusername/llm-hallucination-detector.git
+git clone https://github.com/Mattbusel/llm-hallucination-detector.git
 cd llm-hallucination-detector/rust_mvps
 
 # Build workspace
@@ -881,7 +881,7 @@ We welcome contributions! Here's how you can help:
 
 ### Development Setup
 ```bash
-git clone https://github.com/yourusername/llm-hallucination-detector.git
+git clone https://github.com/Mattbusel/llm-hallucination-detector.git
 cd llm-hallucination-detector
 
 # Run Python tests
