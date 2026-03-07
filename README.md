@@ -1,10 +1,16 @@
 # LLM Hallucination Detector
 
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
+
 [![Python](https://img.shields.io/badge/python-3.7%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code Quality](https://img.shields.io/badge/code%20quality-A-brightgreen.svg)](.)
 
 # LLM Hallucination Detector
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 Python License: MIT Code Quality
 
 A comprehensive, framework-agnostic toolkit for detecting potential hallucinations in Large Language Model (LLM) responses. Works with any LLM API including OpenAI GPT, Anthropic Claude, local models, and more.
@@ -36,9 +42,15 @@ cd rust_visualizer
 cargo run -- --demo
 
 # Custom run
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 cargo run -- --text-file sample.txt --confidence-file analysis.json
 
 # Generate HTML
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 cargo run -- --demo --format html --output report.html
 ```
 
@@ -65,10 +77,16 @@ let html = quick_analyze("Your text", "html")?;
 from hallucination_detector import HallucinationDetector, quick_hallucination_check
 
 # Quick boolean check
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 response = "The Eiffel Tower was definitely built in 1887..."
 is_suspicious = quick_hallucination_check(response, threshold=0.7)
 
 # Detailed analysis
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 detector = HallucinationDetector()
 result = detector.analyze_response(response)
 print(f"Hallucination probability: {result.hallucination_probability:.2f}")
@@ -132,9 +150,15 @@ cd llm-hallucination-detector
 from hallucination_detector import HallucinationDetector
 
 # Create detector instance
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 detector = HallucinationDetector()
 
 # Analyze a response
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 response = "Your LLM response here..."
 result = detector.analyze_response(response)
 
@@ -146,6 +170,9 @@ print(f"Recommendations: {result.recommendations}")
 ### With Context
 ```python
 # Provide context for better accuracy
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 context = "The user asked about the Eiffel Tower's construction date."
 response = "The Eiffel Tower was built in 1889 for the World's Fair."
 
@@ -161,12 +188,21 @@ from hallucination_detector import (
 )
 
 # Quick boolean check
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 is_hallucinating = quick_hallucination_check(response, threshold=0.7)
 
 # Get just the probability score
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 score = get_hallucination_score(response)
 
 # Full analysis with recommendations
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 analysis = analyze_with_recommendations(response, context="...")
 ```
 
@@ -314,6 +350,9 @@ cargo run -- --mode demo
 cd rust_mvps/web_dashboard
 cargo run -- --port 3000
 # Open http://localhost:3000 in your browser
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 ```
 
 **Dashboard Features:**
@@ -327,16 +366,25 @@ cargo run -- --port 3000
 
 ```bash
 # Start production API server
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 cd rust_mvps/api_service
 cargo run -- --port 8080
 
 # Test single analysis
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 curl -X POST http://localhost:8080/analyze \
   -H "Content-Type: application/json" \
   -H "x-api-key: demo-key-12345" \
   -d '{"text": "The Eiffel Tower was definitely built in 1887"}'
 
 # Batch analysis
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 curl -X POST http://localhost:8080/batch \
   -H "Content-Type: application/json" \
   -H "x-api-key: demo-key-12345" \
@@ -413,9 +461,15 @@ rust_mvps/
 #### Prerequisites
 ```bash
 # Install Rust
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 # Install required system dependencies
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 sudo apt-get install -y pkg-config libssl-dev
 ```
 
@@ -425,9 +479,15 @@ git clone https://github.com/Mattbusel/llm-hallucination-detector.git
 cd llm-hallucination-detector/rust_mvps
 
 # Build workspace
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 cargo build --release
 
 # Run specific MVP
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 cargo run --bin neural_detector -- --demo
 cargo run --bin multilang_detector -- --text "Hola mundo"
 cargo run --bin streaming_detector -- --mode websocket
@@ -485,6 +545,9 @@ Each Rust MVP can be integrated with the existing Python detector:
 
 ```python
 # Python integration example
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 import subprocess
 import json
 
@@ -497,6 +560,9 @@ def analyze_with_rust_neural(text):
     return json.loads(result.stdout)
 
 # Use alongside Python detector
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 python_result = detector.analyze_response(text)
 rust_result = analyze_with_rust_neural(text)
 
@@ -510,9 +576,15 @@ For enhanced fact-checking capabilities, the detector can integrate with FactGra
 ### Setup FactGraph
 ```bash
 # Install dependencies (Ubuntu/Debian)
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 sudo apt-get install libboost-graph-dev cmake build-essential
 
 # Build the C++ engine
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 cd factgraph
 chmod +x build.sh
 ./build.sh
@@ -524,18 +596,30 @@ from hallucination_detector import HallucinationDetector
 from factgraph import create_factgraph_engine
 
 # Create both detectors
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 pattern_detector = HallucinationDetector()
 fact_engine = create_factgraph_engine()
 
 # Load knowledge base
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 fact_engine.load_sample_knowledge_base()
 
 # Add custom facts
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 paris_id = fact_engine.add_fact("Paris", "location", "capital of France", 0.95)
 tower_id = fact_engine.add_fact("Eiffel Tower", "landmark", "built in 1889", 0.99)
 fact_engine.add_relation(tower_id, paris_id, "located_in", 0.99)
 
 # Enhanced detection
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 text = "The Eiffel Tower was built in 1889 in Paris."
 pattern_result = pattern_detector.analyze_response(text)
 fact_results = fact_engine.check_facts(text)
@@ -614,6 +698,9 @@ from transformers import pipeline
 from hallucination_detector import HallucinationDetector
 
 # Works with any local model
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 generator = pipeline("text-generation", model="microsoft/DialoGPT-medium")
 detector = HallucinationDetector()
 
@@ -659,23 +746,38 @@ def verify_response():
 detector = HallucinationDetector()
 
 # Low sensitivity (fewer false positives)
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 result = detector.analyze_response(response, confidence_threshold=0.8)
 
 # High sensitivity (catches more potential issues)
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 result = detector.analyze_response(response, confidence_threshold=0.5)
 ```
 
 ### Custom Patterns
 ```python
 # Extend detector with domain-specific patterns
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 detector = HallucinationDetector()
 
 # Add medical terminology flags
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 detector.uncertainty_phrases.extend([
     "may indicate", "could suggest", "potentially related"
 ])
 
 # Add financial overconfidence flags
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 detector.overconfidence_phrases.extend([
     "guaranteed returns", "risk-free investment", "certain profit"
 ])
@@ -769,6 +871,9 @@ Based on testing with 1,000+ manually labeled responses:
 detector = HallucinationDetector()
 
 # Modify internal scoring weights
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 detector._calculate_hallucination_probability = lambda metrics: (
     metrics.get('confidence_inconsistency', 0) * 0.4 +
     metrics.get('factual_density', 0) * 0.3 +
@@ -779,12 +884,18 @@ detector._calculate_hallucination_probability = lambda metrics: (
 ### Domain-Specific Adaptations
 ```python
 # Medical domain
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 medical_detector = HallucinationDetector()
 medical_detector.uncertainty_phrases.extend([
     "consult your doctor", "seek medical advice", "may vary"
 ])
 
 # Financial domain
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 financial_detector = HallucinationDetector()
 financial_detector.overconfidence_phrases.extend([
     "guaranteed profit", "no risk", "certain return"
@@ -798,18 +909,27 @@ financial_detector.overconfidence_phrases.extend([
 #### High False Positives
 ```python
 # Lower the threshold
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 result = detector.analyze_response(response, confidence_threshold=0.8)
 ```
 
 #### Missing Context Issues
 ```python
 # Always provide context when available
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 result = detector.analyze_response(response, context=original_query)
 ```
 
 #### Performance Issues
 ```python
 # For very long texts, consider chunking
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 def analyze_long_text(text, chunk_size=1000):
     chunks = [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
     scores = [get_hallucination_score(chunk) for chunk in chunks]
@@ -819,10 +939,16 @@ def analyze_long_text(text, chunk_size=1000):
 ### Debugging
 ```python
 # Enable detailed metrics
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 result = detector.analyze_response(response)
 print("Detailed metrics:", result.metrics)
 
 # Check individual components
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 print("Confidence issues:", result.metrics.get('confidence_inconsistency'))
 print("Factual density:", result.metrics.get('factual_density'))
 print("Coherence score:", result.metrics.get('coherence_score'))
@@ -840,6 +966,9 @@ Without doubt, it receives 7 million visitors every year.
 
 result = detector.analyze_response(response)
 # Output: High hallucination probability due to overconfident language
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 ```
 
 ### Example 2: Contradictory Response
@@ -852,6 +981,9 @@ It's impossible to use Python for AI development.
 
 result = detector.analyze_response(response)
 # Output: High contradiction score detected
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 ```
 
 ### Example 3: Uncertain but Honest Response
@@ -865,6 +997,9 @@ checking official sources for precise measurements.
 
 result = detector.analyze_response(response)
 # Output: Lower hallucination probability due to appropriate uncertainty
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 ```
 
 ## Contributing
@@ -885,12 +1020,21 @@ git clone https://github.com/Mattbusel/llm-hallucination-detector.git
 cd llm-hallucination-detector
 
 # Run Python tests
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 python -m pytest tests/
 
 # Run Rust tests
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 cd rust_mvps && cargo test
 
 # Run examples
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
+
 python hallucination_detector.py
 ```
 
