@@ -1087,3 +1087,10 @@ python hallucination_detector.py
 
 
 *Help make AI more reliable, one response at a time.*
+
+
+---
+## Related Projects by @Mattbusel
+- [Every-Other-Token](https://github.com/Mattbusel/Every-Other-Token) -- LLM token interpretability and streaming perplexity visualization
+- [llm_affector](https://github.com/Mattbusel/llm_affector) -- Rust/Tokio async hallucination detection and LLM output filtering
+- [Token-Visualizer](https://github.com/Mattbusel/Token-Visualizer) -- Interactive tokenizer and prompt-engineering visualization tool
