@@ -16,7 +16,7 @@ pub fn visualize_tokens(
     config: Option<VisualizationConfig>,
 ) -> Result<String> {
     let config = config.unwrap_or_default();
-    
+
     match format {
         "terminal" => {
             let renderer = TerminalRenderer::new();
@@ -61,7 +61,7 @@ mod tests {
             ],
             flags: vec![],
         };
-        
+
         let result = visualize_tokens("Hello world", &analysis, "markdown", None);
         assert!(result.is_ok());
         assert!(result.unwrap().contains("Hello"));
@@ -83,7 +83,7 @@ mod tests {
             ],
             flags: vec![],
         };
-        
+
         let (metrics, issues) = analyze_with_issues(&analysis);
         assert_eq!(metrics.total_tokens, 2);
         assert!(!issues.is_empty());
