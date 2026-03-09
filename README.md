@@ -2,7 +2,6 @@
 
 [![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
 
-
 [![Python](https://img.shields.io/badge/python-3.7%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code Quality](https://img.shields.io/badge/code%20quality-A-brightgreen.svg)](.)
@@ -17,15 +16,14 @@ A comprehensive, framework-agnostic toolkit for detecting potential hallucinatio
 
 > ** 7+ GitHub Stars • 100s of Repo Clones • Trusted by Early Builders**
 
-This toolkit isn’t just another hallucination detector — it's a production-grade firewall for LLM outputs, built from scratch in Python, Rust, and C++.
+This toolkit isn’t just another hallucination detector -- it's a production-grade firewall for LLM outputs, built from scratch in Python, Rust, and C++.
 
- **Note**: Model weights + trained binaries are not currently available — only the full framework and interfaces. If you want to build your own models, everything you need is here.  
+ **Note**: Model weights + trained binaries are not currently available -- only the full framework and interfaces. If you want to build your own models, everything you need is here. 
  Model drops may come in future versions, but are currently held for evaluation and security reasons.
 
 **Fork it. Clone it. Integrate it.** This repo is just getting started.
 
-
-##  New: Token-by-Token Visualizer (Rust MVP)
+## New: Token-by-Token Visualizer (Rust MVP)
 A production-grade Rust MVP that color-codes and visualizes token-level confidence for LLM output.
 
 ### Features
@@ -63,12 +61,12 @@ let html = quick_analyze("Your text", "html")?;
 ## Repository Structure
 ```
 /
-├── hallucination_detector.py        # Python detector core
-├── factgraph/                       # C++ DAG-based fact verifier
-├── rust_visualizer/                # Rust-based token confidence renderer
-├── rust_mvps/                      #  Rust MVP implementations for v2.0
-├── examples/                        # Sample texts and demo inputs
-└── README.md
+ hallucination_detector.py # Python detector core
+ factgraph/ # C++ DAG-based fact verifier
+ rust_visualizer/ # Rust-based token confidence renderer
+ rust_mvps/ # Rust MVP implementations for v2.0
+ examples/ # Sample texts and demo inputs
+ README.md
 ```
 
 ## Python LLM Hallucination Detector
@@ -182,9 +180,9 @@ result = detector.analyze_response(response, context=context)
 ### Convenience Functions
 ```python
 from hallucination_detector import (
-    quick_hallucination_check,
-    get_hallucination_score,
-    analyze_with_recommendations
+ quick_hallucination_check,
+ get_hallucination_score,
+ analyze_with_recommendations
 )
 
 # Quick boolean check
@@ -250,11 +248,11 @@ Finds conflicting statements within the same response:
 - Logical inconsistencies
 - Conflicting facts
 
-##  Rust MVPs for v2.0
+## Rust MVPs for v2.0
 
 Production-ready Rust implementations for advanced features planned in v2.0.
 
-###  Available Rust MVPs
+### Available Rust MVPs
 
 #### 1. Neural Network-Based Detection MVP
 **Location**: `rust_mvps/neural_detector/`
@@ -317,8 +315,8 @@ let mut detector = StreamingHallucinationDetector::new();
 let mut result_rx = detector.process_stream(chunk_rx).await;
 
 while let Some(result) = result_rx.recv().await {
-    println!(" Chunk: {} | Probability: {:.3}", 
-        result.chunk_id, result.hallucination_probability);
+ println!(" Chunk: {} | Probability: {:.3}", 
+ result.chunk_id, result.hallucination_probability);
 }
 ```
 
@@ -356,10 +354,10 @@ cargo run -- --port 3000
 ```
 
 **Dashboard Features:**
--  Real-time confidence distribution charts
--  Hallucination trend analysis
--  Live text analysis interface
--  Comprehensive statistics panel
+- Real-time confidence distribution charts
+- Hallucination trend analysis
+- Live text analysis interface
+- Comprehensive statistics panel
 
 #### 5. API Service Deployment MVP
 **Location**: `rust_mvps/api_service/`
@@ -377,18 +375,18 @@ cargo run -- --port 8080
 [![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
 
 curl -X POST http://localhost:8080/analyze \
-  -H "Content-Type: application/json" \
-  -H "x-api-key: demo-key-12345" \
-  -d '{"text": "The Eiffel Tower was definitely built in 1887"}'
+ -H "Content-Type: application/json" \
+ -H "x-api-key: demo-key-12345" \
+ -d '{"text": "The Eiffel Tower was definitely built in 1887"}'
 
 # Batch analysis
 
 [![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
 
 curl -X POST http://localhost:8080/batch \
-  -H "Content-Type: application/json" \
-  -H "x-api-key: demo-key-12345" \
-  -d '{"texts": ["Text 1", "Text 2"], "options": {"include_metrics": true}}'
+ -H "Content-Type: application/json" \
+ -H "x-api-key: demo-key-12345" \
+ -d '{"texts": ["Text 1", "Text 2"], "options": {"include_metrics": true}}'
 ```
 
 **API Endpoints:**
@@ -405,58 +403,58 @@ curl -X POST http://localhost:8080/batch \
 - Comprehensive error handling
 - OpenAPI documentation
 
-###  Rust MVP Project Structure
+### Rust MVP Project Structure
 
 ```
 rust_mvps/
-├── Cargo.toml                     # Workspace configuration
-├── neural_detector/
-│   ├── Cargo.toml
-│   ├── src/
-│   │   ├── lib.rs
-│   │   ├── neural_detector.rs
-│   │   └── main.rs
-│   └── models/                    # Pre-trained model files
-├── multilang_detector/
-│   ├── Cargo.toml
-│   ├── src/
-│   │   ├── lib.rs
-│   │   ├── multilang_detector.rs
-│   │   └── main.rs
-│   └── patterns/                  # Language pattern files
-├── streaming_detector/
-│   ├── Cargo.toml
-│   ├── src/
-│   │   ├── lib.rs
-│   │   ├── streaming_detector.rs
-│   │   └── main.rs
-│   └── examples/                  # Demo streaming data
-├── web_dashboard/
-│   ├── Cargo.toml
-│   ├── src/
-│   │   ├── lib.rs
-│   │   ├── web_dashboard.rs
-│   │   └── main.rs
-│   ├── templates/
-│   │   └── dashboard.html
-│   └── static/                    # CSS, JS, images
-├── api_service/
-│   ├── Cargo.toml
-│   ├── src/
-│   │   ├── lib.rs
-│   │   ├── api_service.rs
-│   │   └── main.rs
-│   ├── Dockerfile
-│   └── k8s/                       # Kubernetes manifests
-└── shared/
-    ├── Cargo.toml
-    └── src/
-        ├── lib.rs
-        ├── detector.rs            # Core detection logic
-        └── types.rs               # Shared types
+ Cargo.toml # Workspace configuration
+ neural_detector/
+ Cargo.toml
+ src/
+ lib.rs
+ neural_detector.rs
+ main.rs
+ models/ # Pre-trained model files
+ multilang_detector/
+ Cargo.toml
+ src/
+ lib.rs
+ multilang_detector.rs
+ main.rs
+ patterns/ # Language pattern files
+ streaming_detector/
+ Cargo.toml
+ src/
+ lib.rs
+ streaming_detector.rs
+ main.rs
+ examples/ # Demo streaming data
+ web_dashboard/
+ Cargo.toml
+ src/
+ lib.rs
+ web_dashboard.rs
+ main.rs
+ templates/
+ dashboard.html
+ static/ # CSS, JS, images
+ api_service/
+ Cargo.toml
+ src/
+ lib.rs
+ api_service.rs
+ main.rs
+ Dockerfile
+ k8s/ # Kubernetes manifests
+ shared/
+ Cargo.toml
+ src/
+ lib.rs
+ detector.rs # Core detection logic
+ types.rs # Shared types
 ```
 
-###  Getting Started with Rust MVPs
+### Getting Started with Rust MVPs
 
 #### Prerequisites
 ```bash
@@ -495,7 +493,7 @@ cargo run --bin web_dashboard -- --port 3000
 cargo run --bin api_service -- --port 8080
 ```
 
-###  Rust MVP Performance Benchmarks
+### Rust MVP Performance Benchmarks
 
 | MVP Component | Processing Time | Memory Usage | Throughput |
 |---------------|----------------|--------------|------------|
@@ -505,32 +503,32 @@ cargo run --bin api_service -- --port 8080
 | Web Dashboard | ~30ms | ~15MB | 50 req/sec |
 | API Service | ~100ms | ~25MB | 20 req/sec |
 
-###  MVP Feature Status
+### MVP Feature Status
 
-- ✅ **Neural Network Detection** - Basic BERT-based implementation
-- ✅ **Multi-Language Support** - 6 languages with pattern matching
-- ✅ **Real-Time Streaming** - WebSocket-based analysis
-- ✅ **Web Dashboard** - Interactive monitoring interface
-- ✅ **API Service** - RESTful API with rate limiting
+- **Neural Network Detection** - Basic BERT-based implementation
+- **Multi-Language Support** - 6 languages with pattern matching
+- **Real-Time Streaming** - WebSocket-based analysis
+- **Web Dashboard** - Interactive monitoring interface
+- **API Service** - RESTful API with rate limiting
 
-###  Deployment Options
+### Deployment Options
 
 #### Docker Compose
 ```yaml
 version: '3.8'
 services:
-  api:
-    build: ./rust_mvps/api_service
-    ports:
-      - "8080:8080"
-  dashboard:
-    build: ./rust_mvps/web_dashboard  
-    ports:
-      - "3000:3000"
-  streaming:
-    build: ./rust_mvps/streaming_detector
-    ports:
-      - "8081:8081"
+ api:
+ build: ./rust_mvps/api_service
+ ports:
+ - "8080:8080"
+ dashboard:
+ build: ./rust_mvps/web_dashboard 
+ ports:
+ - "3000:3000"
+ streaming:
+ build: ./rust_mvps/streaming_detector
+ ports:
+ - "8081:8081"
 ```
 
 #### Cloud Deployment
@@ -552,12 +550,12 @@ import subprocess
 import json
 
 def analyze_with_rust_neural(text):
-    result = subprocess.run([
-        'cargo', 'run', '--bin', 'neural_detector', '--', 
-        '--text', text, '--format', 'json'
-    ], capture_output=True, text=True, cwd='rust_mvps')
-    
-    return json.loads(result.stdout)
+ result = subprocess.run([
+ 'cargo', 'run', '--bin', 'neural_detector', '--', 
+ '--text', text, '--format', 'json'
+ ], capture_output=True, text=True, cwd='rust_mvps')
+
+ return json.loads(result.stdout)
 
 # Use alongside Python detector
 
@@ -644,25 +642,25 @@ import openai
 from hallucination_detector import HallucinationDetector
 
 def safe_gpt_query(prompt, max_retries=3):
-    detector = HallucinationDetector()
-    
-    for attempt in range(max_retries):
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}]
-        )
-        
-        content = response.choices[0].message.content
-        result = detector.analyze_response(content, context=prompt)
-        
-        if result.hallucination_probability < 0.7:
-            return {
-                "content": content,
-                "confidence": result.confidence_score,
-                "verified": True
-            }
-    
-    return {"error": "High hallucination probability detected"}
+ detector = HallucinationDetector()
+
+ for attempt in range(max_retries):
+ response = openai.ChatCompletion.create(
+ model="gpt-3.5-turbo",
+ messages=[{"role": "user", "content": prompt}]
+ )
+
+ content = response.choices[0].message.content
+ result = detector.analyze_response(content, context=prompt)
+
+ if result.hallucination_probability < 0.7:
+ return {
+ "content": content,
+ "confidence": result.confidence_score,
+ "verified": True
+ }
+
+ return {"error": "High hallucination probability detected"}
 ```
 
 ### Anthropic Claude Integration
@@ -671,25 +669,25 @@ import anthropic
 from hallucination_detector import analyze_with_recommendations
 
 def claude_with_verification(prompt):
-    client = anthropic.Client()
-    
-    response = client.completions.create(
-        model="claude-3-sonnet-20240229",
-        prompt=prompt,
-        max_tokens=1000
-    )
-    
-    analysis = analyze_with_recommendations(
-        response.completion, 
-        context=prompt
-    )
-    
-    return {
-        "response": response.completion,
-        "hallucination_probability": analysis["hallucination_probability"],
-        "issues": analysis["issues"],
-        "recommendations": analysis["recommendations"]
-    }
+ client = anthropic.Client()
+
+ response = client.completions.create(
+ model="claude-3-sonnet-20240229",
+ prompt=prompt,
+ max_tokens=1000
+ )
+
+ analysis = analyze_with_recommendations(
+ response.completion, 
+ context=prompt
+ )
+
+ return {
+ "response": response.completion,
+ "hallucination_probability": analysis["hallucination_probability"],
+ "issues": analysis["issues"],
+ "recommendations": analysis["recommendations"]
+ }
 ```
 
 ### Local Model Integration
@@ -705,14 +703,14 @@ generator = pipeline("text-generation", model="microsoft/DialoGPT-medium")
 detector = HallucinationDetector()
 
 def generate_with_verification(prompt):
-    response = generator(prompt, max_length=100)[0]['generated_text']
-    result = detector.analyze_response(response, context=prompt)
-    
-    return {
-        "text": response,
-        "reliability_score": result.confidence_score,
-        "flags": result.detected_issues
-    }
+ response = generator(prompt, max_length=100)[0]['generated_text']
+ result = detector.analyze_response(response, context=prompt)
+
+ return {
+ "text": response,
+ "reliability_score": result.confidence_score,
+ "flags": result.detected_issues
+ }
 ```
 
 ### Flask Web API Integration
@@ -724,19 +722,19 @@ app = Flask(__name__)
 
 @app.route('/verify', methods=['POST'])
 def verify_response():
-    data = request.json
-    response_text = data.get('response')
-    context = data.get('context', '')
-    
-    analysis = analyze_with_recommendations(response_text, context)
-    
-    return jsonify({
-        'hallucination_probability': analysis['hallucination_probability'],
-        'confidence': analysis['confidence'],
-        'issues': analysis['issues'],
-        'recommendations': analysis['recommendations'],
-        'safe_to_use': analysis['hallucination_probability'] < 0.7
-    })
+ data = request.json
+ response_text = data.get('response')
+ context = data.get('context', '')
+
+ analysis = analyze_with_recommendations(response_text, context)
+
+ return jsonify({
+ 'hallucination_probability': analysis['hallucination_probability'],
+ 'confidence': analysis['confidence'],
+ 'issues': analysis['issues'],
+ 'recommendations': analysis['recommendations'],
+ 'safe_to_use': analysis['hallucination_probability'] < 0.7
+ })
 ```
 
 ## Configuration
@@ -771,7 +769,7 @@ detector = HallucinationDetector()
 [![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
 
 detector.uncertainty_phrases.extend([
-    "may indicate", "could suggest", "potentially related"
+ "may indicate", "could suggest", "potentially related"
 ])
 
 # Add financial overconfidence flags
@@ -779,7 +777,7 @@ detector.uncertainty_phrases.extend([
 [![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
 
 detector.overconfidence_phrases.extend([
-    "guaranteed returns", "risk-free investment", "certain profit"
+ "guaranteed returns", "risk-free investment", "certain profit"
 ])
 ```
 
@@ -875,9 +873,9 @@ detector = HallucinationDetector()
 [![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
 
 detector._calculate_hallucination_probability = lambda metrics: (
-    metrics.get('confidence_inconsistency', 0) * 0.4 +
-    metrics.get('factual_density', 0) * 0.3 +
-    metrics.get('contradiction_score', 0) * 0.3
+ metrics.get('confidence_inconsistency', 0) * 0.4 +
+ metrics.get('factual_density', 0) * 0.3 +
+ metrics.get('contradiction_score', 0) * 0.3
 )
 ```
 
@@ -889,7 +887,7 @@ detector._calculate_hallucination_probability = lambda metrics: (
 
 medical_detector = HallucinationDetector()
 medical_detector.uncertainty_phrases.extend([
-    "consult your doctor", "seek medical advice", "may vary"
+ "consult your doctor", "seek medical advice", "may vary"
 ])
 
 # Financial domain
@@ -898,7 +896,7 @@ medical_detector.uncertainty_phrases.extend([
 
 financial_detector = HallucinationDetector()
 financial_detector.overconfidence_phrases.extend([
-    "guaranteed profit", "no risk", "certain return"
+ "guaranteed profit", "no risk", "certain return"
 ])
 ```
 
@@ -931,9 +929,9 @@ result = detector.analyze_response(response, context=original_query)
 [![Star History Chart](https://api.star-history.com/svg?repos=Mattbusel/LLM-Hallucination-Detection-Script&type=Date)](https://star-history.com/#Mattbusel/LLM-Hallucination-Detection-Script)
 
 def analyze_long_text(text, chunk_size=1000):
-    chunks = [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
-    scores = [get_hallucination_score(chunk) for chunk in chunks]
-    return sum(scores) / len(scores)
+ chunks = [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
+ scores = [get_hallucination_score(chunk) for chunk in chunks]
+ return sum(scores) / len(scores)
 ```
 
 ### Debugging
@@ -1045,8 +1043,6 @@ python hallucination_detector.py
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-
-
 ## Acknowledgments
 
 - Inspired by research in LLM reliability and hallucination detection
@@ -1057,21 +1053,20 @@ python hallucination_detector.py
 
 - **Email**: mattbusel@gmail.com
 
-
 ## Roadmap
 
 ### v2.0 ( **MVPs Available in Rust**)
-- ✅ **Neural network-based detection** - BERT-based implementation in Rust
-- ✅ **Multi-language support** - 6+ languages with pattern matching
-- ✅ **Real-time streaming analysis** - WebSocket-based processing
-- ✅ **Web dashboard interface** - Interactive monitoring and visualization
-- ✅ **API service deployment** - Production-ready REST API
+- **Neural network-based detection** - BERT-based implementation in Rust
+- **Multi-language support** - 6+ languages with pattern matching
+- **Real-time streaming analysis** - WebSocket-based processing
+- **Web dashboard interface** - Interactive monitoring and visualization
+- **API service deployment** - Production-ready REST API
 
 ### v1.5 (In Progress)
-- ☐ Improved accuracy metrics
-- ☐ Custom domain adaptations
-- ☐ Performance optimizations
-- ☐ Extended test coverage
+- Improved accuracy metrics
+- Custom domain adaptations
+- Performance optimizations
+- Extended test coverage
 
 ### Future Enhancements
 - Advanced neural architectures (Transformer-based)
@@ -1084,10 +1079,7 @@ python hallucination_detector.py
 
 **Help make AI more reliable, one response at a time.** 
 
-
-
 *Help make AI more reliable, one response at a time.*
-
 
 ---
 ## Related Projects by @Mattbusel
