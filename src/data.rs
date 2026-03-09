@@ -84,13 +84,13 @@ impl TokenAnalysis {
         if self.tokens.is_empty() {
             return Err("No tokens provided".to_string());
         }
-        
+
         for (i, token) in self.tokens.iter().enumerate() {
             if token.confidence < 0.0 || token.confidence > 1.0 {
                 return Err(format!("Invalid confidence score for token {}: {}", i, token.confidence));
             }
         }
-        
+
         for flag in &self.flags {
             if flag.start >= self.tokens.len() || flag.end > self.tokens.len() {
                 return Err(format!("Flag span out of bounds: {} to {}", flag.start, flag.end));
@@ -99,17 +99,17 @@ impl TokenAnalysis {
                 return Err(format!("Invalid flag span: {} to {}", flag.start, flag.end));
             }
         }
-        
+
         Ok(())
     }
-    
+
     pub fn get_flags_for_token(&self, token_index: usize) -> Vec<&TokenFlag> {
         self.flags
             .iter()
             .filter(|flag| token_index >= flag.start && token_index < flag.end)
             .collect()
     }
-    
+
     pub fn get_confidence_stats(&self) -> (f64, f64, f64) {
         let confidences: Vec<f64> = self.tokens.iter().map(|t| t.confidence).collect();
         let sum: f64 = confidences.iter().sum();
