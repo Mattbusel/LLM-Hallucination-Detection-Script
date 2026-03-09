@@ -1,0 +1,14 @@
+C:\Users\Matthew\AppData\Local\Temp\llm-hallu-fix2\target\debug\deps\serde-d9f1b741fd9dab40.d: C:\Users\Matthew\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\lib.rs C:\Users\Matthew\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\integer128.rs C:\Users\Matthew\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\mod.rs C:\Users\Matthew\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\de.rs C:\Users\Matthew\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\ser.rs C:\Users\Matthew\AppData\Local\Temp\llm-hallu-fix2\target\debug\build\serde-eb917dd564a7a0e2\out/private.rs
+
+C:\Users\Matthew\AppData\Local\Temp\llm-hallu-fix2\target\debug\deps\libserde-d9f1b741fd9dab40.rlib: C:\Users\Matthew\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\lib.rs C:\Users\Matthew\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\integer128.rs C:\Users\Matthew\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\mod.rs C:\Users\Matthew\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\de.rs C:\Users\Matthew\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\ser.rs C:\Users\Matthew\AppData\Local\Temp\llm-hallu-fix2\target\debug\build\serde-eb917dd564a7a0e2\out/private.rs
+
+C:\Users\Matthew\AppData\Local\Temp\llm-hallu-fix2\target\debug\deps\libserde-d9f1b741fd9dab40.rmeta: C:\Users\Matthew\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\lib.rs C:\Users\Matthew\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\integer128.rs C:\Users\Matthew\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\mod.rs C:\Users\Matthew\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\de.rs C:\Users\Matthew\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\ser.rs C:\Users\Matthew\AppData\Local\Temp\llm-hallu-fix2\target\debug\build\serde-eb917dd564a7a0e2\out/private.rs
+
+C:\Users\Matthew\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\lib.rs:
+C:\Users\Matthew\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\integer128.rs:
+C:\Users\Matthew\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\mod.rs:
+C:\Users\Matthew\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\de.rs:
+C:\Users\Matthew\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\ser.rs:
+C:\Users\Matthew\AppData\Local\Temp\llm-hallu-fix2\target\debug\build\serde-eb917dd564a7a0e2\out/private.rs:
+
+# env-dep:OUT_DIR=C:\\Users\\Matthew\\AppData\\Local\\Temp\\llm-hallu-fix2\\target\\debug\\build\\serde-eb917dd564a7a0e2\\out

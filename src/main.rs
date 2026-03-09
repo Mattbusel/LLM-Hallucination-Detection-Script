@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use anyhow::Result;
 use clap::Parser;
 use std::path::PathBuf;
@@ -7,7 +8,7 @@ mod renderer;
 mod utils;
 
 use data::{TokenAnalysis, VisualizationConfig};
-use renderer::{HtmlRenderer, MarkdownRenderer, TerminalRenderer};
+use renderer::{HtmlRenderer, MarkdownRenderer, Renderer, TerminalRenderer};
 
 #[derive(Parser)]
 #[command(name = "llm-token-visualizer")]
