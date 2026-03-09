@@ -7,40 +7,42 @@ mod renderer;
 mod utils;
 
 use data::{TokenAnalysis, VisualizationConfig};
-use renderer::{TerminalRenderer, HtmlRenderer, MarkdownRenderer};
+use renderer::{HtmlRenderer, MarkdownRenderer, TerminalRenderer};
 
 #[derive(Parser)]
 #[command(name = "llm-token-visualizer")]
-#[command(about = "Visualize LLM output token-by-token to detect hallucinations and confidence shifts")]
+#[command(
+    about = "Visualize LLM output token-by-token to detect hallucinations and confidence shifts"
+)]
 struct Args {
     /// LLM response text
     #[arg(short, long)]
     text: Option<String>,
-    
+
     /// Path to text file containing LLM response
     #[arg(long)]
     text_file: Option<PathBuf>,
-    
+
     /// JSON string with token confidence data
     #[arg(short, long)]
     confidence: Option<String>,
-    
+
     /// Path to JSON file with confidence data
     #[arg(long)]
     confidence_file: Option<PathBuf>,
-    
+
     /// Output format: terminal, html, markdown
     #[arg(short, long, default_value = "terminal")]
     format: String,
-    
+
     /// Output file path (for html/markdown formats)
     #[arg(short, long)]
     output: Option<PathBuf>,
-    
+
     /// Show detailed token information
     #[arg(long)]
     verbose: bool,
-    
+
     /// Use demo data for testing
     #[arg(long)]
     demo: bool,
@@ -48,7 +50,7 @@ struct Args {
 
 fn main() -> Result<()> {
     let args = Args::parse();
-    
+
     let (text, token_analysis) = if args.demo {
         load_demo_data()?
     } else {
@@ -56,13 +58,13 @@ fn main() -> Result<()> {
         let token_analysis = load_token_analysis(&args)?;
         (text, token_analysis)
     };
-    
+
     let config = VisualizationConfig {
         verbose: args.verbose,
         show_confidence_scores: true,
         show_flags: true,
     };
-    
+
     match args.format.as_str() {
         "terminal" => {
             let renderer = TerminalRenderer::new();
@@ -88,7 +90,7 @@ fn main() -> Result<()> {
         }
         _ => anyhow::bail!("Unsupported format: {}", args.format),
     }
-    
+
     Ok(())
 }
 
@@ -110,13 +112,13 @@ fn load_token_analysis(args: &Args) -> Result<TokenAnalysis> {
     } else {
         anyhow::bail!("Either --confidence or --confidence-file must be provided")
     };
-    
+
     Ok(serde_json::from_str(&json_str)?)
 }
 
 fn load_demo_data() -> Result<(String, TokenAnalysis)> {
     let text = "The Eiffel Tower was built in 1889 and stands 324 meters tall. It's located in Paris, France, and was designed by Gustave Eiffel. The tower has three levels and receives millions of visitors each year.".to_string();
-    
+
     let demo_json = r#"{
         "tokens": [
             {"text": "The", "confidence": 0.95},
@@ -168,7 +170,7 @@ fn load_demo_data() -> Result<(String, TokenAnalysis)> {
             {"start": 25, "end": 27, "flag": "fact", "description": "Historical attribution"}
         ]
     }"#;
-    
+
     let token_analysis: TokenAnalysis = serde_json::from_str(demo_json)?;
     Ok((text, token_analysis))
 }

@@ -2,9 +2,11 @@ pub mod data;
 pub mod renderer;
 pub mod utils;
 
-pub use data::{TokenAnalysis, TokenInfo, TokenFlag, VisualizationConfig, ConfidenceLevel, FlagType};
-pub use renderer::{Renderer, TerminalRenderer, HtmlRenderer, MarkdownRenderer};
-pub use utils::{simple_tokenize, create_mock_analysis, detect_issues, AnalysisMetrics};
+pub use data::{
+    ConfidenceLevel, FlagType, TokenAnalysis, TokenFlag, TokenInfo, VisualizationConfig,
+};
+pub use renderer::{HtmlRenderer, MarkdownRenderer, Renderer, TerminalRenderer};
+pub use utils::{create_mock_analysis, detect_issues, simple_tokenize, AnalysisMetrics};
 
 use anyhow::Result;
 
@@ -56,8 +58,14 @@ mod tests {
     fn test_visualize_tokens() {
         let analysis = TokenAnalysis {
             tokens: vec![
-                TokenInfo { text: "Hello".to_string(), confidence: 0.9 },
-                TokenInfo { text: " world".to_string(), confidence: 0.8 },
+                TokenInfo {
+                    text: "Hello".to_string(),
+                    confidence: 0.9,
+                },
+                TokenInfo {
+                    text: " world".to_string(),
+                    confidence: 0.8,
+                },
             ],
             flags: vec![],
         };
@@ -78,8 +86,14 @@ mod tests {
     fn test_analyze_with_issues() {
         let analysis = TokenAnalysis {
             tokens: vec![
-                TokenInfo { text: "good".to_string(), confidence: 0.9 },
-                TokenInfo { text: "bad".to_string(), confidence: 0.1 },
+                TokenInfo {
+                    text: "good".to_string(),
+                    confidence: 0.9,
+                },
+                TokenInfo {
+                    text: "bad".to_string(),
+                    confidence: 0.1,
+                },
             ],
             flags: vec![],
         };

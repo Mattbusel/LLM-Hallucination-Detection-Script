@@ -87,13 +87,19 @@ impl TokenAnalysis {
 
         for (i, token) in self.tokens.iter().enumerate() {
             if token.confidence < 0.0 || token.confidence > 1.0 {
-                return Err(format!("Invalid confidence score for token {}: {}", i, token.confidence));
+                return Err(format!(
+                    "Invalid confidence score for token {}: {}",
+                    i, token.confidence
+                ));
             }
         }
 
         for flag in &self.flags {
             if flag.start >= self.tokens.len() || flag.end > self.tokens.len() {
-                return Err(format!("Flag span out of bounds: {} to {}", flag.start, flag.end));
+                return Err(format!(
+                    "Flag span out of bounds: {} to {}",
+                    flag.start, flag.end
+                ));
             }
             if flag.start >= flag.end {
                 return Err(format!("Invalid flag span: {} to {}", flag.start, flag.end));
