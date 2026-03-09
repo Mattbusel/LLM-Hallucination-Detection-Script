@@ -14,6 +14,12 @@ pub trait Renderer {
 
 pub struct TerminalRenderer;
 
+impl Default for TerminalRenderer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl TerminalRenderer {
     pub fn new() -> Self {
         Self
@@ -64,10 +70,8 @@ impl Renderer for TerminalRenderer {
         let mut output = String::new();
 
         // Header
-        output.push_str(&format!("🔍 LLM Token Analysis\n"));
-        output.push_str(&format!(
-            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-        ));
+        output.push_str(&"🔍 LLM Token Analysis\n".to_string());
+        output.push_str(&"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n".to_string());
 
         if config.verbose {
             let (min_conf, max_conf, avg_conf) = analysis.get_confidence_stats();
@@ -76,9 +80,7 @@ impl Renderer for TerminalRenderer {
                 min_conf, max_conf, avg_conf
             ));
             output.push_str(&format!("🏷️  Flags: {}\n", analysis.flags.len()));
-            output.push_str(&format!(
-                "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            ));
+            output.push_str(&"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n".to_string());
         }
 
         // Legend
@@ -127,7 +129,7 @@ impl Renderer for TerminalRenderer {
                     i, token.text, token.confidence, flag_str
                 ));
             }
-            output.push_str("\n");
+            output.push('\n');
         }
 
         // Show flags if enabled
@@ -157,6 +159,12 @@ impl Renderer for TerminalRenderer {
 }
 
 pub struct HtmlRenderer;
+
+impl Default for HtmlRenderer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl HtmlRenderer {
     pub fn new() -> Self {
@@ -312,6 +320,12 @@ impl Renderer for HtmlRenderer {
 }
 
 pub struct MarkdownRenderer;
+
+impl Default for MarkdownRenderer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl MarkdownRenderer {
     pub fn new() -> Self {
