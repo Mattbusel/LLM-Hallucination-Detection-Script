@@ -1,6 +1,7 @@
 # LLM Hallucination Detector
 
 [![CI](https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/actions/workflows/ci.yml/badge.svg)](https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/actions/workflows/ci.yml)
+[![crates.io](https://img.shields.io/crates/v/llm-token-visualizer.svg)](https://crates.io/crates/llm-token-visualizer)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 A Rust CLI and library that reads an LLM answer's token log probabilities and flags the words the model was unsure about, with the alternatives it was weighing at that point. It can also render per-token confidence as colored terminal output, a standalone HTML report, or Markdown.
@@ -25,10 +26,10 @@ That is a real response from Llama 3.1 8B Instruct. The answer happens to be rig
 
 Prebuilt binaries for Linux, macOS (Intel and Apple Silicon) and Windows are attached to each [GitHub Release](https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/releases/latest). Download the archive for your platform, unpack it, and run `llm-token-visualizer` (the archive includes the sample responses under `samples/`).
 
-Or build from source with a Rust toolchain:
+Or install from crates.io with a Rust toolchain:
 
 ```bash
-cargo install --git https://github.com/Mattbusel/LLM-Hallucination-Detection-Script
+cargo install llm-token-visualizer
 ```
 
 ## Quick start
