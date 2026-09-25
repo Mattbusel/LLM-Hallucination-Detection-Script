@@ -23,4 +23,7 @@ jobs:
         run: |
           cargo run -q -- --logprobs-file examples/logprobs/cuyp.json --threshold 0.6 --format json | tee report.json
           grep -q '"text": " Dordrecht"' report.json
+          cargo run -q -- --logprobs-file examples/logprobs/cuyp.json --threshold 0.6 --format html -o report.html
+          grep -q 'class="f" id="s2"' report.html
+          cargo run -q -- --logprobs-file examples/logprobs/cuyp.json --threshold 0.6 --format markdown | grep -q 'üsseldorf'
           cargo run -q --example detect

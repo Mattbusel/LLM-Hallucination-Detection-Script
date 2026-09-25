@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- New: `--format html` in detect mode writes a self-contained report page (no scripts, no external assets, light and dark): the answer as a confidence heatmap, a per-token probability strip, and each flagged span with bars for the alternatives. Hover or focus any word for its probability and alternatives.
+- New: `--format markdown` in detect mode writes a compact report for pull requests, issues and `$GITHUB_STEP_SUMMARY`.
+- Terminal output in detect mode is now a heatmap with aligned alternative bars per span. Confident tokens keep the terminal's own color so it reads on light and dark themes; `NO_COLOR` is honored.
+- `--help` lists examples. Emoji removed from the visualizer headers.
+- New `report` module (`report::terminal`, `report::html`, `report::markdown`, `report::heat`).
+- Project site at https://mattbusel.github.io/LLM-Hallucination-Detection-Script/.
+
 ## 0.2.0 (2026-09-25)
 
 - New: hallucination-risk detection from token logprobs. `--logprobs-file` reads a Chat Completions response (or its `logprobs` block, or a bare token array) and flags words below `--threshold` (default 0.5), with the alternatives the model considered.

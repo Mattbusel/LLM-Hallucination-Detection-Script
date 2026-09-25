@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>LLM Hallucination Detector: token confidence from logprobs</title>
+<meta name="description" content="A Rust CLI and library that reads an LLM answer's token log probabilities, flags the words the model was unsure about, and shows the alternatives it weighed.">
+<meta property="og:title" content="LLM Hallucination Detector">
+<meta property="og:description" content="Find the words your model wasn't sure about. Token logprobs in, flagged spans and alternatives out.">
+<meta property="og:image" content="https://mattbusel.github.io/LLM-Hallucination-Detection-Script/assets/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23f4efe4'/%3E%3Crect x='6' y='16' width='5' height='10' rx='1' fill='%23d6d0c4'/%3E%3Crect x='13.5' y='9' width='5' height='17' rx='1' fill='%23d6d0c4'/%3E%3Crect x='21' y='20' width='5' height='6' rx='1' fill='%23e84830'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#f4efe4;--card:#fbf8f1;--ink:#1d1b17;--mute:#6b665b;--rule:#ddd5c4;--track:#e6dfd0;
+  --flag:#c9391f;--blue:#2f5d8a;--alpha:.62;--code:#efe8da;
+  --serif:"Iowan Old Style","Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#141311;--card:#1b1a17;--ink:#ebe5d8;--mute:#9d9688;--rule:#302d27;--track:#2a2723;
+  --flag:#f0654a;--blue:#86b1dc;--alpha:.5;--code:#211f1b}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--sans)}
+a{color:inherit;text-decoration-color:color-mix(in srgb,currentColor 35%,transparent);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--flag)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.k{font:12.5px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 0}
+nav .mark{font:600 14px var(--mono);text-decoration:none;display:flex;align-items:center;gap:10px}
+nav .mark svg{flex:none}
+nav ul{display:flex;gap:22px;list-style:none;margin:0;padding:0;font-size:15px}
+nav ul a{text-decoration:none;color:var(--mute)}nav ul a:hover{color:var(--ink)}
+header.hero{padding:36px 0 20px}
+h1{font:400 clamp(40px,6vw,68px)/1.02 var(--serif);letter-spacing:-.015em;margin:16px 0 20px;max-width:980px}
+h1 em{color:var(--flag)}
+.lede{font-size:clamp(18px,2.1vw,21px);color:var(--mute);max-width:720px;margin:0 0 30px}
+.install{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px}
+.cmd{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:10px 10px 10px 16px;font:15px var(--mono);max-width:100%}
+.cmd code{white-space:nowrap;overflow-x:auto;min-width:0}
+.cmd code::before{content:"$ ";color:var(--flag)}
+button.copy{font:12px var(--mono);letter-spacing:.06em;text-transform:uppercase;background:transparent;color:var(--mute);border:1px solid var(--rule);border-radius:6px;padding:5px 9px;cursor:pointer;flex:none}
+button.copy:hover{color:var(--ink);border-color:var(--mute)}
+button.copy.ok{color:var(--flag);border-color:var(--flag)}
+.small{font-size:14.5px;color:var(--mute)}
+
+/* specimen */
+.spec{margin:44px 0 0;background:var(--card);border:1px solid var(--rule);border-radius:18px;overflow:hidden}
+.bar-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;padding:14px 18px;border-bottom:1px solid var(--rule)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button{font:13.5px var(--mono);background:transparent;color:var(--mute);border:1px solid transparent;border-radius:8px;padding:6px 10px;cursor:pointer}
+.tabs button[aria-selected=true]{color:var(--ink);background:var(--bg);border-color:var(--rule)}
+.tabs button:hover{color:var(--ink)}
+.thr{display:flex;align-items:center;gap:10px;font:13.5px var(--mono);color:var(--mute)}
+.thr input{accent-color:var(--flag);width:150px}
+.thr output{color:var(--ink);min-width:3.2em}
+.spec-body{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:0}
+.spec-text{padding:30px 32px 26px;border-right:1px solid var(--rule)}
+.spec-side{padding:22px 22px 24px}
+.answer{font:clamp(22px,2.7vw,30px)/1.8 var(--serif);margin:0 0 22px;min-height:3.6em}
+.t{position:relative;border-radius:4px;background:rgba(var(--h),calc(var(--a)*var(--alpha)));padding:.05em 0;outline:none}
+.t:hover,.t:focus-visible,.t.on{box-shadow:0 0 0 1.5px rgb(var(--h))}
+.tip{position:fixed;z-index:10;pointer-events:none;background:var(--ink);color:var(--bg);font:12.5px/1.55 var(--mono);white-space:pre;padding:8px 11px;border-radius:8px;opacity:0;transition:opacity .08s}
+.tip.show{opacity:1}
+.f{text-decoration:underline wavy var(--flag);text-decoration-thickness:1.5px;text-underline-offset:.28em;text-decoration-skip-ink:none}
+sup{font:600 12px var(--mono);color:var(--flag);margin-left:1px}
+.trace{display:flex;align-items:flex-end;gap:2px;height:46px}
+.trace i{flex:1;min-width:2px;max-width:22px;border-radius:2px 2px 0 0;background:rgb(var(--h))}
+.stats{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:14px}
+.span{border-bottom:1px solid var(--rule);padding:12px 0 14px}
+.span:first-child{padding-top:4px}.span:last-child{border-bottom:0}
+.span h3{margin:0 0 8px;font:600 16px var(--sans);display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.span h3 .n{font:600 13px var(--mono);color:var(--flag)}
+.span h3 .w{font:12.5px var(--mono);color:var(--mute);font-weight:400}
+.row{display:grid;grid-template-columns:8.6em 1fr 40px;gap:10px;align-items:center;font:13.5px var(--mono);margin:4px 0}
+.row .bar,.row .b{height:8px;border-radius:4px;background:var(--track);overflow:hidden}
+.row .bar i,.row .b i{display:block;height:100%;background:rgb(var(--h));transition:width .25s}
+.row > span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:pre}
+.row.c{font-weight:700}.row .p{text-align:right;color:var(--mute)}
+.none{color:var(--mute);font-size:15px;margin:4px 0}
+.verdict{margin:16px 0 0;font-size:15px;color:var(--mute)}
+.note{font:italic 17px/1.5 var(--serif);color:var(--mute);margin:0 0 4px}
+
+section{padding:88px 0 0}
+h2{font:400 clamp(30px,4vw,44px)/1.1 var(--serif);letter-spacing:-.01em;margin:10px 0 16px}
+section > .wrap > p{max-width:720px;color:var(--mute);margin:0 0 20px}
+.two{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px;align-items:start}
+figure{margin:0}
+figure img{display:block;width:100%;height:auto;border-radius:12px}
+figcaption{font:13px var(--mono);color:var(--mute);margin-top:10px}
+
+/* how it works */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:28px;counter-reset:s}
+.step{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:18px}
+.step .k{display:block;margin-bottom:10px}
+.step p{margin:10px 0 0;font-size:15px;color:var(--mute)}
+.chips{display:flex;flex-wrap:wrap;gap:4px;font:14px var(--mono)}
+.chip{border:1px solid var(--rule);border-radius:6px;padding:3px 6px;background:rgba(var(--h),calc(var(--a)*var(--alpha)))}
+.chip small{display:block;font-size:11px;color:var(--mute)}
+.word{font:24px var(--serif)}
+
+/* formats */
+.fmt{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:22px}
+pre{margin:0;background:var(--code);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;font:13.5px/1.6 var(--mono);overflow-x:auto}
+#md{white-space:pre-wrap;overflow-wrap:anywhere}
+pre .c{color:var(--mute)}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:20px}
+.card h3{margin:0 0 6px;font:600 17px var(--sans)}
+.card p{margin:0 0 14px;color:var(--mute);font-size:15px}
+.wrong{outline:2px dashed var(--blue);outline-offset:3px;border-radius:6px}
+.honest{display:grid;grid-template-columns:1.2fr 1fr;gap:24px;margin-top:24px}
+.honest h4{margin:0 0 10px;font:600 15px var(--sans)}
+.honest h4.b{color:var(--blue)}
+.honest p{margin:10px 0 0;font-size:15px;color:var(--mute)}
+.honest p b{color:var(--ink)}
+footer{margin:110px 0 0;padding:28px 0 40px;border-top:1px solid var(--rule)}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between;font-size:14.5px;color:var(--mute)}
+.scale{display:inline-flex;align-items:center;gap:8px}
+.scale span.g{height:7px;width:120px;border-radius:4px;background:linear-gradient(90deg,rgb(232,72,48),rgb(240,140,52) 40%,rgb(236,192,92) 76%,rgb(214,208,196))}
+
+@media (max-width:900px){
+  .spec-body,.two,.honest{grid-template-columns:minmax(0,1fr)}
+  .spec-text{border-right:0;border-bottom:1px solid var(--rule)}
+  .steps{grid-template-columns:1fr 1fr}
+  .fmt{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:560px){
+  .wrap{padding:0 16px}
+  nav ul{gap:14px;font-size:14px}
+  nav ul li.opt{display:none}
+  header.hero{padding-top:28px}
+  .spec-text{padding:22px 18px}
+  .spec-side{padding:18px}
+  .steps{grid-template-columns:minmax(0,1fr)}
+  .thr input{width:110px}
+  .cmd{font-size:13px;padding-left:12px}
+  section{padding-top:64px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a class="mark" href="./"><svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="14" width="7" height="15" rx="1.5" fill="#d6d0c4"/><rect x="12.5" y="5" width="7" height="24" rx="1.5" fill="#ecc05c"/><rect x="22" y="20" width="7" height="9" rx="1.5" fill="#e84830"/></svg>llm-token-visualizer</a>
+    <ul>
+      <li><a href="#how">How it works</a></li>
+      <li class="opt"><a href="#formats">Formats</a></li>
+      <li class="opt"><a href="https://crates.io/crates/llm-token-visualizer">crates.io</a></li>
+      <li><a href="https://github.com/Mattbusel/LLM-Hallucination-Detection-Script">GitHub</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <div class="k">Rust CLI and library &nbsp;/&nbsp; MIT</div>
+    <h1>Find the words your model <em>wasn&rsquo;t sure</em> about.</h1>
+    <p class="lede">Hand it an LLM answer with token log probabilities. It flags the words where the model's confidence dropped and shows what it almost said instead. Offline on a saved response, or live against any OpenAI-compatible API.</p>
+    <div class="install">
+      <div class="cmd"><code>cargo install llm-token-visualizer</code><button class="copy" data-copy="cargo install llm-token-visualizer">Copy</button></div>
+    </div>
+    <p class="small">Or grab a prebuilt binary for Linux, macOS or Windows from the <a href="https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/releases/latest">latest release</a>.</p>
+
+    <div class="spec" id="spec">
+      <div class="bar-top">
+        <div class="tabs" role="tablist" aria-label="Sample answers"></div>
+        <label class="thr">threshold <input type="range" id="thr" min="0.05" max="0.95" step="0.05" value="0.6" aria-label="Detection threshold"><output id="thrv">0.60</output></label>
+      </div>
+      <div class="spec-body">
+        <div class="spec-text">
+          <p class="note" id="note"></p>
+          <p class="answer" id="answer"></p>
+          <div class="trace" id="trace" aria-hidden="true"></div>
+          <div class="stats k" id="stats"></div>
+        </div>
+        <div class="spec-side">
+          <div class="k" style="margin-bottom:10px">Flagged spans and what the model weighed</div>
+          <div id="spans"></div>
+          <p class="verdict" id="verdict"></p>
+        </div>
+      </div>
+    </div>
+    <p class="small" style="margin-top:12px">Real responses from Llama 3.1 8B Instruct, bundled in <code>examples/logprobs/</code>. The detection runs in your browser with the same rules as the CLI; hover or tap any word for its probability and alternatives.</p>
+  </header>
+</div>
+
+<section id="terminal"><div class="wrap">
+  <div class="k">In your terminal</div>
+  <h2>One command, no API key.</h2>
+  <p>Point it at a saved Chat Completions response. The answer comes back as a heatmap, every flagged span lists the candidates at its weakest token, and <code>--fail-on-flag</code> turns it into a CI gate.</p>
+  <div class="two">
+    <figure><img src="assets/terminal-cuyp.png" width="822" height="455" alt="Terminal output for the cuyp sample: the answer with Aelbert and Dordrecht underlined, then bars for the alternatives A 0.49, The 0.43, D 0.08 and ord 0.57, üsseldorf 0.39, elf 0.03." loading="lazy"><figcaption>llm-token-visualizer --logprobs-file examples/logprobs/cuyp.json --threshold 0.6</figcaption></figure>
+    <div>
+      <div class="cmd" style="margin-bottom:10px"><code>git clone https://github.com/Mattbusel/LLM-Hallucination-Detection-Script</code><button class="copy" data-copy="git clone https://github.com/Mattbusel/LLM-Hallucination-Detection-Script && cd LLM-Hallucination-Detection-Script">Copy</button></div>
+      <pre><span class="c"># offline, on a bundled real response</span>
+cargo run -- --logprobs-file examples/logprobs/cuyp.json --threshold 0.6
+
+<span class="c"># all four samples through the library API</span>
+cargo run --example detect
+
+<span class="c"># live: ask a model, analyze its answer</span>
+export OPENAI_API_KEY=sk-...
+cargo run -- --live "Who was the second person to walk on the Moon?" \
+  --save answer.json</pre>
+      <p class="small" style="margin-top:12px">Live mode works with any server that returns <code>logprobs</code>: set <code>OPENAI_BASE_URL</code>, for example to <code>https://router.huggingface.co/v1</code>. Anthropic's API does not return logprobs.</p>
+    </div>
+  </div>
+</div></section>
+
+<section id="how"><div class="wrap">
+  <div class="k">How it works</div>
+  <h2>Four rules, no model of its own.</h2>
+  <p>No second LLM, no embeddings, no network call in offline mode. Just the numbers the model already gave you, read carefully.</p>
+  <div class="steps" id="steps"></div>
+</div></section>
+
+<section id="honest"><div class="wrap">
+  <div class="k">What it cannot tell you</div>
+  <h2>Models can be confidently wrong.</h2>
+  <p>Low token probability is a place to look, not a fact check. This bundled answer is wrong, and the detector does not catch it.</p>
+  <div class="card"><p class="answer" id="wrong-answer" style="margin:0"></p>
+    <div class="honest">
+      <div><h4 class="b">The wrong name is not flagged</h4><div id="wrong-name"></div>
+        <p>The second person on the Moon was <b>Buzz Aldrin</b>. The model put at least 0.72 on every token of <b>Pete Conrad</b>, and Aldrin is not among the top 3 alternatives it returned at any of them.</p></div>
+      <div><h4>What got flagged instead</h4><div id="wrong-flags"></div>
+        <p>Phrasing words. Use the flags to decide where to look first, never to certify an answer.</p></div>
+    </div>
+  </div>
+</div></section>
+
+<section id="formats"><div class="wrap">
+  <div class="k">Output formats</div>
+  <h2>Terminal, HTML, Markdown, JSON.</h2>
+  <p>The same report in the shape your workflow needs. All four are produced by the CLI from the same detection.</p>
+  <div class="fmt">
+    <div class="card"><h3>--format html</h3><p>A single self-contained page: no scripts, no external assets, light and dark. Hover any word for its alternatives.</p>
+      <figure><img src="assets/report-html.png" width="900" height="1313" alt="HTML report for the eiffel sample in dark mode with four flagged spans and probability bars." loading="lazy"></figure>
+      <div class="cmd" style="margin-top:14px"><code>llm-token-visualizer --logprobs-file answer.json --format html -o report.html</code><button class="copy" data-copy="llm-token-visualizer --logprobs-file answer.json --format html -o report.html">Copy</button></div></div>
+    <div class="card"><h3>--format markdown</h3><p>Paste into a pull request, an issue, or <code>$GITHUB_STEP_SUMMARY</code>.</p>
+      <pre id="md"></pre>
+      <h3 style="margin-top:22px">--format json and --fail-on-flag</h3><p>Machine-readable spans, and exit status 2 when anything is flagged, so a pipeline can route answers to review.</p>
+      <pre>llm-token-visualizer --logprobs-file answer.json \
+  --fail-on-flag --format json -o report.json</pre></div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <span>MIT licensed. Built in Rust. <a href="https://github.com/Mattbusel/LLM-Hallucination-Detection-Script">Source</a> &middot; <a href="https://crates.io/crates/llm-token-visualizer">crates.io</a> &middot; <a href="https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/releases/latest">Releases</a></span>
+  <span class="scale k">p 0 <span class="g"></span> p 1</span>
+</div></footer>
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>// Same color scale as src/report.rs `heat`.
+const STOPS = [[0.25, [232, 72, 48]], [0.55, [240, 140, 52]], [0.80, [236, 192, 92]], [0.97, [214, 208, 196]]];
+function heat(p) {
+  p = Math.min(1, Math.max(0, p));
+  if (p <= STOPS[0][0]) return STOPS[0][1];
+  for (let i = 0; i < STOPS.length - 1; i++) {
+    const [p0, a] = STOPS[i], [p1, b] = STOPS[i + 1];
+    if (p <= p1) { const t = (p - p0) / (p1 - p0); return a.map((x, k) => Math.round(x + (b[k] - x) * t)); }
+  }
+  return STOPS[3][1];
+}
+const q = s => JSON.stringify(s);
+const esc = s => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+// Render a sample's answer as heatmap HTML. Tokens: [token, p, [[alt, p]...]]
+function answerHTML(sample, opts = {}) {
+  const idx = new Array(sample.tokens.length).fill(0);
+  sample.spans.forEach((s, n) => { for (let i = s.start; i < s.end; i++) idx[i] = n + 1; });
+  let h = '';
+  sample.tokens.forEach(([tok, p, alts], i) => {
+    const n = idx[i];
+    const starts = n && (i === 0 || idx[i - 1] !== n);
+    const ends = n && (i + 1 === sample.tokens.length || idx[i + 1] !== n);
+    const body = tok.replace(/^\s+/, ''), lead = tok.slice(0, tok.length - body.length);
+    h += esc(lead);
+    if (starts) h += `<span class="f" data-span="${n}">`;
+    const a = Math.pow(Math.max(0, (0.95 - p) / 0.95), 0.7);
+    let tip = `p ${p.toFixed(2)}  ${q(tok)}`;
+    for (const [t, pp] of alts) tip += `\n     ${pp.toFixed(2)}  ${q(t)}`;
+    h += `<span class="t" tabindex="0" style="--h:${heat(p).join(',')};--a:${a.toFixed(3)}" data-tip="${esc(tip)}">${esc(body)}</span>`;
+    if (ends) h += `</span>${opts.nosup ? '' : `<sup>${n}</sup>`}`;
+  });
+  return h;
+}
+function traceHTML(sample) {
+  return sample.tokens.map(([tok, p]) => `<i style="--h:${heat(p).join(',')};height:${Math.max(4, p * 100).toFixed(0)}%" title="${esc(q(tok))} p ${p.toFixed(2)}"></i>`).join('');
+}
+// Candidates at a span's weakest token, chosen included, most likely first.
+function candidates(span) {
+  const c = span.alts.map(([t, p]) => [t, p, t === span.weak]);
+  if (!c.some(x => x[2])) c.push([span.weak, span.p, true]);
+  return c.sort((a, b) => b[1] - a[1]);
+}
+function barsHTML(span) {
+  return candidates(span).map(([t, p, chosen]) =>
+    `<div class="row${chosen ? ' c' : ''}"><span>${esc(q(t))}</span><span class="bar"><i style="--h:${heat(p).join(',')};width:${(p * 100).toFixed(1)}%"></i></span><span class="p">${p.toFixed(2)}</span></div>`).join('');
+}
+</script>
+<script>
+const DATA = {"cuyp": {"model": "meta-llama/llama-3.1-8b-instruct", "tokens": [["A", 0.4897, [["The", 0.4322], ["D", 0.0751]]], ["el", 0.9992, [[" Dutch", 0.0006], ["e", 0.0001]]], ["bert", 1.0, [["ert", 0.0], ["BERT", 0.0]]], [" Cu", 0.993, [[" Jacobs", 0.0059], [" Jacob", 0.0004]]], ["yp", 0.9999, [["yps", 0.0001], ["yl", 0.0]]], [" died", 0.6573, [[",", 0.3105], [" passed", 0.0225]]], [" in", 0.9941, [[" on", 0.0036], [" ", 0.0015]]], [" ", 0.9746, [[" D", 0.0229], [" the", 0.0017]]], ["169", 0.9881, [["166", 0.011], ["179", 0.0004]]], ["1", 0.9976, [["2", 0.0022], ["0", 0.0001]]], [" in", 0.9056, [[",", 0.0842], [" at", 0.0042]]], [" D", 0.9848, [[" Meg", 0.0016], [" N", 0.001]]], ["ord", 0.5701, [["üsseldorf", 0.3918], ["elf", 0.0284]]], ["recht", 0.9996, [["t", 0.0002], ["trecht", 0.0001]]], [",", 0.6158, [[".", 0.3735], [" city", 0.0047]]], [" Netherlands", 0.7963, [[" a", 0.1078], [" the", 0.0577]]], [".", 0.9846, [[",", 0.0097], ["<|eot_id|>", 0.0036]]]], "spans": [{"start": 0, "end": 3, "text": "Aelbert", "weak": "A", "p": 0.4897, "alts": [["A", 0.4897], ["The", 0.4322], ["D", 0.0751]]}, {"start": 11, "end": 14, "text": " Dordrecht", "weak": "ord", "p": 0.5701, "alts": [["ord", 0.5701], ["üsseldorf", 0.3918], ["elf", 0.0284]]}], "mean": 0.8794, "count": 17}, "tour-de-france": {"model": "meta-llama/llama-3.1-8b-instruct", "tokens": [["Stephen", 0.4888, [["The", 0.4313], ["Steven", 0.0276]]], [" Ro", 0.9995, [[" Roth", 0.0001], ["Ro", 0.0001]]], ["che", 1.0, [["ach", 0.0], ["ache", 0.0]]], [" won", 0.9479, [[" from", 0.0324], [" of", 0.0093]]], [" the", 1.0, [[" ", 0.0], [" both", 0.0]]], [" ", 0.9999, [[" Tour", 0.0001], [" general", 0.0]]], ["198", 0.9999, [[" ", 0.0001], ["100", 0.0]]], ["7", 1.0, [["6", 0.0], ["8", 0.0]]], [" Tour", 0.9998, [[" edition", 0.0002], ["Tour", 0.0]]], [" de", 1.0, [[" De", 0.0], ["-de", 0.0]]], [" France", 1.0, [["France", 0.0], [" French", 0.0]]], [",", 0.6568, [[" for", 0.2738], [" while", 0.0327]]], [" riding", 0.7163, [[" competing", 0.0856], [" representing", 0.0856]]], [" for", 0.9946, [[" as", 0.0052], [" in", 0.0001]]], [" the", 0.9167, [[" Carr", 0.0456], [" La", 0.019]]], [" Carr", 0.9716, [[" Lan", 0.0037], [" Panasonic", 0.0023]]], ["era", 0.9978, [["eras", 0.0009], ["éra", 0.0006]]], [" Jeans", 0.9268, [[" team", 0.0359], ["-V", 0.0192]]], ["-V", 0.5725, [["–", 0.2106], [" -", 0.1448]]], ["ag", 0.9346, [["iag", 0.0063], ["iv", 0.0059]]], ["ab", 0.996, [["abl", 0.0028], ["abo", 0.0003]]], ["ond", 0.9992, [["OND", 0.0003], ["onds", 0.0002]]], [" team", 0.9829, [[" cycling", 0.0052], [" and", 0.0046]]], [".", 0.964, [[",", 0.0156], [" and", 0.0045]]]], "spans": [{"start": 0, "end": 1, "text": "Stephen", "weak": "Stephen", "p": 0.4888, "alts": [["Stephen", 0.4888], ["The", 0.4313], ["Steven", 0.0276]]}, {"start": 18, "end": 22, "text": "-Vagabond", "weak": "-V", "p": 0.5725, "alts": [["-V", 0.5725], ["–", 0.2106], [" -", 0.1448]]}], "mean": 0.9194, "count": 24}, "eiffel": {"model": "meta-llama/llama-3.1-8b-instruct", "tokens": [["The", 0.9885, [["G", 0.011], ["Built", 0.0001]]], [" E", 0.9969, [[" iconic", 0.0028], [" famous", 0.0001]]], ["iff", 1.0, [["IFF", 0.0], ["if", 0.0]]], ["el", 1.0, [["elt", 0.0], ["ел", 0.0]]], [" Tower", 1.0, [["Tower", 0.0], [" Iron", 0.0]]], [" was", 0.9668, [[",", 0.0331], [" in", 0.0]]], [" designed", 0.9998, [[" primarily", 0.0], [" originally", 0.0]]], [" by", 0.9987, [[" and", 0.0013], [" in", 0.0]]], [" Gust", 0.5699, [[" French", 0.3917], [" the", 0.0284]]], ["ave", 1.0, [["av", 0.0], ["AVE", 0.0]]], [" E", 1.0, [[" Alexandre", 0.0], ["E", 0.0]]], ["iff", 1.0, [["IFF", 0.0], ["iffe", 0.0]]], ["el", 1.0, [["EL", 0.0], ["els", 0.0]]], [" and", 0.8776, [[",", 0.072], ["'s", 0.0495]]], [" his", 0.967, [[" was", 0.0048], [" opened", 0.0037]]], [" engineering", 0.9484, [[" company", 0.0472], [" engineer", 0.003]]], [" company", 0.9988, [[" firm", 0.0012], ["company", 0.0]]], [",", 0.9137, [[" Comp", 0.0515], [" E", 0.0215]]], [" Comp", 0.5335, [[" and", 0.2856], [" E", 0.1191]]], ["agn", 1.0, [["aign", 0.0], ["ang", 0.0]]], ["ie", 1.0, [["ied", 0.0], ["ies", 0.0]]], [" des", 1.0, [[" Des", 0.0], ["-des", 0.0]]], [" É", 0.9863, [[" E", 0.0124], [" Entre", 0.0003]]], ["tabl", 0.9777, [["ta", 0.0123], ["tas", 0.0031]]], ["isse", 0.9996, [["iss", 0.0004], ["issement", 0.0]]], ["ments", 1.0, [["MENTS", 0.0], ["mts", 0.0]]], [" E", 1.0, [[" Gust", 0.0], [" Eug", 0.0]]], ["iff", 0.9991, [["IFF", 0.0008], ["ifu", 0.0]]], ["el", 1.0, [["ell", 0.0], ["ель", 0.0]]], [",", 0.9997, [[" (", 0.0002], [";", 0.0001]]], [" and", 0.9442, [[" which", 0.047], [" for", 0.003]]], [" it", 0.9801, [[" opened", 0.0158], [" was", 0.0024]]], [" opened", 0.859, [[" officially", 0.0905], [" was", 0.0377]]], [" on", 0.4911, [[" to", 0.4911], [" in", 0.0116]]], [" March", 0.9846, [[" May", 0.014], [" April", 0.001]]], [" ", 1.0, [[",", 0.0], [" ", 0.0]]], ["31", 0.9994, [["15", 0.0005], ["30", 0.0001]]], [",", 0.9999, [["st", 0.0001], [" ", 0.0]]], [" ", 1.0, [["188", 0.0], ["189", 0.0]]], ["188", 1.0, [["189", 0.0], ["193", 0.0]]], ["9", 1.0, [["7", 0.0], ["8", 0.0]]], [",", 0.6483, [[".", 0.347], [" for", 0.003]]], [" during", 0.3206, [[" for", 0.3206], [" at", 0.2497]]], [" the", 0.9999, [[" World", 0.0], [" a", 0.0]]], [" World", 0.9624, [[" Ex", 0.0291], [" ", 0.0039]]], ["'s", 0.9999, [[" Ex", 0.0001], [" Fair", 0.0]]], [" Fair", 0.9997, [[" Colum", 0.0002], ["Fair", 0.0001]]], [" in", 0.9817, [[" held", 0.0096], [" (", 0.0066]]], [" Paris", 1.0, [["Paris", 0.0], [" France", 0.0]]], [",", 0.8348, [[".", 0.1644], [" to", 0.0007]]], [" France", 0.9957, [[" held", 0.0013], [" which", 0.0007]]], [".", 0.9857, [[",", 0.0141], [" to", 0.0002]]]], "spans": [{"start": 8, "end": 10, "text": " Gustave", "weak": " Gust", "p": 0.5699, "alts": [[" Gust", 0.5699], [" French", 0.3917], [" the", 0.0284]]}, {"start": 18, "end": 21, "text": " Compagnie", "weak": " Comp", "p": 0.5335, "alts": [[" Comp", 0.5335], [" and", 0.2856], [" E", 0.1191]]}, {"start": 33, "end": 34, "text": " on", "weak": " on", "p": 0.4911, "alts": [[" on", 0.4911], [" to", 0.4911], [" in", 0.0116]]}, {"start": 42, "end": 43, "text": " during", "weak": " during", "p": 0.3206, "alts": [[" during", 0.3206], [" for", 0.3206], [" at", 0.2497]]}], "mean": 0.9367, "count": 52}, "moonwalk": {"model": "meta-llama/llama-3.1-8b-instruct", "tokens": [["P", 0.7174, [["The", 0.1413], ["Charles", 0.052]]], ["ete", 0.7573, [["ilot", 0.1316], ["il", 0.0798]]], [" Conrad", 0.9989, [[" Richardson", 0.0004], [" Davidson", 0.0002]]], [" was", 0.5989, [[",", 0.3633], [" became", 0.0338]]], [" the", 0.9987, [[" not", 0.0012], [" indeed", 0.0]]], [" second", 0.9987, [[" third", 0.001], [" ", 0.0001]]], [" person", 1.0, [[" astronaut", 0.0], [" man", 0.0]]], [" to", 0.9998, [[",", 0.0002], [" and", 0.0]]], [" walk", 1.0, [[" set", 0.0], [" walked", 0.0]]], [" on", 1.0, [[" the", 0.0], [" in", 0.0]]], [" the", 1.0, [[" Moon", 0.0], [" Earth", 0.0]]], [" Moon", 0.9972, [[" moon", 0.0028], [" lunar", 0.0]]], [",", 0.8259, [[" as", 0.0528], [" and", 0.0466]]], [" which", 0.144, [[" on", 0.1271], [" and", 0.1271]]], [" occurred", 0.6353, [[" he", 0.2648], [" happened", 0.086]]], [" on", 0.9946, [[" during", 0.0046], [" as", 0.0002]]], [" November", 0.6471, [[" July", 0.3057], [" February", 0.0251]]], [" ", 1.0, [[",", 0.0], [".", 0.0]]], ["19", 0.9971, [["20", 0.0022], ["21", 0.0003]]], [",", 0.9934, [["-", 0.0041], ["th", 0.0017]]], [" ", 0.9995, [["196", 0.0002], [" during", 0.0001]]], ["196", 1.0, [["199", 0.0], ["69", 0.0]]], ["9", 1.0, [["7", 0.0], ["8", 0.0]]], [",", 0.6095, [[".", 0.3697], [" during", 0.0143]]], [" during", 0.5549, [[" as", 0.4322], [" while", 0.0042]]], [" the", 0.9985, [[" Apollo", 0.001], [" NASA", 0.0004]]], [" Apollo", 0.9894, [[" second", 0.0031], [" mission", 0.0028]]], [" ", 1.0, [[" missions", 0.0], ["-", 0.0]]], ["12", 1.0, [["16", 0.0], ["11", 0.0]]], [" mission", 0.999, [[" Mission", 0.0003], [" lunar", 0.0003]]], [".", 0.9922, [[",", 0.0067], [" as", 0.0003]]]], "spans": [{"start": 3, "end": 4, "text": " was", "weak": " was", "p": 0.5989, "alts": [[" was", 0.5989], [",", 0.3633], [" became", 0.0338]]}, {"start": 13, "end": 14, "text": " which", "weak": " which", "p": 0.144, "alts": [[" which", 0.144], [" on", 0.1271], [" and", 0.1271]]}, {"start": 24, "end": 25, "text": " during", "weak": " during", "p": 0.5549, "alts": [[" during", 0.5549], [" as", 0.4322], [" while", 0.0042]]}], "mean": 0.8854, "count": 31}};
+const MD = "### Token confidence report\n\n`cuyp.json` · `meta-llama/llama-3.1-8b-instruct` · 17 tokens · mean p 0.88 · threshold 0.60\n\n> **Aelbert**<sup>1</sup> Cuyp died in 1691 in **Dordrecht**<sup>2</sup>, Netherlands.\n\n| # | Span | Weakest token | p | Model also considered |\n|---|---|---|---|---|\n| 1 | Aelbert | `A` | 0.49 | `The` 0.43, `D` 0.08 |\n| 2 | Dordrecht | `ord` | 0.57 | `üsseldorf` 0.39, `elf` 0.03 |\n\n2 low-confidence spans. Check these claims before trusting the answer.";
+const NOTES = {
+  'cuyp': 'Right answer. The model still gave Düsseldorf 39%.',
+  'tour-de-france': 'Right answer. Flags land on phrasing: "Stephen" vs "The", and a hyphen.',
+  'eiffel': 'Mostly phrasing words, plus a 39% pull toward "French" instead of "Gustave".',
+  'moonwalk': 'Wrong answer (it was Buzz Aldrin), and the name is not flagged. See below.'
+};
+const ORDER = ['cuyp', 'tour-de-france', 'eiffel', 'moonwalk'];
+
+// Port of src/detect.rs so the threshold slider matches the CLI exactly.
+const wordy = s => /[\p{L}\p{N}]/u.test(s);
+const boundary = c => c === undefined || c === '' || /\s/.test(c) || /[!-\/:-@\[-`{-~]/.test(c);
+function detect(sample, th) {
+  const T = sample.tokens, words = [];
+  T.forEach(([tok], i) => {
+    const starts = i === 0 || boundary(tok[0]) || boundary(T[i - 1][0].slice(-1));
+    if (starts || !words.length) words.push([i, i + 1]); else words[words.length - 1][1] = i + 1;
+  });
+  const flagged = words.filter(([s, e]) => T.slice(s, e).some(([t, p]) => wordy(t) && p < th));
+  const ranges = [];
+  for (const [s, e] of flagged) {
+    const last = ranges[ranges.length - 1];
+    if (last && T.slice(last[1], s).every(([t]) => t.trim() === '')) { last[1] = e; continue; }
+    ranges.push([s, e]);
+  }
+  return ranges.map(([start, end]) => {
+    let w = start, best = Infinity;
+    for (let i = start; i < end; i++) if (wordy(T[i][0]) && T[i][1] < best) { best = T[i][1]; w = i; }
+    const [tok, p, alts] = T[w];
+    return { start, end, text: T.slice(start, end).map(t => t[0]).join(''), weak: tok, p, alts: [[tok, p], ...alts] };
+  });
+}
+
+const $ = id => document.getElementById(id);
+let current = 'cuyp';
+function draw() {
+  const th = +$('thr').value; $('thrv').textContent = th.toFixed(2);
+  const s = DATA[current];
+  const view = { ...s, spans: detect(s, th) };
+  $('note').textContent = NOTES[current];
+  $('answer').innerHTML = answerHTML(view);
+  $('trace').innerHTML = traceHTML(view);
+  $('stats').innerHTML = `<span>${s.model}</span><span>${s.count} tokens</span><span>mean p ${s.mean.toFixed(2)}</span>`;
+  $('spans').innerHTML = view.spans.length ? view.spans.map((sp, n) =>
+    `<div class="span"><h3><span class="n">${n + 1}</span>${esc(sp.text.trim())}<span class="w">weakest ${esc(q(sp.weak))} at p ${sp.p.toFixed(2)}</span></h3>${barsHTML(sp)}</div>`).join('')
+    : '<p class="none">Nothing below this threshold.</p>';
+  const n = view.spans.length;
+  $('verdict').textContent = n === 0 ? 'No low-confidence spans. That does not prove the answer is correct.'
+    : `${n} low-confidence span${n > 1 ? 's' : ''}. Check ${n > 1 ? 'these claims' : 'it'} before trusting the answer.`;
+}
+const tabs = document.querySelector('.tabs');
+ORDER.forEach(k => {
+  const b = document.createElement('button');
+  b.role = 'tab'; b.textContent = k + '.json'; b.setAttribute('aria-selected', k === current);
+  b.onclick = () => { current = k; tabs.querySelectorAll('button').forEach(x => x.setAttribute('aria-selected', x === b)); draw(); };
+  tabs.appendChild(b);
+});
+$('thr').addEventListener('input', draw);
+draw();
+
+// Tooltip that follows tokens and never clips.
+const tip = $('tip');
+function showTip(el) {
+  document.querySelectorAll('.t.on').forEach(x => x.classList.remove('on'));
+  el.classList.add('on');
+  tip.textContent = el.dataset.tip; tip.classList.add('show');
+  const r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+  let x = Math.min(Math.max(8, r.left), innerWidth - w - 8), y = r.bottom + 8;
+  if (y + h > innerHeight - 8) y = r.top - h - 8;
+  tip.style.left = x + 'px'; tip.style.top = y + 'px';
+}
+function hideTip() { tip.classList.remove('show'); document.querySelectorAll('.t.on').forEach(x => x.classList.remove('on')); }
+document.addEventListener('mouseover', e => { const t = e.target.closest('.t'); t ? showTip(t) : hideTip(); });
+document.addEventListener('focusin', e => { const t = e.target.closest('.t'); if (t) showTip(t); });
+document.addEventListener('click', e => { const t = e.target.closest('.t'); t ? showTip(t) : hideTip(); });
+addEventListener('scroll', hideTip, { passive: true });
+
+// How it works, built from the real Dordrecht tokens.
+(() => {
+  const T = DATA.cuyp.tokens.slice(11, 14);
+  const chip = ([t, p]) => { const a = Math.pow(Math.max(0, (0.95 - p) / 0.95), 0.7);
+    return `<span class="chip" style="--h:${heat(p).join(',')};--a:${a.toFixed(3)}">${esc(q(t))}<small>p ${p.toFixed(2)}</small></span>`; };
+  const steps = [
+    ['1 &nbsp;Probability', `<div class="chips">${T.map(chip).join('')}</div>`, 'Each token\'s probability is exp(logprob), read from the response.'],
+    ['2 &nbsp;Words', `<div class="word">&nbsp;D<span style="color:rgb(${heat(0.57).join(',')})">ord</span>recht</div>`, 'Subword tokens are grouped into the word they belong to.'],
+    ['3 &nbsp;Threshold', `<div class="word"><span class="f">Dordrecht</span></div><div class="k" style="margin-top:6px">p 0.57 &lt; threshold 0.60</div>`, 'A word is flagged if any token with letters or digits falls below the threshold. Punctuation never triggers.'],
+    ['4 &nbsp;Spans', `<div class="chips"><span class="chip" style="--h:${heat(0.39).join(',')};--a:.5">"&uuml;sseldorf"<small>p 0.39</small></span><span class="chip" style="--h:${heat(0.03).join(',')};--a:.8">"elf"<small>p 0.03</small></span></div>`, 'Neighbouring flagged words merge. Each span reports its weakest token and the alternatives there.']
+  ];
+  $('steps').innerHTML = steps.map(([k, v, p]) => `<div class="step"><span class="k">${k}</span>${v}<p>${p}</p></div>`).join('');
+})();
+
+// The honest example.
+(() => {
+  const s = DATA.moonwalk, view = { ...s, spans: detect(s, 0.6) };
+  $('wrong-answer').innerHTML = answerHTML(view);
+  const ts = $('wrong-answer').querySelectorAll('.t');
+  const wrap = document.createElement('span'); wrap.className = 'wrong';
+  ts[0].before(wrap); [ts[0], ts[1], ts[2].previousSibling, ts[2]].forEach(n => n && wrap.appendChild(n));
+  const row = (l, p) => `<div class="row"><span>${esc(l)}</span><span class="b"><i style="--h:${heat(p).join(',')};width:${(p * 100).toFixed(1)}%"></i></span><span class="p">${p.toFixed(2)}</span></div>`;
+  $('wrong-name').innerHTML = s.tokens.slice(0, 3).map(([t, p]) => row(q(t), p)).join('');
+  $('wrong-flags').innerHTML = view.spans.map(sp => row(q(sp.weak), sp.p)).join('');
+})();
+
+$('md').textContent = MD;
+
+document.querySelectorAll('button.copy').forEach(b => b.addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = 'Copied'; b.classList.add('ok'); }
+  catch { b.textContent = 'Select'; }
+  setTimeout(() => { b.textContent = 'Copy'; b.classList.remove('ok'); }, 1600);
+}));
+</script>
+</body>
+</html>

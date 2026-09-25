@@ -6,6 +6,8 @@ description = "Flag low-confidence spans in LLM output from token logprobs, and 
 license = "MIT"
 repository = "https://github.com/Mattbusel/LLM-Hallucination-Detection-Script"
 readme = "README.md"
+homepage = "https://mattbusel.github.io/LLM-Hallucination-Detection-Script/"
+exclude = ["docs/", ".github/"]
 keywords = ["llm", "hallucination", "logprobs", "confidence", "cli"]
 categories = ["command-line-utilities", "text-processing"]
 
