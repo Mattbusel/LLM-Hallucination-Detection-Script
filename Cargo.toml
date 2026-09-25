@@ -1,6 +1,6 @@
 [package]
 name = "llm-token-visualizer"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 description = "Flag low-confidence spans in LLM output from token logprobs, and render per-token confidence as terminal, HTML or Markdown"
 license = "MIT"
