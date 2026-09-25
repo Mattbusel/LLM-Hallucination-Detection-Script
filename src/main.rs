@@ -3,13 +3,22 @@ use clap::Parser;
 use std::io::Read;
 use std::path::PathBuf;
 
-use llm_token_visualizer::detect::{self, Report};
+use llm_token_visualizer::detect;
+use llm_token_visualizer::report;
 use llm_token_visualizer::{
     HtmlRenderer, MarkdownRenderer, Renderer, TerminalRenderer, TokenAnalysis, VisualizationConfig,
 };
 
 #[derive(Parser)]
 #[command(name = "llm-token-visualizer", version)]
+#[command(after_help = "Examples:
+  llm-token-visualizer --logprobs-file answer.json
+  llm-token-visualizer --logprobs-file answer.json --format html -o report.html
+  llm-token-visualizer --logprobs-file answer.json --format markdown >> $GITHUB_STEP_SUMMARY
+  llm-token-visualizer --live \"Who painted The Night Watch?\" --save answer.json
+  llm-token-visualizer --logprobs-file answer.json --fail-on-flag --format json
+
+Sample responses with logprobs are in examples/logprobs/ (samples/ in release archives).")]
 #[command(
     about = "Flag low-confidence spans in LLM output from token logprobs, and visualize per-token confidence"
 )]
@@ -58,7 +67,7 @@ struct Args {
     #[arg(long)]
     confidence_file: Option<PathBuf>,
 
-    /// Output format: terminal, html, markdown, or json (json: detect mode only)
+    /// Output format: terminal, html (a self-contained report page), markdown, or json (json: detect mode only)
     #[arg(short, long, default_value = "terminal")]
     format: String,
 
@@ -158,41 +167,57 @@ fn run_detect(args: &Args) -> Result<i32> {
 
     let tokens = detect::parse_logprobs(&json)?;
     let report = detect::detect(&tokens, args.threshold);
+    let source = match (&args.live, &args.logprobs_file) {
+        (Some(_), _) => "live".to_string(),
+        (None, Some(p)) if p.as_os_str() == "-" => "stdin".to_string(),
+        (None, Some(p)) => p
+            .file_name()
+            .map(|n| n.to_string_lossy().into_owned())
+            .unwrap_or_else(|| p.display().to_string()),
+        (None, None) => unreachable!("checked by caller"),
+    };
+    let meta = report::Meta::from_response(source, &json);
 
-    if args.format == "json" {
-        write_output(args, &serde_json::to_string_pretty(&report)?)?;
-    } else {
-        let analysis = detect::to_token_analysis(&tokens, &report);
-        render(args, &report.text, &analysis)?;
-        if args.format == "terminal" {
-            println!("{}", verdict(&report));
+    let output = match args.format.as_str() {
+        "json" => serde_json::to_string_pretty(&report)?,
+        "html" => report::html(&tokens, &report, &meta),
+        "markdown" => report::markdown(&tokens, &report, &meta),
+        "terminal" => {
+            let mut out = report::terminal(&tokens, &report, &meta);
+            if args.verbose {
+                out.push_str(
+                    "
+  token                 p      alternatives
+",
+                );
+                for (i, t) in tokens.iter().enumerate() {
+                    let alts: Vec<String> = t
+                        .top_logprobs
+                        .iter()
+                        .filter(|a| a.token != t.token)
+                        .map(|a| format!("{:?} {:.2}", a.token, a.logprob.exp()))
+                        .collect();
+                    out.push_str(&format!(
+                        "  {:>3} {:<18} {:.3}  {}
+",
+                        i,
+                        format!("{:?}", t.token),
+                        t.prob(),
+                        alts.join(", ")
+                    ));
+                }
+            }
+            out
         }
-    }
+        f => anyhow::bail!("unsupported format {f:?}; use terminal, html, markdown or json"),
+    };
+    write_output(args, &output)?;
 
     Ok(if args.fail_on_flag && report.flagged() {
         2
     } else {
         0
     })
-}
-
-fn verdict(r: &Report) -> String {
-    if r.spans.is_empty() {
-        format!(
-            "No low-confidence spans (threshold {:.2}, {} tokens, mean p={:.2}).\n\
-             This does not prove the answer is correct: models can be confidently wrong.",
-            r.threshold, r.token_count, r.mean_prob
-        )
-    } else {
-        format!(
-            "{} low-confidence span(s) at threshold {:.2} ({} tokens, mean p={:.2}).\n\
-             Check these claims before trusting the answer.",
-            r.spans.len(),
-            r.threshold,
-            r.token_count,
-            r.mean_prob
-        )
-    }
 }
 
 #[cfg(feature = "live")]

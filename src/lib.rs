@@ -3,6 +3,7 @@ pub mod detect;
 #[cfg(feature = "live")]
 pub mod live;
 pub mod renderer;
+pub mod report;
 pub mod utils;
 
 pub use data::{

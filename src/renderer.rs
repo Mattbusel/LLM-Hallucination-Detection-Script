@@ -70,21 +70,21 @@ impl Renderer for TerminalRenderer {
         let mut output = String::new();
 
         // Header
-        output.push_str("🔍 LLM Token Analysis\n");
+        output.push_str("LLM Token Analysis\n");
         output.push_str("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
 
         if config.verbose {
             let (min_conf, max_conf, avg_conf) = analysis.get_confidence_stats();
             output.push_str(&format!(
-                "📊 Confidence Stats: Min: {:.2}, Max: {:.2}, Avg: {:.2}\n",
+                "Confidence Stats: Min: {:.2}, Max: {:.2}, Avg: {:.2}\n",
                 min_conf, max_conf, avg_conf
             ));
-            output.push_str(&format!("🏷️  Flags: {}\n", analysis.flags.len()));
+            output.push_str(&format!("Flags: {}\n", analysis.flags.len()));
             output.push_str("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
         }
 
         // Legend
-        output.push_str("🎨 Color Legend:\n");
+        output.push_str("Color Legend:\n");
         output.push_str(&format!(
             "   {} Very Low Confidence (0.0-0.3)\n",
             "██".red().bold()
@@ -102,7 +102,7 @@ impl Renderer for TerminalRenderer {
         output.push_str("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
 
         // Render tokens
-        output.push_str("📝 Token Visualization:\n\n");
+        output.push_str("Token Visualization:\n\n");
         for (i, token) in analysis.tokens.iter().enumerate() {
             let formatted_token = self.format_token(token, i, analysis);
             output.push_str(&format!("{}", formatted_token));
@@ -111,7 +111,7 @@ impl Renderer for TerminalRenderer {
 
         // Show token details if verbose
         if config.verbose && config.show_confidence_scores {
-            output.push_str("📋 Token Details:\n");
+            output.push_str("Token Details:\n");
             output.push_str("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
             for (i, token) in analysis.tokens.iter().enumerate() {
                 let flags = analysis.get_flags_for_token(i);
@@ -134,7 +134,7 @@ impl Renderer for TerminalRenderer {
 
         // Show flags if enabled
         if config.show_flags && !analysis.flags.is_empty() {
-            output.push_str("🏷️  Flags:\n");
+            output.push_str("Flags:\n");
             output.push_str("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
             for flag in &analysis.flags {
                 let token_text: String = analysis.tokens[flag.start..flag.end]
@@ -221,7 +221,7 @@ impl Renderer for HtmlRenderer {
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔍 LLM Token Analysis</h1>
+            <h1>LLM Token Analysis</h1>
         </div>
 "#);
 
@@ -230,7 +230,7 @@ impl Renderer for HtmlRenderer {
             html.push_str(&format!(
                 r#"
         <div class="stats">
-            <h3>📊 Statistics</h3>
+            <h3>Statistics</h3>
             <p>Confidence Range: {:.3} - {:.3} (Average: {:.3})</p>
             <p>Total Tokens: {}</p>
             <p>Total Flags: {}</p>
@@ -246,7 +246,7 @@ impl Renderer for HtmlRenderer {
 
         html.push_str(r#"
         <div class="legend">
-            <h3>🎨 Confidence Legend</h3>
+            <h3>Confidence Legend</h3>
             <div class="legend-item"><span class="color-box" style="background-color: #ff4444;"></span>Very Low (0.0-0.3)</div>
             <div class="legend-item"><span class="color-box" style="background-color: #ffaa44;"></span>Low (0.3-0.5)</div>
             <div class="legend-item"><span class="color-box" style="background-color: #888888;"></span>Medium (0.5-0.7)</div>
@@ -255,7 +255,7 @@ impl Renderer for HtmlRenderer {
         </div>
         
         <div class="token-container">
-            <h3>📝 Token Visualization</h3>
+            <h3>Token Visualization</h3>
 "#);
 
         for (i, token) in analysis.tokens.iter().enumerate() {
@@ -280,7 +280,7 @@ impl Renderer for HtmlRenderer {
             html.push_str(
                 r#"
         <div class="flags">
-            <h3>🏷️ Flags</h3>
+            <h3>Flags</h3>
 "#,
             );
 
@@ -343,11 +343,11 @@ impl Renderer for MarkdownRenderer {
 
         let mut md = String::new();
 
-        md.push_str("# 🔍 LLM Token Analysis\n\n");
+        md.push_str("# LLM Token Analysis\n\n");
 
         if config.verbose {
             let (min_conf, max_conf, avg_conf) = analysis.get_confidence_stats();
-            md.push_str("## 📊 Statistics\n\n");
+            md.push_str("## Statistics\n\n");
             md.push_str(&format!(
                 "- **Confidence Range**: {:.3} - {:.3} (Average: {:.3})\n",
                 min_conf, max_conf, avg_conf
@@ -356,14 +356,14 @@ impl Renderer for MarkdownRenderer {
             md.push_str(&format!("- **Total Flags**: {}\n\n", analysis.flags.len()));
         }
 
-        md.push_str("## 🎨 Confidence Legend\n\n");
+        md.push_str("## Confidence Legend\n\n");
         md.push_str("- 🔴 Very Low (0.0-0.3)\n");
         md.push_str("- 🟡 Low (0.3-0.5)\n");
         md.push_str("- ⚪ Medium (0.5-0.7)\n");
         md.push_str("- 🔵 High (0.7-0.9)\n");
         md.push_str("- 🟢 Very High (0.9-1.0)\n\n");
 
-        md.push_str("## 📝 Token Visualization\n\n");
+        md.push_str("## Token Visualization\n\n");
 
         for (i, token) in analysis.tokens.iter().enumerate() {
             let confidence_level = ConfidenceLevel::from(token.confidence);
@@ -388,7 +388,7 @@ impl Renderer for MarkdownRenderer {
         md.push_str("\n\n");
 
         if config.show_flags && !analysis.flags.is_empty() {
-            md.push_str("## 🏷️ Flags\n\n");
+            md.push_str("## Flags\n\n");
 
             for flag in &analysis.flags {
                 let token_text: String = analysis.tokens[flag.start..flag.end]
@@ -409,7 +409,7 @@ impl Renderer for MarkdownRenderer {
         }
 
         if config.verbose && config.show_confidence_scores {
-            md.push_str("\n## 📋 Detailed Token Information\n\n");
+            md.push_str("\n## Detailed Token Information\n\n");
             md.push_str("| Index | Token | Confidence | Flags |\n");
             md.push_str("|-------|-------|------------|-------|\n");
 
