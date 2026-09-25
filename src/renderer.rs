@@ -153,7 +153,6 @@ impl Renderer for TerminalRenderer {
             }
         }
 
-        println!("{}", output);
         Ok(output)
     }
 }
