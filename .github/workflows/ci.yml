@@ -16,5 +16,11 @@ jobs:
           components: clippy, rustfmt
       - uses: Swatinem/rust-cache@v2
       - run: cargo fmt --all -- --check
-      - run: cargo clippy -- -D warnings
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo clippy --all-targets --no-default-features -- -D warnings
       - run: cargo test
+      - name: Smoke test the offline detector on a bundled sample
+        run: |
+          cargo run -q -- --logprobs-file examples/logprobs/cuyp.json --threshold 0.6 --format json | tee report.json
+          grep -q '"text": " Dordrecht"' report.json
+          cargo run -q --example detect

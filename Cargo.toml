@@ -1,7 +1,19 @@
 [package]
 name = "llm-token-visualizer"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
+description = "Flag low-confidence spans in LLM output from token logprobs, and render per-token confidence as terminal, HTML or Markdown"
+license = "MIT"
+repository = "https://github.com/Mattbusel/LLM-Hallucination-Detection-Script"
+readme = "README.md"
+keywords = ["llm", "hallucination", "logprobs", "confidence", "cli"]
+categories = ["command-line-utilities", "text-processing"]
+
+[features]
+default = ["live"]
+# Live mode: call an OpenAI-compatible API. Disable with --no-default-features
+# for an offline-only build without an HTTP client.
+live = ["dep:ureq"]
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
@@ -10,6 +22,7 @@ clap = { version = "4.0", features = ["derive"] }
 colored = "2.0"
 anyhow = "1.0"
 thiserror = "1.0"
+ureq = { version = "2", optional = true }
 
 [dev-dependencies]
 tempfile = "3.0"

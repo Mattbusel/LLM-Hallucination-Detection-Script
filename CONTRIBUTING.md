@@ -1,22 +1,34 @@
-# Contributing to LLM-Hallucination-Detection-Script
+# Contributing
 
-Thanks for your interest. Contributions that improve detection accuracy, add new methods, extend provider integrations, or add test coverage are all welcome.
+Thanks for helping. Small, focused PRs are easiest to review.
 
-## What we want
+## Setup
 
-- **New detection methods** -- additional heuristics or ML-based approaches
-- **Provider integrations** -- examples using Mistral, Gemini, local models
-- **Rust MVP improvements** -- better streaming detection, new dashboard features
-- **Bug fixes** -- correctness issues, edge cases, false positive reduction
-- **Tests** -- more labeled examples, accuracy benchmarks
+You need a stable Rust toolchain.
 
-## How to contribute
+```bash
+git clone https://github.com/Mattbusel/LLM-Hallucination-Detection-Script
+cd LLM-Hallucination-Detection-Script
+cargo test
+cargo run -- --logprobs-file examples/logprobs/cuyp.json --threshold 0.6
+```
 
-1. Fork and clone
-2. Python: `python -m pytest tests/` must pass
-3. Rust: `cargo test --all` must pass
-4. Open a PR with a description of the change and why
+## Before you open a PR
 
-## Questions
+CI runs these; run them locally first:
 
-Open a [Discussion](https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/discussions) for design questions or ideas before building.
+```bash
+cargo fmt --all -- --check
+cargo clippy --all-targets -- -D warnings
+cargo clippy --all-targets --no-default-features -- -D warnings
+cargo test
+cargo run --example detect
+```
+
+## Good places to start
+
+- Detection logic lives in `src/detect.rs`, with unit tests at the bottom of the file. New heuristics should come with a test and, ideally, a real sample response in `examples/logprobs/`.
+- Sample responses must be real API output (say which model and provider in the PR). Do not hand-edit logprobs.
+- `rust_mvps/` is design sketches that are not built. Turning one into a working crate is welcome, but open an issue first.
+
+Issues labelled `good first issue` are sized for a first PR.

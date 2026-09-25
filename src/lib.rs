@@ -1,4 +1,7 @@
 pub mod data;
+pub mod detect;
+#[cfg(feature = "live")]
+pub mod live;
 pub mod renderer;
 pub mod utils;
 
