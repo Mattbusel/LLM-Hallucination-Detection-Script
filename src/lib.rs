@@ -1,3 +1,40 @@
+//! Flag the words an LLM answer was unsure about, from the token log
+//! probabilities (logprobs) that OpenAI-compatible APIs return.
+//!
+//! Each token's probability is `exp(logprob)`. A word is flagged when any of
+//! its tokens with letters or digits falls below the threshold, neighbouring
+//! flagged words merge into one span, and each span keeps the alternatives the
+//! model was weighing at its weakest token.
+//!
+//! ```
+//! use llm_token_visualizer::detect::{detect, parse_logprobs};
+//!
+//! // Three real tokens from a Llama 3.1 8B answer ("... in Dordrecht").
+//! let json = r#"[
+//!   {"token": " D", "logprob": -0.0153},
+//!   {"token": "ord", "logprob": -0.5620, "top_logprobs": [
+//!     {"token": "ord", "logprob": -0.5620},
+//!     {"token": "üsseldorf", "logprob": -0.9370},
+//!     {"token": "elf", "logprob": -3.5620}]},
+//!   {"token": "recht", "logprob": -0.0004}
+//! ]"#;
+//!
+//! let tokens = parse_logprobs(json)?;
+//! let report = detect(&tokens, 0.6);
+//!
+//! assert_eq!(report.spans.len(), 1);
+//! assert_eq!(report.spans[0].text, " Dordrecht");
+//! assert_eq!(
+//!     report.spans[0].describe(),
+//!     r#"p=0.57 at "ord"; model also considered "üsseldorf" (0.39), "elf" (0.03)"#
+//! );
+//! # Ok::<(), anyhow::Error>(())
+//! ```
+//!
+//! [`report`] renders the same result as a terminal heatmap, a self-contained
+//! HTML page or Markdown. The command-line tool is `llm-token-visualizer`
+//! (`cargo install llm-token-visualizer`).
+
 pub mod data;
 pub mod detect;
 #[cfg(feature = "live")]

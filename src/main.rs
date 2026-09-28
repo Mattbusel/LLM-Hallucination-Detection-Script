@@ -94,8 +94,34 @@ fn main() {
     }
 }
 
+/// Shown when the program is started without any input, e.g. by double-clicking
+/// the Windows .exe, instead of an error about missing flags.
+const GETTING_STARTED: &str = "llm-token-visualizer flags the words an LLM answer was unsure about, using the
+token log probabilities (logprobs) the API returns.
+
+Try it on a real sample answer (no API key needed):
+  curl -LO https://raw.githubusercontent.com/Mattbusel/LLM-Hallucination-Detection-Script/main/examples/logprobs/cuyp.json
+  llm-token-visualizer --logprobs-file cuyp.json --threshold 0.6
+
+Check a live answer from any OpenAI-compatible API (set OPENAI_API_KEY first):
+  llm-token-visualizer --live \"Who painted The Night Watch?\"
+
+Run llm-token-visualizer --help for every option.";
+
 fn run() -> Result<i32> {
     let args = Args::parse();
+
+    let no_input = args.logprobs_file.is_none()
+        && args.live.is_none()
+        && args.text.is_none()
+        && args.text_file.is_none()
+        && args.confidence.is_none()
+        && args.confidence_file.is_none()
+        && !args.demo;
+    if no_input {
+        println!("{GETTING_STARTED}");
+        return Ok(2);
+    }
 
     if !(0.0..=1.0).contains(&args.threshold) {
         anyhow::bail!("--threshold must be between 0 and 1");
@@ -160,8 +186,12 @@ fn run_detect(args: &Args) -> Result<i32> {
             std::io::stdin().read_to_string(&mut s)?;
             s
         } else {
-            std::fs::read_to_string(path)
-                .with_context(|| format!("could not read {}", path.display()))?
+            std::fs::read_to_string(path).with_context(|| {
+                format!(
+                    "could not read {} (check the path; samples are in examples/logprobs/)",
+                    path.display()
+                )
+            })?
         }
     };
 

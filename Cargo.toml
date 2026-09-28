@@ -1,12 +1,13 @@
 [package]
 name = "llm-token-visualizer"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
 description = "Flag low-confidence spans in LLM output from token logprobs, and render per-token confidence as terminal, HTML or Markdown"
 license = "MIT"
 repository = "https://github.com/Mattbusel/LLM-Hallucination-Detection-Script"
 readme = "README.md"
 homepage = "https://mattbusel.github.io/LLM-Hallucination-Detection-Script/"
+documentation = "https://docs.rs/llm-token-visualizer"
 exclude = ["docs/", ".github/"]
 keywords = ["llm", "hallucination", "logprobs", "confidence", "cli"]
 categories = ["command-line-utilities", "text-processing"]

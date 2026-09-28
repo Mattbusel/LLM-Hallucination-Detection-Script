@@ -4,12 +4,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<title>LLM Hallucination Detector: token confidence from logprobs</title>
-<meta name="description" content="A Rust CLI and library that reads an LLM answer's token log probabilities, flags the words the model was unsure about, and shows the alternatives it weighed.">
+<title>LLM Hallucination Detector: flag unsure words</title>
+<meta name="description" content="Free LLM hallucination detector: reads token logprobs from OpenAI-compatible APIs and highlights the words the model was unsure about. Rust CLI, Windows .exe.">
+<link rel="canonical" href="https://mattbusel.github.io/LLM-Hallucination-Detection-Script/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mattbusel.github.io/LLM-Hallucination-Detection-Script/">
 <meta property="og:title" content="LLM Hallucination Detector">
 <meta property="og:description" content="Find the words your model wasn't sure about. Token logprobs in, flagged spans and alternatives out.">
-<meta property="og:image" content="https://mattbusel.github.io/LLM-Hallucination-Detection-Script/assets/social-preview.png">
+<meta property="og:image" content="https://mattbusel.github.io/LLM-Hallucination-Detection-Script/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A Llama 3.1 answer as a confidence heatmap with Aelbert and Dordrecht flagged">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="LLM Hallucination Detector">
+<meta name="twitter:description" content="Find the words your model wasn't sure about. Token logprobs in, flagged spans and alternatives out.">
+<meta name="twitter:image" content="https://mattbusel.github.io/LLM-Hallucination-Detection-Script/assets/og-image.png">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"LLM Hallucination Detector (llm-token-visualizer)","description":"Command-line tool and Rust library that reads an LLM answer's token log probabilities, flags the words the model was unsure about, and shows the alternatives it weighed.","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux","url":"https://mattbusel.github.io/LLM-Hallucination-Detection-Script/","codeRepository":"https://github.com/Mattbusel/LLM-Hallucination-Detection-Script","downloadUrl":"https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/releases/latest/download/llm-token-visualizer-x86_64-pc-windows-msvc.exe","programmingLanguage":"Rust","license":"https://opensource.org/licenses/MIT","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Matthew Busel","url":"https://github.com/Mattbusel"}}
+</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23f4efe4'/%3E%3Crect x='6' y='16' width='5' height='10' rx='1' fill='%23d6d0c4'/%3E%3Crect x='13.5' y='9' width='5' height='17' rx='1' fill='%23d6d0c4'/%3E%3Crect x='21' y='20' width='5' height='6' rx='1' fill='%23e84830'/%3E%3C/svg%3E">
 <style>
 :root{
@@ -46,6 +58,10 @@ button.copy{font:12px var(--mono);letter-spacing:.06em;text-transform:uppercase;
 button.copy:hover{color:var(--ink);border-color:var(--mute)}
 button.copy.ok{color:var(--flag);border-color:var(--flag)}
 .small{font-size:14.5px;color:var(--mute)}
+.dl{margin:14px 0 8px}
+.dlbtn{display:inline-block;background:#c9391f;color:#fff;text-decoration:none;font:600 16px var(--sans);padding:12px 20px;border-radius:10px}
+.dlbtn:hover{filter:brightness(1.08);color:#fff}
+.how-img{display:block;width:100%;max-width:900px;height:auto;margin:22px 0 8px;border-radius:14px}
 
 /* specimen */
 .spec{margin:44px 0 0;background:var(--card);border:1px solid var(--rule);border-radius:18px;overflow:hidden}
@@ -161,7 +177,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
     <div class="install">
       <div class="cmd"><code>cargo install llm-token-visualizer</code><button class="copy" data-copy="cargo install llm-token-visualizer">Copy</button></div>
     </div>
-    <p class="small">Or grab a prebuilt binary for Linux, macOS or Windows from the <a href="https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/releases/latest">latest release</a>.</p>
+    <p class="dl"><a class="dlbtn" href="https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/releases/latest/download/llm-token-visualizer-x86_64-pc-windows-msvc.exe">Download for Windows (.exe)</a></p>
+    <p class="small">Or with Rust installed: the command above. macOS and Linux builds are on the <a href="https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/releases/latest">latest release</a>.</p>
 
     <div class="spec" id="spec">
       <div class="bar-top">
@@ -213,6 +230,7 @@ cargo run -- --live "Who was the second person to walk on the Moon?" \
   <div class="k">How it works</div>
   <h2>Four rules, no model of its own.</h2>
   <p>No second LLM, no embeddings, no network call in offline mode. Just the numbers the model already gave you, read carefully.</p>
+  <img class="how-img" src="img/how-it-works.svg" width="1200" height="1130" loading="lazy" alt="Animated diagram: each token of a real Llama 3.1 answer gets p = e^logprob and a color from red to grey; tokens join into words and a word with a token below the 0.6 threshold is flagged (Aelbert p 0.49, Dordrecht p 0.57); each flagged span lists the alternatives the model weighed, The 0.43 and üsseldorf 0.39.">
   <div class="steps" id="steps"></div>
 </div></section>
 

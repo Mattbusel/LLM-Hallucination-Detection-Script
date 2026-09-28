@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.1 (2026-09-28)
+
+- Running with no arguments (for example by double-clicking the Windows .exe) prints a short getting-started guide instead of an error about missing flags.
+- A missing `--logprobs-file` now says to check the path and where the samples are.
+- docs.rs front page: one-paragraph overview and a compiling example.
+- Releases also ship a plain `llm-token-visualizer-x86_64-pc-windows-msvc.exe` and versionless archives, so `releases/latest/download/...` links always work.
+- README shortened; reference material moved to `docs/REFERENCE.md` and `docs/ARCHITECTURE.md`.
+
 ## 0.3.0 (2026-09-25)
 
 - New: `--format html` in detect mode writes a self-contained report page (no scripts, no external assets, light and dark): the answer as a confidence heatmap, a per-token probability strip, and each flagged span with bars for the alternatives. Hover or focus any word for its probability and alternatives.
