@@ -5,8 +5,8 @@
 For anyone who ships or checks LLM answers: developers, evaluators, and CI pipelines. Works with OpenAI and any OpenAI-compatible API that returns token logprobs. Rust CLI and library (`llm-token-visualizer`).
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Mattbusel/LLM-Hallucination-Detection-Script/main/docs/assets/hero-dark.png">
-  <img alt="LLM hallucination detection on a real Llama 3.1 answer, 'Aelbert Cuyp died in 1691 in Dordrecht, Netherlands.', shown as a token confidence heatmap with Aelbert and Dordrecht flagged, and the alternatives at 'ord': ord 0.57, üsseldorf 0.39, elf 0.03." src="https://raw.githubusercontent.com/Mattbusel/LLM-Hallucination-Detection-Script/main/docs/assets/hero-light.png" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/hero-dark.png">
+  <img alt="LLM hallucination detection on a real Llama 3.1 answer, 'Aelbert Cuyp died in 1691 in Dordrecht, Netherlands.', shown as a token confidence heatmap with Aelbert and Dordrecht flagged, and the alternatives at 'ord': ord 0.57, üsseldorf 0.39, elf 0.03." src="docs/assets/hero-light.png" width="100%">
 </picture>
 
 <p align="center">
@@ -33,13 +33,13 @@ The archives include the sample answers under `samples/`. Every release: [releas
 
 ## How it works
 
-<img alt="Animated diagram of how the detector works on a real answer. Step 1: every token comes with a logprob, p equals e to the logprob, and each token is colored from red (unsure) to grey (sure); 'A' has p 0.49 and 'ord' has p 0.57. Step 2: tokens join into words and a word is flagged if any of its tokens is below the 0.6 threshold, so Aelbert and Dordrecht are flagged. Step 3: each flagged span shows the alternatives the model weighed: The 0.43 instead of A, üsseldorf 0.39 instead of ord." src="https://raw.githubusercontent.com/Mattbusel/LLM-Hallucination-Detection-Script/main/docs/img/how-it-works.svg" width="100%">
+<img alt="Animated diagram of how the detector works on a real answer. Step 1: every token comes with a logprob, p equals e to the logprob, and each token is colored from red (unsure) to grey (sure); 'A' has p 0.49 and 'ord' has p 0.57. Step 2: tokens join into words and a word is flagged if any of its tokens is below the 0.6 threshold, so Aelbert and Dordrecht are flagged. Step 3: each flagged span shows the alternatives the model weighed: The 0.43 instead of A, üsseldorf 0.39 instead of ord." src="docs/img/how-it-works.svg" width="100%">
 
 When a model writes an answer, it picks each token (a word or piece of a word) from a list of candidates, each with a probability. APIs expose these as `logprobs`. Hallucinations often sit where that probability drops: a name, a date, a city the model half-remembers. This tool turns the numbers into a heatmap and flags the shaky words, with the alternatives the model almost said. No model of its own, no API calls unless you ask for `--live`.
 
 ## Examples
 
-Real answers from Llama 3.1 8B Instruct, bundled in `examples/logprobs/`. Output of `cargo run --example detect` (threshold 0.6):
+Real answers from Llama 3.1 8B Instruct, bundled in `examples/logprobs/`. The first two of the four answers in the output of `cargo run --example detect` (threshold 0.6):
 
 ```text
 examples/logprobs/cuyp.json
@@ -57,13 +57,13 @@ The Dordrecht answer is right, but the model gave Düsseldorf a 39% chance: exac
 
 The terminal report for the first one (`--logprobs-file examples/logprobs/cuyp.json --threshold 0.6`):
 
-<img alt="Terminal output of llm-token-visualizer on examples/logprobs/cuyp.json: the answer with Aelbert and Dordrecht underlined, then bars for the candidates at each weak token: A 0.49, The 0.43, D 0.08, and ord 0.57, üsseldorf 0.39, elf 0.03." src="https://raw.githubusercontent.com/Mattbusel/LLM-Hallucination-Detection-Script/main/docs/assets/terminal-cuyp.png" width="720">
+<img alt="Terminal output of llm-token-visualizer on examples/logprobs/cuyp.json: the answer with Aelbert and Dordrecht underlined, then bars for the candidates at each weak token: A 0.49, The 0.43, D 0.08, and ord 0.57, üsseldorf 0.39, elf 0.03." src="docs/assets/terminal-cuyp.png" width="720">
 
 ### What it cannot tell you
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Mattbusel/LLM-Hallucination-Detection-Script/main/docs/assets/confidently-wrong-dark.png">
-  <img alt="The moonwalk sample: 'Pete Conrad was the second person to walk on the Moon'. Pete Conrad is outlined as wrong but not flagged: P 0.72, ete 0.76, Conrad 1.00. Flagged instead: was 0.60, which 0.14, during 0.55." src="https://raw.githubusercontent.com/Mattbusel/LLM-Hallucination-Detection-Script/main/docs/assets/confidently-wrong-light.png" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/confidently-wrong-dark.png">
+  <img alt="The moonwalk sample: 'Pete Conrad was the second person to walk on the Moon'. Pete Conrad is outlined as wrong but not flagged: P 0.72, ete 0.76, Conrad 1.00. Flagged instead: was 0.60, which 0.14, during 0.55." src="docs/assets/confidently-wrong-light.png" width="100%">
 </picture>
 
 Models can be confidently wrong. In `moonwalk.json` the model says "Pete Conrad was the second person to walk on the Moon" (it was Buzz Aldrin) with at least 72% probability on every token of the name, so the wrong name is not flagged. Use this to decide where to look first, not to certify an answer.
@@ -80,11 +80,11 @@ No API key handy? Grab a sample first: `curl -LO https://raw.githubusercontent.c
 
 | | |
 |---|---|
-| [Reference](https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/blob/main/docs/REFERENCE.md) | Every flag, output formats (terminal, HTML, Markdown, JSON), CI use, input formats, live mode, your own confidence scores, library API |
-| [How it works and repo layout](https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/blob/main/docs/ARCHITECTURE.md) | The detection rules and color scale in detail, source layout, what is a sketch and what ships |
+| [Reference](docs/REFERENCE.md) | Every flag, output formats (terminal, HTML, Markdown, JSON), CI use, input formats, live mode, your own confidence scores, library API |
+| [How it works and repo layout](docs/ARCHITECTURE.md) | The detection rules and color scale in detail, source layout, what is a sketch and what ships |
 | [API docs on docs.rs](https://docs.rs/llm-token-visualizer) | The Rust library |
 | [Project site](https://mattbusel.github.io/LLM-Hallucination-Detection-Script/) | Try the samples with a threshold slider |
-| [Changelog](https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/blob/main/CHANGELOG.md) | What changed in each release |
+| [Changelog](CHANGELOG.md) | What changed in each release |
 
 ## License
 
