@@ -37,10 +37,17 @@ jobs:
           cp -r examples/logprobs "dist/$name/samples"
           cd dist
           if [ "${{ runner.os }}" = "Windows" ]; then 7z a "$name.zip" "$name" >/dev/null; else tar czf "$name.tar.gz" "$name"; fi
+          # Versionless copies so README links can use releases/latest/download/<asset>.
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            cp "$name/$exe" "$BIN-${{ matrix.target }}.exe"
+          else
+            cp "$name.tar.gz" "$BIN-${{ matrix.target }}.tar.gz"
+          fi
+          rm -rf "$name"
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.target }}
-          path: dist/*.*z*
+          path: dist/*
   release:
     needs: build
     runs-on: ubuntu-latest

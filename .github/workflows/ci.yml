@@ -27,3 +27,4 @@ jobs:
           grep -q 'class="f" id="s2"' report.html
           cargo run -q -- --logprobs-file examples/logprobs/cuyp.json --threshold 0.6 --format markdown | grep -q 'üsseldorf'
           cargo run -q --example detect
+          cargo run -q | grep -q 'Try it on a real sample'
