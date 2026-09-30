@@ -14,21 +14,22 @@ For anyone who ships or checks LLM answers: developers, evaluators, and CI pipel
   &nbsp;<a href="https://mattbusel.github.io/LLM-Hallucination-Detection-Script/"><b>Try it in the browser</b></a>
 </p>
 
-## Download
+## Install
 
-### [Download for Windows (.exe)](https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/releases/latest/download/llm-token-visualizer-x86_64-pc-windows-msvc.exe)
+**Linux** (x86_64, Ubuntu 20.04+ / Debian 11+). One line, no dependencies, installs to `~/.local/bin`:
 
-It is a command-line tool: open PowerShell in your Downloads folder and run `.\llm-token-visualizer-x86_64-pc-windows-msvc.exe`. With no arguments it prints how to get started.
+```sh
+mkdir -p ~/.local/bin && curl -fsSL https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases/permalink/latest/downloads/llm-token-visualizer-linux-x86_64.tar.gz | tar xz --strip-components=1 -C ~/.local/bin --wildcards '*/llm-token-visualizer'
+```
 
-| Platform | Download |
+| Other systems | |
 |---|---|
-| macOS (Apple Silicon) | [llm-token-visualizer-aarch64-apple-darwin.tar.gz](https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/releases/latest/download/llm-token-visualizer-aarch64-apple-darwin.tar.gz) |
-| macOS (Intel) | [llm-token-visualizer-x86_64-apple-darwin.tar.gz](https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/releases/latest/download/llm-token-visualizer-x86_64-apple-darwin.tar.gz) |
-| Linux (x86_64) | [llm-token-visualizer-x86_64-unknown-linux-gnu.tar.gz](https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/releases/latest/download/llm-token-visualizer-x86_64-unknown-linux-gnu.tar.gz) |
-| Any OS with Rust | `cargo install llm-token-visualizer` |
-| Rust library | `cargo add llm-token-visualizer` |
+| **Windows** | [Download llm-token-visualizer-windows-x86_64.exe](https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases/permalink/latest/downloads/llm-token-visualizer-windows-x86_64.exe) and run it. (Unsigned, so SmartScreen may ask: *More info*, then *Run anyway*.) |
+| **macOS, or from source** | `cargo install --locked llm-token-visualizer` |
 
-The archives include the sample answers under `samples/`. Every release: [releases page](https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/releases/latest).
+The release archives also include the sample answers under `samples/`. Every release, with SHA-256 checksums: [Releases](https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases).
+
+**In GitLab CI:** fail a pipeline when a saved LLM answer has low-confidence words with the [`hallucination-gate`](https://gitlab.com/explore/catalog/mattbusel/llm-ci) CI/CD component.
 
 ## How it works
 
