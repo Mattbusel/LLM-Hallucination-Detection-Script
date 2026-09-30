@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.0 (2026-09-30)
+
+- New: `--provider openai|openrouter|together|vllm|ollama` for `--live`, each with its default base URL, API key variable and (for openai and openrouter) a default model; `--base-url` overrides the address. Without `--provider`, `--live` behaves as before (OpenAI, `OPENAI_API_KEY`, `OPENAI_BASE_URL`).
+- Together requests use Together's integer `logprobs` form; OpenRouter requests ask to be routed only to upstream providers that support the parameters.
+- If a provider answers without token logprobs, `--live` now fails with a clear message (and the answer) instead of a generic parse error.
+- Input: the `tokens` / `token_logprobs` / `top_logprobs` logprobs shape is read too.
+- Library: `live::Provider`, `live::Target` (`resolve`, `body`, `url`), `live::fetch_target`, `live::check_has_logprobs`. `live::fetch` and `live::request_body` are unchanged.
+- Ollama preset checked against a real Ollama 0.34.4 server (qwen2.5-coder:14b): logprobs and alternatives come back.
+- New browser page `docs/try/` (served at /try/): the four sample answers with a threshold slider, detected with the same rules as the CLI, and an optional "ask your own question" form for OpenAI, OpenRouter, Together or a custom OpenAI-compatible URL with your own key, sent only from the browser to that provider.
+
 ## 0.3.1 (2026-09-28)
 
 - Running with no arguments (for example by double-clicking the Windows .exe) prints a short getting-started guide instead of an error about missing flags.

@@ -54,19 +54,26 @@ llm-token-visualizer --logprobs-file answer.json --format markdown >> "$GITHUB_S
 
 ## Live mode
 
-`--live "<prompt>"` sends the prompt with temperature 0, `logprobs: true` and `top_logprobs: 3`, then analyzes the answer.
+`--live "<prompt>"` sends the prompt with temperature 0, `logprobs: true` and `top_logprobs: 3` (Together: `logprobs: 3`), then analyzes the answer.
 
-| Variable | Default | Meaning |
-|---|---|---|
-| `OPENAI_API_KEY` | required | Bearer token for the API |
-| `OPENAI_BASE_URL` | `https://api.openai.com/v1` | Any server with Chat Completions and logprobs, e.g. `https://router.huggingface.co/v1` |
+`--provider <name>` picks a preset (default `openai`); `--base-url <URL>` overrides its address (the part before `/chat/completions`).
+
+| `--provider` | Base URL | API key variable | Default model |
+|---|---|---|---|
+| `openai` | `https://api.openai.com/v1`, or `OPENAI_BASE_URL` if set | `OPENAI_API_KEY` (required) | `gpt-4o-mini` |
+| `openrouter` | `https://openrouter.ai/api/v1` | `OPENROUTER_API_KEY` (required) | `openai/gpt-4o-mini` |
+| `together` | `https://api.together.ai/v1` | `TOGETHER_API_KEY` (required) | none |
+| `vllm` | `http://localhost:8000/v1` | `VLLM_API_KEY` (optional) | none |
+| `ollama` | `http://localhost:11434/v1` | none | none |
+
+`OPENAI_BASE_URL` still works for the `openai` preset, e.g. `https://router.huggingface.co/v1`. OpenRouter requests also set `provider.require_parameters: true` so they are only routed to upstream providers that accept logprobs. If the response has no token logprobs, the command fails with a message naming the provider and model (and `--save` still writes the raw response).
 
 ```bash
 export OPENAI_API_KEY=sk-...
 llm-token-visualizer --live "Who was the second person to walk on the Moon?" --save answer.json
 ```
 
-Flags: `--model` (default `gpt-4o-mini`), `--max-tokens` (default 200), and `--save <path>` to keep the raw response so you can re-run it offline with `--logprobs-file`. Anthropic's API does not return logprobs, so Claude models cannot be analyzed this way.
+Flags: `--model` (default depends on the provider, see above), `--max-tokens` (default 200), and `--save <path>` to keep the raw response so you can re-run it offline with `--logprobs-file`. Anthropic's API does not return logprobs, so Claude models cannot be analyzed this way.
 
 The bundled samples were fetched through the Hugging Face router (`meta-llama/Llama-3.1-8B-Instruct:novita`). Build with `--no-default-features` for an offline-only binary without an HTTP client.
 

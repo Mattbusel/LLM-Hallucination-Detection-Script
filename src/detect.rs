@@ -87,6 +87,20 @@ pub fn parse_logprobs(json: &str) -> Result<Vec<LogprobToken>> {
     if let Some(err) = value.get("error") {
         bail!("the API returned an error: {}", err);
     }
+    // Completions-style shape (`tokens` + `token_logprobs`), which some
+    // servers return from Chat Completions too.
+    let legacy = value
+        .pointer("/choices/0/logprobs")
+        .or_else(|| Some(&value).filter(|v| v.get("token_logprobs").is_some()))
+        .filter(|l| l.get("tokens").is_some() && l.get("token_logprobs").is_some());
+    if let Some(l) = legacy {
+        let mut tokens = parse_legacy(l)?;
+        tokens.retain(|t| !is_special_token(&t.token));
+        if tokens.is_empty() {
+            bail!("logprobs contain no tokens");
+        }
+        return Ok(tokens);
+    }
     let content = if value.is_array() {
         &value
     } else if let Some(c) = value.pointer("/choices/0/logprobs/content") {
@@ -111,6 +125,50 @@ pub fn parse_logprobs(json: &str) -> Result<Vec<LogprobToken>> {
         bail!("logprobs contain no tokens");
     }
     Ok(tokens)
+}
+
+/// Read `{"tokens": [..], "token_logprobs": [..], "top_logprobs": [..]}`,
+/// where each `top_logprobs` entry is either a `{token: logprob}` map or a
+/// list of `{"token", "logprob"}` objects.
+fn parse_legacy(l: &Value) -> Result<Vec<LogprobToken>> {
+    let toks = l["tokens"]
+        .as_array()
+        .context("logprobs.tokens is not a list")?;
+    let lps = l["token_logprobs"]
+        .as_array()
+        .context("logprobs.token_logprobs is not a list")?;
+    if toks.len() != lps.len() {
+        bail!("logprobs.tokens and logprobs.token_logprobs have different lengths");
+    }
+    let tops = l.get("top_logprobs").and_then(Value::as_array);
+    let mut out = Vec::with_capacity(toks.len());
+    for (i, (t, lp)) in toks.iter().zip(lps).enumerate() {
+        let token = t
+            .as_str()
+            .context("a logprobs token is not a string")?
+            .to_string();
+        let logprob = lp.as_f64().unwrap_or(f64::NEG_INFINITY);
+        let mut top_logprobs: Vec<Alternative> = match tops.and_then(|a| a.get(i)) {
+            Some(Value::Object(m)) => m
+                .iter()
+                .filter_map(|(k, v)| {
+                    v.as_f64().map(|lp| Alternative {
+                        token: k.clone(),
+                        logprob: lp,
+                    })
+                })
+                .collect(),
+            Some(v @ Value::Array(_)) => serde_json::from_value(v.clone()).unwrap_or_default(),
+            _ => Vec::new(),
+        };
+        top_logprobs.sort_by(|a, b| b.logprob.total_cmp(&a.logprob));
+        out.push(LogprobToken {
+            token,
+            logprob,
+            top_logprobs,
+        });
+    }
+    Ok(out)
 }
 
 fn is_special_token(s: &str) -> bool {
@@ -283,6 +341,23 @@ mod tests {
             assert_eq!(t.len(), 1);
             assert_eq!(t[0].token, "Hi");
         }
+    }
+
+    #[test]
+    fn parses_tokens_and_token_logprobs_shape() {
+        let map = r#"{"choices":[{"logprobs":{"tokens":["Hi","!"],"token_logprobs":[-0.1,-2.0],
+            "top_logprobs":[{"Hello":-2.5,"Hi":-0.1},{"!":-2.0}]}}]}"#;
+        let t = parse_logprobs(map).unwrap();
+        assert_eq!(t.len(), 2);
+        assert_eq!(t[0].token, "Hi");
+        assert_eq!(t[0].top_logprobs[0].token, "Hi");
+        assert_eq!(t[0].top_logprobs[1].token, "Hello");
+        let list = r#"{"choices":[{"logprobs":{"tokens":["Hi"],"token_logprobs":[-0.1],
+            "top_logprobs":[[{"token":"Hi","logprob":-0.1},{"token":"Yo","logprob":-3.0}]]}}]}"#;
+        let t = parse_logprobs(list).unwrap();
+        assert_eq!(t[0].top_logprobs.len(), 2);
+        let bad = r#"{"choices":[{"logprobs":{"tokens":["a","b"],"token_logprobs":[-0.1]}}]}"#;
+        assert!(parse_logprobs(bad).is_err());
     }
 
     #[test]

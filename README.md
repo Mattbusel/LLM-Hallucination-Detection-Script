@@ -2,7 +2,9 @@
 
 **Highlights the words an AI chatbot was unsure about, so you know which parts of its answer to double-check.**
 
-For anyone who ships or checks LLM answers: developers, evaluators, and CI pipelines. Works with OpenAI and any OpenAI-compatible API that returns token logprobs. Rust CLI and library (`llm-token-visualizer`).
+For anyone who ships or checks LLM answers: developers, evaluators, and CI pipelines. Works with OpenAI, OpenRouter, Together, vLLM, Ollama and any OpenAI-compatible API that returns token logprobs. Rust CLI and library (`llm-token-visualizer`).
+
+**No install:** [try it in your browser](https://hallucination-highlighter.vercel.app/try/) (page source in [`docs/try/`](docs/try/index.html)). Play with the real sample answers and a threshold slider, or paste your own OpenAI, OpenRouter or Together key and ask a question. The key goes only from your browser to that provider.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/hero-dark.png">
@@ -11,7 +13,7 @@ For anyone who ships or checks LLM answers: developers, evaluators, and CI pipel
 
 <p align="center">
   <a href="https://crates.io/crates/llm-token-visualizer"><img alt="crates.io" src="https://img.shields.io/crates/v/llm-token-visualizer.svg"></a>
-  &nbsp;<a href="https://hallucination-highlighter.vercel.app/"><b>Try it in the browser</b></a>
+  &nbsp;<a href="https://hallucination-highlighter.vercel.app/try/"><b>Try it in the browser</b></a>
 </p>
 
 ## Install
@@ -74,6 +76,26 @@ Models can be confidently wrong. In `moonwalk.json` the model says "Pete Conrad 
 2. **Run it:** `llm-token-visualizer --logprobs-file answer.json --threshold 0.6`
 3. **Share or gate it:** `--format html -o report.html` for a page you can send, `--format markdown` for a PR comment, `--fail-on-flag` to fail a CI job when anything is flagged.
 
+## Providers
+
+`--live` asks a model and analyzes its answer. Pick where with `--provider` (default `openai`), and override the address with `--base-url`:
+
+| `--provider` | Default base URL | Key from | Default `--model` | How it was checked |
+|---|---|---|---|---|
+| `openai` | `https://api.openai.com/v1` (or `OPENAI_BASE_URL`) | `OPENAI_API_KEY` | `gpt-4o-mini` | Docs (`logprobs`, `top_logprobs` up to 5). Request building unit-tested. |
+| `openrouter` | `https://openrouter.ai/api/v1` | `OPENROUTER_API_KEY` | `openai/gpt-4o-mini` | Docs (`logprobs`, `top_logprobs`; support depends on the upstream provider, so the request sets `provider.require_parameters`). Request building unit-tested. |
+| `together` | `https://api.together.ai/v1` | `TOGETHER_API_KEY` | none, pass `--model` | Docs (Together takes `"logprobs": <int>` rather than `true`, and the CLI sends that). Request building unit-tested. |
+| `vllm` | `http://localhost:8000/v1` | `VLLM_API_KEY`, only if the server uses `--api-key` | none, pass `--model` | Docs (`logprobs`, `top_logprobs` in Chat Completions). Request building unit-tested. |
+| `ollama` | `http://localhost:11434/v1` | no key | none, pass `--model` | **Real call** to Ollama 0.34.4 with `qwen2.5-coder:14b`: logprobs and top 3 alternatives came back. (Ollama's own OpenAI-compatibility page still lists logprobs as unsupported; older versions may not return them.) |
+
+```sh
+llm-token-visualizer --live "Who painted The Night Watch?" --provider ollama --model qwen2.5-coder:14b
+llm-token-visualizer --live "Who painted The Night Watch?" --provider openrouter --save answer.json
+llm-token-visualizer --live "..." --provider vllm --model my-model --base-url http://gpu-box:8000/v1
+```
+
+No hosted provider was called with a real key for this release. If a provider or model answers without logprobs, the CLI stops with an error that says so (and shows the answer) instead of printing an empty report. Anthropic's API does not return logprobs, so it has no preset.
+
 No API key handy? Grab a sample first: `curl -LO https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/raw/main/examples/logprobs/cuyp.json`
 
 ## Documentation
@@ -83,7 +105,8 @@ No API key handy? Grab a sample first: `curl -LO https://gitlab.com/mattbusel/LL
 | [Reference](docs/REFERENCE.md) | Every flag, output formats (terminal, HTML, Markdown, JSON), CI use, input formats, live mode, your own confidence scores, library API |
 | [How it works and repo layout](docs/ARCHITECTURE.md) | The detection rules and color scale in detail, source layout, what is a sketch and what ships |
 | [API docs on docs.rs](https://docs.rs/llm-token-visualizer) | The Rust library |
-| [Project site](https://hallucination-highlighter.vercel.app/) | Try the samples with a threshold slider |
+| [Project site](https://hallucination-highlighter.vercel.app/) | Overview, with the samples and a threshold slider |
+| [Try it in the browser](https://hallucination-highlighter.vercel.app/try/) | Samples, or ask OpenAI, OpenRouter or Together with your own key |
 | [Changelog](CHANGELOG.md) | What changed in each release |
 
 ## License

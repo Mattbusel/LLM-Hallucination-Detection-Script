@@ -163,10 +163,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
   <nav>
     <a class="mark" href="./"><svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="14" width="7" height="15" rx="1.5" fill="#d6d0c4"/><rect x="12.5" y="5" width="7" height="24" rx="1.5" fill="#ecc05c"/><rect x="22" y="20" width="7" height="9" rx="1.5" fill="#e84830"/></svg>llm-token-visualizer</a>
     <ul>
-      <li><a href="#how">How it works</a></li>
+      <li><a href="try/">Try it</a></li>
+      <li class="opt"><a href="#how">How it works</a></li>
       <li class="opt"><a href="#formats">Formats</a></li>
       <li class="opt"><a href="https://crates.io/crates/llm-token-visualizer">crates.io</a></li>
-      <li><a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script">GitHub</a></li>
+      <li><a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script">GitLab</a></li>
     </ul>
   </nav>
 
@@ -199,7 +200,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
         </div>
       </div>
     </div>
-    <p class="small" style="margin-top:12px">Real responses from Llama 3.1 8B Instruct, bundled in <code>examples/logprobs/</code>. The detection runs in your browser with the same rules as the CLI; hover or tap any word for its probability and alternatives.</p>
+    <p class="small" style="margin-top:12px">Real responses from Llama 3.1 8B Instruct, bundled in <code>examples/logprobs/</code>. The detection runs in your browser with the same rules as the CLI; hover or tap any word for its probability and alternatives. <a href="try/"><b>Ask your own question</b></a> with an OpenAI, OpenRouter or Together key, right in the browser.</p>
   </header>
 </div>
 
@@ -221,7 +222,7 @@ cargo run --example detect
 export OPENAI_API_KEY=sk-...
 cargo run -- --live "Who was the second person to walk on the Moon?" \
   --save answer.json</pre>
-      <p class="small" style="margin-top:12px">Live mode works with any server that returns <code>logprobs</code>: set <code>OPENAI_BASE_URL</code>, for example to <code>https://router.huggingface.co/v1</code>. Anthropic's API does not return logprobs.</p>
+      <p class="small" style="margin-top:12px">Live mode has presets: <code>--provider openai</code>, <code>openrouter</code>, <code>together</code>, <code>vllm</code> or <code>ollama</code> (local, no key). Any other server that returns <code>logprobs</code> works with <code>--base-url</code>. Anthropic's API does not return logprobs.</p>
     </div>
   </div>
 </div></section>

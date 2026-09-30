@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Try the Hallucination Highlighter</title>
+<meta name="description" content="Paste nothing, install nothing: see which words an LLM answer was unsure about, from real token logprobs. Try the bundled samples, or ask OpenAI, OpenRouter or Together with your own key, straight from your browser.">
+<link rel="canonical" href="https://hallucination-highlighter.vercel.app/try/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://hallucination-highlighter.vercel.app/try/">
+<meta property="og:title" content="Try the Hallucination Highlighter">
+<meta property="og:description" content="See which words an LLM answer was unsure about, from real token logprobs, in your browser.">
+<meta property="og:image" content="https://hallucination-highlighter.vercel.app/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23f4efe4'/%3E%3Crect x='6' y='16' width='5' height='10' rx='1' fill='%23d6d0c4'/%3E%3Crect x='13.5' y='9' width='5' height='17' rx='1' fill='%23d6d0c4'/%3E%3Crect x='21' y='20' width='5' height='6' rx='1' fill='%23e84830'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#f4efe4;--card:#fbf8f1;--ink:#1d1b17;--mute:#6b665b;--rule:#ddd5c4;--track:#e6dfd0;
+  --flag:#c9391f;--blue:#2f5d8a;--alpha:.62;--code:#efe8da;--field:#fffdf8;--ok:#3d7a3a;
+  --serif:"Iowan Old Style","Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#141311;--card:#1b1a17;--ink:#ebe5d8;--mute:#9d9688;--rule:#302d27;--track:#2a2723;
+  --flag:#f0654a;--blue:#86b1dc;--alpha:.5;--code:#211f1b;--field:#12110f;--ok:#8fc98a}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--sans)}
+a{color:inherit;text-decoration-color:color-mix(in srgb,currentColor 35%,transparent);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--flag)}
+code{font:.9em var(--mono)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.k{font:12.5px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 0}
+nav .mark{font:600 14px var(--mono);text-decoration:none;display:flex;align-items:center;gap:10px}
+nav .mark svg{flex:none}
+nav ul{display:flex;gap:22px;list-style:none;margin:0;padding:0;font-size:15px}
+nav ul a{text-decoration:none;color:var(--mute)}nav ul a:hover,nav ul a[aria-current]{color:var(--ink)}
+header.hero{padding:28px 0 8px}
+h1{font:400 clamp(36px,5.4vw,60px)/1.04 var(--serif);letter-spacing:-.015em;margin:14px 0 16px;max-width:900px}
+h1 em{color:var(--flag)}
+.lede{font-size:clamp(17px,2vw,20px);color:var(--mute);max-width:720px;margin:0 0 8px}
+.small{font-size:14.5px;color:var(--mute)}
+
+/* viewer, same look as the home page specimen */
+.spec{margin:30px 0 0;background:var(--card);border:1px solid var(--rule);border-radius:18px;overflow:hidden}
+.bar-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;padding:14px 18px;border-bottom:1px solid var(--rule)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button{font:13.5px var(--mono);background:transparent;color:var(--mute);border:1px solid transparent;border-radius:8px;padding:6px 10px;cursor:pointer}
+.tabs button[aria-selected=true]{color:var(--ink);background:var(--bg);border-color:var(--rule)}
+.tabs button:hover{color:var(--ink)}
+.tabs button.mine{color:var(--flag)}
+.thr{display:flex;align-items:center;gap:10px;font:13.5px var(--mono);color:var(--mute)}
+.thr input{accent-color:var(--flag);width:170px}
+.thr output{color:var(--ink);min-width:3.2em}
+.spec-body{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}
+.spec-text{padding:28px 32px 24px;border-right:1px solid var(--rule)}
+.spec-side{padding:22px 22px 24px}
+.note{font:italic 17px/1.5 var(--serif);color:var(--mute);margin:0 0 6px}
+.answer{font:clamp(21px,2.5vw,28px)/1.8 var(--serif);margin:0 0 22px;min-height:3.6em;overflow-wrap:anywhere}
+.answer.plain{white-space:pre-wrap}
+.t{position:relative;border-radius:4px;background:rgba(var(--h),calc(var(--a)*var(--alpha)));padding:.05em 0;outline:none}
+.t:hover,.t:focus-visible,.t.on{box-shadow:0 0 0 1.5px rgb(var(--h))}
+.tip{position:fixed;z-index:10;pointer-events:none;background:var(--ink);color:var(--bg);font:12.5px/1.55 var(--mono);white-space:pre;padding:8px 11px;border-radius:8px;opacity:0;transition:opacity .08s;max-width:calc(100vw - 16px);overflow:hidden}
+.tip.show{opacity:1}
+.f{text-decoration:underline wavy var(--flag);text-decoration-thickness:1.5px;text-underline-offset:.28em;text-decoration-skip-ink:none}
+sup{font:600 12px var(--mono);color:var(--flag);margin-left:1px}
+.trace{display:flex;align-items:flex-end;gap:2px;height:46px}
+.trace i{flex:1;min-width:1px;max-width:22px;border-radius:2px 2px 0 0;background:rgb(var(--h))}
+.stats{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:14px}
+.span{border-bottom:1px solid var(--rule);padding:12px 0 14px}
+.span:first-child{padding-top:4px}.span:last-child{border-bottom:0}
+.span h3{margin:0 0 8px;font:600 16px var(--sans);display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.span h3 .n{font:600 13px var(--mono);color:var(--flag)}
+.span h3 .w{font:12.5px var(--mono);color:var(--mute);font-weight:400}
+.row{display:grid;grid-template-columns:8.6em 1fr 40px;gap:10px;align-items:center;font:13.5px var(--mono);margin:4px 0}
+.row .bar{height:8px;border-radius:4px;background:var(--track);overflow:hidden}
+.row .bar i{display:block;height:100%;background:rgb(var(--h));transition:width .25s}
+.row > span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:pre}
+.row.c{font-weight:700}.row .p{text-align:right;color:var(--mute)}
+.none{color:var(--mute);font-size:15px;margin:4px 0}
+.verdict{margin:16px 0 0;font-size:15px;color:var(--mute)}
+.dlraw{margin-top:10px;font:13px var(--mono)}
+.dlraw[hidden]{display:none}
+
+/* ask form */
+section{padding:72px 0 0}
+h2{font:400 clamp(28px,3.6vw,40px)/1.1 var(--serif);letter-spacing:-.01em;margin:10px 0 14px}
+section > .wrap > p{max-width:720px;color:var(--mute);margin:0 0 18px}
+.ask{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:22px;align-items:start}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:22px}
+.card h3{margin:0 0 8px;font:600 17px var(--sans)}
+.card p{margin:0 0 12px;color:var(--mute);font-size:15px}
+.card p:last-child{margin-bottom:0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+.grid .full{grid-column:1/-1}
+label.fld{display:flex;flex-direction:column;gap:6px;font:12.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mute);min-width:0}
+input[type=text],input[type=url],input[type=password],select,textarea{font:15px var(--sans);color:var(--ink);background:var(--field);border:1px solid var(--rule);border-radius:9px;padding:10px 12px;width:100%;min-width:0;letter-spacing:0;text-transform:none}
+input[readonly]{color:var(--mute)}
+textarea{min-height:92px;resize:vertical;line-height:1.5}
+input:focus,select:focus,textarea:focus{outline:2px solid color-mix(in srgb,var(--flag) 55%,transparent);outline-offset:1px;border-color:transparent}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;color:var(--mute)}
+.check input{accent-color:var(--flag);margin-top:4px;flex:none}
+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px}
+.go{background:#c9391f;color:#fff;border:0;font:600 16px var(--sans);padding:11px 22px;border-radius:10px;cursor:pointer}
+.go:hover{filter:brightness(1.08)}
+.go:disabled{opacity:.55;cursor:progress}
+.status{font-size:14.5px;color:var(--mute);min-height:1.5em;margin:0}
+.status.err{color:var(--flag)}
+.status.ok{color:var(--ok)}
+.keynote{border-left:3px solid var(--flag);padding:2px 0 2px 14px;margin:0 0 16px}
+.keynote p{margin:0 0 6px;font-size:15px;color:var(--ink)}
+table{border-collapse:collapse;width:100%;font-size:14px;table-layout:fixed}
+th,td{text-align:left;padding:8px 8px 8px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font:12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mute);font-weight:400}
+td b{font-weight:600}
+td code{overflow-wrap:anywhere;word-break:break-word}
+th:first-child,td:first-child{width:6.8em}
+.yes{color:var(--ok)}.no{color:var(--flag)}
+pre{margin:0;background:var(--code);border:1px solid var(--rule);border-radius:10px;padding:12px 14px;font:13px/1.6 var(--mono);overflow-x:auto}
+footer{margin:96px 0 0;padding:28px 0 40px;border-top:1px solid var(--rule)}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between;font-size:14.5px;color:var(--mute)}
+.scale{display:inline-flex;align-items:center;gap:8px}
+.scale span.g{height:7px;width:120px;border-radius:4px;background:linear-gradient(90deg,rgb(232,72,48),rgb(240,140,52) 40%,rgb(236,192,92) 76%,rgb(214,208,196))}
+
+@media (max-width:900px){
+  .spec-body,.ask{grid-template-columns:minmax(0,1fr)}
+  .spec-text{border-right:0;border-bottom:1px solid var(--rule)}
+}
+@media (max-width:560px){
+  .wrap{padding:0 16px}
+  nav ul{gap:14px;font-size:14px}
+  nav ul li.opt{display:none}
+  .spec-text{padding:22px 18px}
+  .spec-side{padding:18px}
+  .bar-top{padding:12px 14px}
+  .thr{width:100%}
+  .thr input{flex:1;width:auto}
+  .grid{grid-template-columns:minmax(0,1fr)}
+  .card{padding:18px}
+  section{padding-top:56px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a class="mark" href="../"><svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="14" width="7" height="15" rx="1.5" fill="#d6d0c4"/><rect x="12.5" y="5" width="7" height="24" rx="1.5" fill="#ecc05c"/><rect x="22" y="20" width="7" height="9" rx="1.5" fill="#e84830"/></svg>llm-token-visualizer</a>
+    <ul>
+      <li><a href="./" aria-current="page">Try it</a></li>
+      <li class="opt"><a href="../#how">How it works</a></li>
+      <li><a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script">GitLab</a></li>
+    </ul>
+  </nav>
+
+  <header class="hero">
+    <div class="k">Try it in your browser &nbsp;/&nbsp; no install</div>
+    <h1>Which words was the model <em>unsure</em> about?</h1>
+    <p class="lede">Every word an AI writes comes with a probability. Low ones are where it was guessing. Pick a real answer below and drag the threshold, or ask your own question further down.</p>
+
+    <div class="spec" id="spec">
+      <div class="bar-top">
+        <div class="tabs" role="tablist" aria-label="Answers" id="tabs"></div>
+        <label class="thr">threshold <input type="range" id="thr" min="0.05" max="0.95" step="0.05" value="0.6" aria-label="Detection threshold"><output id="thrv">0.60</output></label>
+      </div>
+      <div class="spec-body">
+        <div class="spec-text">
+          <p class="note" id="note"></p>
+          <p class="answer" id="answer" aria-live="polite"></p>
+          <div class="trace" id="trace" aria-hidden="true"></div>
+          <div class="stats k" id="stats"></div>
+          <a class="dlraw" id="dlraw" href="#" download="answer.json" hidden>Download the raw response (for the CLI)</a>
+        </div>
+        <div class="spec-side">
+          <div class="k" style="margin-bottom:10px">Unsure words and what the model weighed</div>
+          <div id="spans"></div>
+          <p class="verdict" id="verdict"></p>
+        </div>
+      </div>
+    </div>
+    <p class="small" style="margin-top:12px">The samples are real Llama 3.1 8B Instruct responses from <code>examples/logprobs/</code>. A word is flagged when any of its pieces has a probability (p = e<sup style="color:inherit;font-weight:400">logprob</sup>) below the threshold, exactly as the CLI does it. Hover or tap a word for its probability and the alternatives.</p>
+  </header>
+</div>
+
+<section id="ask"><div class="wrap">
+  <div class="k">Your own question</div>
+  <h2>Ask a model, with your own key.</h2>
+  <p>Only APIs that return token probabilities work here. Pick one, paste your key, ask something, and the answer shows up above with the unsure words marked.</p>
+  <div class="ask">
+    <form class="card" id="askform" autocomplete="off">
+      <div class="grid">
+        <label class="fld">Provider
+          <select id="prov">
+            <option value="openai">OpenAI</option>
+            <option value="openrouter">OpenRouter</option>
+            <option value="together">Together AI</option>
+            <option value="custom">Custom OpenAI-compatible URL</option>
+          </select>
+        </label>
+        <label class="fld">Model
+          <input type="text" id="model" spellcheck="false" autocapitalize="off">
+        </label>
+        <label class="fld full">API base URL
+          <input type="url" id="base" spellcheck="false" autocapitalize="off" readonly>
+        </label>
+        <label class="fld full">API key
+          <input type="password" id="key" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="sk-...">
+        </label>
+        <label class="check full"><input type="checkbox" id="remember"> <span>Remember this key on this device (saved in this browser's local storage for this site; untick to delete it)</span></label>
+        <label class="fld full">Question
+          <textarea id="q" placeholder="Who was the second person to walk on the Moon?"></textarea>
+        </label>
+        <div class="actions full">
+          <button class="go" type="submit" id="go">Ask and highlight</button>
+          <p class="status" id="status" role="status"></p>
+        </div>
+      </div>
+    </form>
+
+    <div class="card">
+      <div class="keynote">
+        <p><b>Your key stays in your browser.</b> This page has no server. It sends your key only to the provider you picked, directly from your browser, in the request that asks your question.</p>
+        <p>It is not saved anywhere unless you tick "Remember", and then only in this browser.</p>
+      </div>
+      <h3>Which providers work from a browser</h3>
+      <table>
+        <thead><tr><th>Provider</th><th>Browser calls</th></tr></thead>
+        <tbody>
+          <tr><td><b>OpenAI</b></td><td><span class="yes">Yes.</span> Answers cross-origin requests from this site. Use a model that returns logprobs, like <code>gpt-4o-mini</code>.</td></tr>
+          <tr><td><b>OpenRouter</b></td><td><span class="yes">Yes.</span> Allows any site. Only some upstream providers return logprobs, so the request asks OpenRouter to route to one that supports every parameter.</td></tr>
+          <tr><td><b>Together AI</b></td><td><span class="yes">Yes.</span> Allows any site. Asks with Together's own <code>"logprobs": 3</code> form.</td></tr>
+          <tr><td><b>Local Ollama</b></td><td><span class="no">Not by default.</span> Ollama refuses requests from other websites. Start it with <code>OLLAMA_ORIGINS=https://hallucination-highlighter.vercel.app</code> and use Custom with <code>http://localhost:11434/v1</code>. Your browser may also ask before letting a site reach your own machine. Or use the CLI, which has no such limit.</td></tr>
+          <tr><td><b>Anthropic</b></td><td><span class="no">No.</span> Its API does not return token probabilities, so there is nothing to highlight.</td></tr>
+        </tbody>
+      </table>
+      <p class="small" style="margin-top:12px">Browser access checked on 2026-09-30 with a CORS preflight from this site's address. Providers can change this.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:22px">
+    <h3>Same thing in a terminal</h3>
+    <p>The <a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script">CLI</a> does this too, with presets for the same providers plus vLLM and Ollama, and no browser limits:</p>
+    <pre>llm-token-visualizer --live "Who painted The Night Watch?" --provider openrouter
+llm-token-visualizer --live "Who painted The Night Watch?" --provider ollama --model qwen2.5-coder:14b</pre>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <span>MIT licensed. <a href="../">Home</a> &middot; <a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script">Source</a> &middot; <a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases">Releases</a></span>
+  <span class="scale k">p 0 <span class="g"></span> p 1</span>
+</div></footer>
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+// ---- Detection: a port of src/detect.rs (parse_logprobs + detect). ----
+// Same color scale as src/report.rs `heat`.
+const STOPS = [[0.25, [232, 72, 48]], [0.55, [240, 140, 52]], [0.80, [236, 192, 92]], [0.97, [214, 208, 196]]];
+function heat(p) {
+  p = Math.min(1, Math.max(0, p));
+  if (p <= STOPS[0][0]) return STOPS[0][1];
+  for (let i = 0; i < STOPS.length - 1; i++) {
+    const [p0, a] = STOPS[i], [p1, b] = STOPS[i + 1];
+    if (p <= p1) { const t = (p - p0) / (p1 - p0); return a.map((x, k) => Math.round(x + (b[k] - x) * t)); }
+  }
+  return STOPS[3][1];
+}
+const prob = lp => Math.min(1, Math.max(0, Math.exp(lp)));
+const isSpecial = s => s.startsWith('<|') && s.endsWith('|>');
+const wordy = s => /[\p{Alphabetic}\p{N}]/u.test(s);
+const boundary = c => c === undefined || /\s/u.test(c) || /[!-\/:-@\[-`{-~]/.test(c);
+const firstChar = s => { for (const c of s) return c; };
+const lastChar = s => { const a = Array.from(s); return a[a.length - 1]; };
+
+class ParseError extends Error {}
+
+// Returns [{token, logprob, top: [{token, logprob}]}].
+function parseLogprobs(value) {
+  if (value && typeof value === 'object' && value.error) {
+    const e = value.error;
+    throw new ParseError('The API returned an error: ' + (e.message || JSON.stringify(e)));
+  }
+  let tokens;
+  const lp0 = value && value.choices && value.choices[0] && value.choices[0].logprobs;
+  const legacy = (lp0 && lp0.tokens && lp0.token_logprobs) ? lp0 : (value && value.tokens && value.token_logprobs ? value : null);
+  if (legacy) {
+    if (legacy.tokens.length !== legacy.token_logprobs.length) throw new ParseError('logprobs.tokens and token_logprobs differ in length.');
+    tokens = legacy.tokens.map((t, i) => {
+      const raw = legacy.top_logprobs && legacy.top_logprobs[i];
+      let top = [];
+      if (Array.isArray(raw)) top = raw.map(a => ({ token: a.token, logprob: a.logprob }));
+      else if (raw && typeof raw === 'object') top = Object.entries(raw).map(([token, logprob]) => ({ token, logprob }));
+      top.sort((a, b) => b.logprob - a.logprob);
+      return { token: t, logprob: typeof legacy.token_logprobs[i] === 'number' ? legacy.token_logprobs[i] : -Infinity, top };
+    });
+  } else {
+    let content;
+    if (Array.isArray(value)) content = value;
+    else if (lp0 && 'content' in lp0) content = lp0.content;
+    else if (value && 'content' in value && !value.choices) content = value.content;
+    else throw new ParseError('No token logprobs in the response.');
+    if (content == null) throw new ParseError('The response has no token logprobs (logprobs is null).');
+    tokens = content.map(t => ({ token: t.token, logprob: t.logprob, top: (t.top_logprobs || []).map(a => ({ token: a.token, logprob: a.logprob })) }));
+  }
+  tokens = tokens.filter(t => !isSpecial(t.token));
+  if (!tokens.length) throw new ParseError('The logprobs contain no tokens.');
+  return tokens;
+}
+
+function detect(T, th) {
+  const words = [];
+  T.forEach((t, i) => {
+    const starts = i === 0 || boundary(firstChar(t.token)) || boundary(lastChar(T[i - 1].token));
+    if (starts || !words.length) words.push([i, i + 1]); else words[words.length - 1][1] = i + 1;
+  });
+  const flagged = words.filter(([s, e]) => T.slice(s, e).some(t => wordy(t.token) && prob(t.logprob) < th));
+  const ranges = [];
+  for (const [s, e] of flagged) {
+    const last = ranges[ranges.length - 1];
+    if (last && T.slice(last[1], s).every(t => t.token.trim() === '')) { last[1] = e; continue; }
+    ranges.push([s, e]);
+  }
+  return ranges.map(([start, end]) => {
+    let w = start, best = Infinity;
+    for (let i = start; i < end; i++) if (wordy(T[i].token) && prob(T[i].logprob) < best) { best = prob(T[i].logprob); w = i; }
+    const wt = T[w];
+    return { start, end, text: T.slice(start, end).map(t => t.token).join(''), weak: wt.token, p: prob(wt.logprob),
+      alts: wt.top.map(a => [a.token, Math.exp(a.logprob)]) };
+  });
+}
+
+// ---- Rendering ----
+const q = s => JSON.stringify(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const $ = id => document.getElementById(id);
+
+function answerHTML(T, spans) {
+  const idx = new Array(T.length).fill(0);
+  spans.forEach((s, n) => { for (let i = s.start; i < s.end; i++) idx[i] = n + 1; });
+  let h = '';
+  T.forEach((t, i) => {
+    const n = idx[i], p = prob(t.logprob);
+    const starts = n && (i === 0 || idx[i - 1] !== n);
+    const ends = n && (i + 1 === T.length || idx[i + 1] !== n);
+    const body = t.token.replace(/^\s+/, ''), lead = t.token.slice(0, t.token.length - body.length);
+    h += esc(lead);
+    if (starts) h += `<span class="f" data-span="${n}">`;
+    const a = Math.pow(Math.max(0, (0.95 - p) / 0.95), 0.7);
+    let tip = `p ${p.toFixed(2)}  ${q(t.token)}`;
+    for (const alt of t.top) if (alt.token !== t.token) tip += `\n     ${Math.exp(alt.logprob).toFixed(2)}  ${q(alt.token)}`;
+    h += `<span class="t" tabindex="0" style="--h:${heat(p).join(',')};--a:${a.toFixed(3)}" data-tip="${esc(tip)}">${esc(body)}</span>`;
+    if (ends) h += `</span><sup>${n}</sup>`;
+  });
+  return h;
+}
+function candidates(span) {
+  const c = span.alts.map(([t, p]) => [t, p, t === span.weak]);
+  if (!c.some(x => x[2])) c.push([span.weak, span.p, true]);
+  return c.sort((a, b) => b[1] - a[1]);
+}
+function barsHTML(span) {
+  return candidates(span).map(([t, p, chosen]) =>
+    `<div class="row${chosen ? ' c' : ''}"><span>${esc(q(t))}</span><span class="bar"><i style="--h:${heat(p).join(',')};width:${(p * 100).toFixed(1)}%"></i></span><span class="p">${p.toFixed(2)}</span></div>`).join('');
+}
+
+// ---- Answers shown in the viewer ----
+const SAMPLES = [
+  ['cuyp', 'Right answer. The model still gave Düsseldorf 39%.'],
+  ['tour-de-france', 'Right answer. Flags land on phrasing: "Stephen" vs "The", and a hyphen.'],
+  ['eiffel', 'Mostly phrasing words, plus a 39% pull toward "French" instead of "Gustave".'],
+  ['moonwalk', 'Wrong answer (it was Buzz Aldrin), and the name is not flagged: low probability is a place to look, not a fact check.'],
+];
+const answers = {};   // id -> {label, note, tokens, model, raw}
+let current = null;
+
+function draw() {
+  const th = +$('thr').value; $('thrv').textContent = th.toFixed(2);
+  const A = answers[current];
+  const dl = $('dlraw');
+  if (!A) return;
+  $('note').textContent = A.note || '';
+  if (A.error) {
+    $('answer').className = 'answer plain';
+    $('answer').textContent = A.text || '';
+    $('trace').innerHTML = ''; $('stats').innerHTML = `<span>${esc(A.model || '')}</span>`;
+    $('spans').innerHTML = `<p class="none">${esc(A.error)}</p>`;
+    $('verdict').textContent = '';
+  } else {
+    const spans = detect(A.tokens, th);
+    const T = A.tokens;
+    $('answer').className = 'answer';
+    $('answer').innerHTML = answerHTML(T, spans);
+    $('trace').innerHTML = T.map(t => { const p = prob(t.logprob); return `<i style="--h:${heat(p).join(',')};height:${Math.max(4, p * 100).toFixed(0)}%"></i>`; }).join('');
+    const mean = T.reduce((s, t) => s + prob(t.logprob), 0) / T.length;
+    $('stats').innerHTML = `<span>${esc(A.model || 'unknown model')}</span><span>${T.length} tokens</span><span>mean p ${mean.toFixed(2)}</span>`;
+    $('spans').innerHTML = spans.length ? spans.map((sp, n) =>
+      `<div class="span" data-start="${sp.start}" data-end="${sp.end}" data-weak="${esc(sp.weak)}" data-p="${sp.p}"><h3><span class="n">${n + 1}</span><span class="st">${esc(sp.text.trim())}</span><span class="w">weakest ${esc(q(sp.weak))} at p ${sp.p.toFixed(2)}</span></h3>${barsHTML(sp)}</div>`).join('')
+      : '<p class="none">Nothing below this threshold.</p>';
+    const n = spans.length;
+    $('verdict').textContent = n === 0 ? 'No unsure words at this threshold. That does not prove the answer is correct.'
+      : `${n} unsure span${n > 1 ? 's' : ''}. Check ${n > 1 ? 'these claims' : 'it'} before trusting the answer.`;
+  }
+  if (A.raw) {
+    if (dl.dataset.url) URL.revokeObjectURL(dl.dataset.url);
+    dl.dataset.url = URL.createObjectURL(new Blob([A.raw], { type: 'application/json' }));
+    dl.href = dl.dataset.url; dl.hidden = false;
+  } else dl.hidden = true;
+}
+
+function select(id) {
+  current = id;
+  $('tabs').querySelectorAll('button').forEach(b => b.setAttribute('aria-selected', b.dataset.id === id));
+  draw();
+}
+function addTab(id, label, mine) {
+  let b = $('tabs').querySelector(`button[data-id="${id}"]`);
+  if (!b) {
+    b = document.createElement('button');
+    b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.id = id;
+    if (mine) b.className = 'mine';
+    b.onclick = () => select(id);
+    $('tabs').appendChild(b);
+  }
+  b.textContent = label;
+}
+
+async function loadSamples() {
+  SAMPLES.forEach(([id]) => addTab(id, id + '.json'));
+  await Promise.all(SAMPLES.map(async ([id, note]) => {
+    try {
+      const r = await fetch(`samples/${id}.json`);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const v = await r.json();
+      answers[id] = { note, tokens: parseLogprobs(v), model: v.model };
+    } catch (e) {
+      answers[id] = { note, error: `Could not load samples/${id}.json (${e.message}).`, text: '' };
+    }
+  }));
+  if (!current) select('cuyp'); else draw();
+}
+$('thr').addEventListener('input', draw);
+loadSamples();
+
+// ---- Tooltip ----
+const tip = $('tip');
+function showTip(el) {
+  document.querySelectorAll('.t.on').forEach(x => x.classList.remove('on'));
+  el.classList.add('on');
+  tip.textContent = el.dataset.tip; tip.classList.add('show');
+  const r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+  let x = Math.min(Math.max(8, r.left), innerWidth - w - 8), y = r.bottom + 8;
+  if (y + h > innerHeight - 8) y = r.top - h - 8;
+  tip.style.left = x + 'px'; tip.style.top = y + 'px';
+}
+function hideTip() { tip.classList.remove('show'); document.querySelectorAll('.t.on').forEach(x => x.classList.remove('on')); }
+document.addEventListener('mouseover', e => { const t = e.target.closest('.t'); t ? showTip(t) : hideTip(); });
+document.addEventListener('focusin', e => { const t = e.target.closest('.t'); if (t) showTip(t); });
+document.addEventListener('click', e => { const t = e.target.closest('.t'); t ? showTip(t) : hideTip(); });
+addEventListener('scroll', hideTip, { passive: true });
+
+// ---- Ask your own question ----
+const PROVIDERS = {
+  openai: { base: 'https://api.openai.com/v1', model: 'gpt-4o-mini', style: 'bool', keyNeeded: true },
+  openrouter: { base: 'https://openrouter.ai/api/v1', model: 'openai/gpt-4o-mini', style: 'bool', keyNeeded: true, extra: { provider: { require_parameters: true } } },
+  together: { base: 'https://api.together.ai/v1', model: '', modelHint: 'a Together model id', style: 'int', keyNeeded: true },
+  custom: { base: '', model: '', modelHint: 'model name', style: 'bool', keyNeeded: false },
+};
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch { /* storage blocked: nothing to do */ } },
+  del(k) { try { localStorage.removeItem(k); } catch { /* ignore */ } },
+};
+const keyName = p => 'hh-key-' + p;
+
+function onProvider() {
+  const id = $('prov').value, P = PROVIDERS[id];
+  $('base').readOnly = id !== 'custom';
+  $('base').value = id === 'custom' ? (store.get('hh-custom-base') || '') : P.base;
+  $('base').placeholder = id === 'custom' ? 'https://your-server/v1' : '';
+  $('model').value = P.model;
+  $('model').placeholder = P.modelHint || '';
+  const saved = store.get(keyName(id));
+  $('key').value = saved || '';
+  $('remember').checked = !!saved;
+  $('key').placeholder = P.keyNeeded ? 'Your API key' : 'API key, if your server needs one';
+  setStatus('');
+}
+$('prov').addEventListener('change', onProvider);
+$('remember').addEventListener('change', () => {
+  const id = $('prov').value;
+  if ($('remember').checked && $('key').value.trim()) store.set(keyName(id), $('key').value.trim());
+  if (!$('remember').checked) store.del(keyName(id));
+});
+$('key').addEventListener('input', () => { if ($('remember').checked) store.set(keyName($('prov').value), $('key').value.trim()); });
+onProvider();
+
+function setStatus(msg, cls) { const s = $('status'); s.textContent = msg; s.className = 'status' + (cls ? ' ' + cls : ''); }
+
+$('askform').addEventListener('submit', async e => {
+  e.preventDefault();
+  const id = $('prov').value, P = PROVIDERS[id];
+  const base = $('base').value.trim().replace(/\/+$/, ''), model = $('model').value.trim(), key = $('key').value.trim();
+  const question = $('q').value.trim() || $('q').placeholder;
+  if (!/^https?:\/\//.test(base)) return setStatus('Enter the API base URL, for example https://your-server/v1.', 'err');
+  if (!model) return setStatus('Enter a model name.', 'err');
+  if (P.keyNeeded && !key) return setStatus('Paste your API key first.', 'err');
+  if (id === 'custom') store.set('hh-custom-base', base);
+
+  const body = { model, messages: [{ role: 'user', content: question }], max_tokens: 200, temperature: 0 };
+  if (P.style === 'int') body.logprobs = 3; else { body.logprobs = true; body.top_logprobs = 3; }
+  Object.assign(body, P.extra || {});
+  const headers = { 'Content-Type': 'application/json' };
+  if (key) headers.Authorization = 'Bearer ' + key;
+  if (id === 'openrouter') headers['X-Title'] = 'Hallucination Highlighter';
+
+  $('go').disabled = true; setStatus('Asking ' + model + '...');
+  let raw, v;
+  try {
+    const r = await fetch(base + '/chat/completions', { method: 'POST', headers, body: JSON.stringify(body) });
+    raw = await r.text();
+    try { v = JSON.parse(raw); } catch { v = null; }
+    if (!r.ok) {
+      const m = v && v.error ? (v.error.message || JSON.stringify(v.error)) : raw.slice(0, 300);
+      throw new Error(`HTTP ${r.status}: ${m}`);
+    }
+    if (!v) throw new Error('The response was not JSON.');
+  } catch (err) {
+    $('go').disabled = false;
+    const blocked = err instanceof TypeError;
+    return setStatus(blocked
+      ? `The browser could not reach ${base}. The server may not allow requests from this page (CORS), or it is not running.`
+      : err.message, 'err');
+  }
+  $('go').disabled = false;
+
+  const text = (v.choices && v.choices[0] && v.choices[0].message && v.choices[0].message.content) || '';
+  const n = Object.keys(answers).filter(k => k.startsWith('mine')).length + 1;
+  const tid = 'mine' + n;
+  const label = `your answer ${n}`;
+  const note = 'You asked: ' + question;
+  try {
+    answers[tid] = { note, tokens: parseLogprobs(v), model: v.model || model, raw };
+    setStatus('Done. Your answer is in the viewer above.', 'ok');
+  } catch (err) {
+    answers[tid] = { note, text, model: v.model || model, raw,
+      error: `${model} answered, but returned no token probabilities, so there is nothing to highlight. Pick a model or provider that returns logprobs. (${err.message})` };
+    setStatus('The answer came back without token probabilities. See above.', 'err');
+  }
+  addTab(tid, label, true);
+  select(tid);
+  $('spec').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+});
+</script>
+</body>
+</html>

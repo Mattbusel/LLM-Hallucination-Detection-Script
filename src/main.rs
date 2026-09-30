@@ -16,6 +16,7 @@ use llm_token_visualizer::{
   llm-token-visualizer --logprobs-file answer.json --format html -o report.html
   llm-token-visualizer --logprobs-file answer.json --format markdown >> $GITHUB_STEP_SUMMARY
   llm-token-visualizer --live \"Who painted The Night Watch?\" --save answer.json
+  llm-token-visualizer --live \"Who painted The Night Watch?\" --provider ollama --model qwen2.5-coder:14b
   llm-token-visualizer --logprobs-file answer.json --fail-on-flag --format json
 
 Sample responses with logprobs are in examples/logprobs/ (samples/ in release archives).")]
@@ -31,9 +32,18 @@ struct Args {
     #[arg(long, value_name = "PROMPT")]
     live: Option<String>,
 
-    /// Model for --live
-    #[arg(long, default_value = "gpt-4o-mini")]
-    model: String,
+    /// Provider preset for --live: openai (OPENAI_API_KEY), openrouter (OPENROUTER_API_KEY),
+    /// together (TOGETHER_API_KEY), vllm (local, http://localhost:8000/v1), ollama (local, http://localhost:11434/v1)
+    #[arg(long, value_name = "NAME", default_value = "openai")]
+    provider: String,
+
+    /// Override the provider's API base URL for --live (the part before /chat/completions)
+    #[arg(long, value_name = "URL")]
+    base_url: Option<String>,
+
+    /// Model for --live [default: gpt-4o-mini for openai, openai/gpt-4o-mini for openrouter; required for the others]
+    #[arg(long)]
+    model: Option<String>,
 
     /// Max tokens for --live
     #[arg(long, default_value_t = 200)]
@@ -106,6 +116,9 @@ Try it on a real sample answer (no API key needed):
 Check a live answer from any OpenAI-compatible API (set OPENAI_API_KEY first):
   llm-token-visualizer --live \"Who painted The Night Watch?\"
 
+Or from a local Ollama, no key needed:
+  llm-token-visualizer --live \"Who painted The Night Watch?\" --provider ollama --model qwen2.5-coder:14b
+
 Run llm-token-visualizer --help for every option.";
 
 fn run() -> Result<i32> {
@@ -125,6 +138,12 @@ fn run() -> Result<i32> {
 
     if !(0.0..=1.0).contains(&args.threshold) {
         anyhow::bail!("--threshold must be between 0 and 1");
+    }
+
+    if args.live.is_none()
+        && (args.base_url.is_some() || args.model.is_some() || args.provider != "openai")
+    {
+        eprintln!("note: --provider, --base-url and --model only apply to --live; ignoring them");
     }
 
     if args.logprobs_file.is_some() || args.live.is_some() {
@@ -173,12 +192,7 @@ fn write_output(args: &Args, output: &str) -> Result<()> {
 
 fn run_detect(args: &Args) -> Result<i32> {
     let json = if let Some(prompt) = &args.live {
-        let raw = fetch_live(prompt, args)?;
-        if let Some(path) = &args.save {
-            std::fs::write(path, &raw)
-                .with_context(|| format!("could not write {}", path.display()))?;
-        }
-        raw
+        fetch_live(prompt, args)?
     } else {
         let path = args.logprobs_file.as_ref().expect("checked by caller");
         if path.as_os_str() == "-" {
@@ -252,7 +266,28 @@ fn run_detect(args: &Args) -> Result<i32> {
 
 #[cfg(feature = "live")]
 fn fetch_live(prompt: &str, args: &Args) -> Result<String> {
-    llm_token_visualizer::live::fetch(prompt, &args.model, args.max_tokens)
+    use llm_token_visualizer::live::{self, Provider, Target};
+    let provider = Provider::from_name(&args.provider).ok_or_else(|| {
+        let names: Vec<&str> = Provider::ALL.iter().map(|p| p.name()).collect();
+        anyhow::anyhow!(
+            "unknown --provider {:?}; use one of {} (or --base-url for any other OpenAI-compatible server that returns logprobs)",
+            args.provider,
+            names.join(", ")
+        )
+    })?;
+    let target = Target::resolve(
+        provider,
+        args.base_url.as_deref(),
+        args.model.as_deref(),
+        |k| std::env::var(k).ok(),
+    )?;
+    let raw = live::fetch_target(&target, prompt, args.max_tokens)?;
+    if let Some(path) = &args.save {
+        std::fs::write(path, &raw)
+            .with_context(|| format!("could not write {}", path.display()))?;
+    }
+    live::check_has_logprobs(&raw, &target)?;
+    Ok(raw)
 }
 
 #[cfg(not(feature = "live"))]
