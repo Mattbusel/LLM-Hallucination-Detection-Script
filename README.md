@@ -10,7 +10,6 @@ For anyone who ships or checks LLM answers: developers, evaluators, and CI pipel
 </picture>
 
 <p align="center">
-  <a href="https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/actions/workflows/ci.yml/badge.svg"></a>
   <a href="https://crates.io/crates/llm-token-visualizer"><img alt="crates.io" src="https://img.shields.io/crates/v/llm-token-visualizer.svg"></a>
   &nbsp;<a href="https://mattbusel.github.io/LLM-Hallucination-Detection-Script/"><b>Try it in the browser</b></a>
 </p>
@@ -74,7 +73,7 @@ Models can be confidently wrong. In `moonwalk.json` the model says "Pete Conrad 
 2. **Run it:** `llm-token-visualizer --logprobs-file answer.json --threshold 0.6`
 3. **Share or gate it:** `--format html -o report.html` for a page you can send, `--format markdown` for a PR comment, `--fail-on-flag` to fail a CI job when anything is flagged.
 
-No API key handy? Grab a sample first: `curl -LO https://raw.githubusercontent.com/Mattbusel/LLM-Hallucination-Detection-Script/main/examples/logprobs/cuyp.json`
+No API key handy? Grab a sample first: `curl -LO https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/raw/main/examples/logprobs/cuyp.json`
 
 ## Documentation
 
