@@ -37,7 +37,7 @@ Running with no arguments prints a short getting-started guide and exits with st
 llm-token-visualizer --logprobs-file answer.json --format html -o report.html
 ```
 
-<img alt="HTML report for the eiffel sample in dark mode: the answer as a heatmap with four wavy-underlined spans, a per-token probability strip, and bars for the alternatives at each span." src="https://raw.githubusercontent.com/Mattbusel/LLM-Hallucination-Detection-Script/main/docs/assets/report-html.png" width="520">
+<img alt="HTML report for the eiffel sample in dark mode: the answer as a heatmap with four wavy-underlined spans, a per-token probability strip, and bars for the alternatives at each span." src="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/raw/main/docs/assets/report-html.png" width="520">
 
 ## Use it in CI or scripts
 

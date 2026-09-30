@@ -11,7 +11,7 @@ For anyone who ships or checks LLM answers: developers, evaluators, and CI pipel
 
 <p align="center">
   <a href="https://crates.io/crates/llm-token-visualizer"><img alt="crates.io" src="https://img.shields.io/crates/v/llm-token-visualizer.svg"></a>
-  &nbsp;<a href="https://mattbusel.github.io/LLM-Hallucination-Detection-Script/"><b>Try it in the browser</b></a>
+  &nbsp;<a href="https://hallucination-highlighter.vercel.app/"><b>Try it in the browser</b></a>
 </p>
 
 ## Install
@@ -83,7 +83,7 @@ No API key handy? Grab a sample first: `curl -LO https://gitlab.com/mattbusel/LL
 | [Reference](docs/REFERENCE.md) | Every flag, output formats (terminal, HTML, Markdown, JSON), CI use, input formats, live mode, your own confidence scores, library API |
 | [How it works and repo layout](docs/ARCHITECTURE.md) | The detection rules and color scale in detail, source layout, what is a sketch and what ships |
 | [API docs on docs.rs](https://docs.rs/llm-token-visualizer) | The Rust library |
-| [Project site](https://mattbusel.github.io/LLM-Hallucination-Detection-Script/) | Try the samples with a threshold slider |
+| [Project site](https://hallucination-highlighter.vercel.app/) | Try the samples with a threshold slider |
 | [Changelog](CHANGELOG.md) | What changed in each release |
 
 ## License

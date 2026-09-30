@@ -6,21 +6,21 @@
 <meta name="color-scheme" content="light dark">
 <title>LLM Hallucination Detector: flag unsure words</title>
 <meta name="description" content="Free LLM hallucination detector: reads token logprobs from OpenAI-compatible APIs and highlights the words the model was unsure about. Rust CLI, Windows .exe.">
-<link rel="canonical" href="https://mattbusel.github.io/LLM-Hallucination-Detection-Script/">
+<link rel="canonical" href="https://hallucination-highlighter.vercel.app/">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://mattbusel.github.io/LLM-Hallucination-Detection-Script/">
+<meta property="og:url" content="https://hallucination-highlighter.vercel.app/">
 <meta property="og:title" content="LLM Hallucination Detector">
 <meta property="og:description" content="Find the words your model wasn't sure about. Token logprobs in, flagged spans and alternatives out.">
-<meta property="og:image" content="https://mattbusel.github.io/LLM-Hallucination-Detection-Script/assets/og-image.png">
+<meta property="og:image" content="https://hallucination-highlighter.vercel.app/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="A Llama 3.1 answer as a confidence heatmap with Aelbert and Dordrecht flagged">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="LLM Hallucination Detector">
 <meta name="twitter:description" content="Find the words your model wasn't sure about. Token logprobs in, flagged spans and alternatives out.">
-<meta name="twitter:image" content="https://mattbusel.github.io/LLM-Hallucination-Detection-Script/assets/og-image.png">
+<meta name="twitter:image" content="https://hallucination-highlighter.vercel.app/assets/og-image.png">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"SoftwareApplication","name":"LLM Hallucination Detector (llm-token-visualizer)","description":"Command-line tool and Rust library that reads an LLM answer's token log probabilities, flags the words the model was unsure about, and shows the alternatives it weighed.","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux","url":"https://mattbusel.github.io/LLM-Hallucination-Detection-Script/","codeRepository":"https://github.com/Mattbusel/LLM-Hallucination-Detection-Script","downloadUrl":"https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/releases/latest/download/llm-token-visualizer-x86_64-pc-windows-msvc.exe","programmingLanguage":"Rust","license":"https://opensource.org/licenses/MIT","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Matthew Busel","url":"https://github.com/Mattbusel"}}
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"LLM Hallucination Detector (llm-token-visualizer)","description":"Command-line tool and Rust library that reads an LLM answer's token log probabilities, flags the words the model was unsure about, and shows the alternatives it weighed.","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux","url":"https://hallucination-highlighter.vercel.app/","codeRepository":"https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script","downloadUrl":"https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases/permalink/latest/downloads/llm-token-visualizer-windows-x86_64.exe","programmingLanguage":"Rust","license":"https://opensource.org/licenses/MIT","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Matthew Busel","url":"https://gitlab.com/mattbusel"}}
 </script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23f4efe4'/%3E%3Crect x='6' y='16' width='5' height='10' rx='1' fill='%23d6d0c4'/%3E%3Crect x='13.5' y='9' width='5' height='17' rx='1' fill='%23d6d0c4'/%3E%3Crect x='21' y='20' width='5' height='6' rx='1' fill='%23e84830'/%3E%3C/svg%3E">
 <style>
@@ -166,7 +166,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
       <li><a href="#how">How it works</a></li>
       <li class="opt"><a href="#formats">Formats</a></li>
       <li class="opt"><a href="https://crates.io/crates/llm-token-visualizer">crates.io</a></li>
-      <li><a href="https://github.com/Mattbusel/LLM-Hallucination-Detection-Script">GitHub</a></li>
+      <li><a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script">GitHub</a></li>
     </ul>
   </nav>
 
@@ -177,8 +177,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
     <div class="install">
       <div class="cmd"><code>cargo install llm-token-visualizer</code><button class="copy" data-copy="cargo install llm-token-visualizer">Copy</button></div>
     </div>
-    <p class="dl"><a class="dlbtn" href="https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/releases/latest/download/llm-token-visualizer-x86_64-pc-windows-msvc.exe">Download for Windows (.exe)</a></p>
-    <p class="small">Or with Rust installed: the command above. macOS and Linux builds are on the <a href="https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/releases/latest">latest release</a>.</p>
+    <p class="dl"><a class="dlbtn" href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases/permalink/latest/downloads/llm-token-visualizer-windows-x86_64.exe">Download for Windows (.exe)</a></p>
+    <p class="small">Or with Rust installed: the command above. macOS and Linux builds are on the <a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases">latest release</a>.</p>
 
     <div class="spec" id="spec">
       <div class="bar-top">
@@ -210,7 +210,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
   <div class="two">
     <figure><img src="assets/terminal-cuyp.png" width="822" height="455" alt="Terminal output for the cuyp sample: the answer with Aelbert and Dordrecht underlined, then bars for the alternatives A 0.49, The 0.43, D 0.08 and ord 0.57, üsseldorf 0.39, elf 0.03." loading="lazy"><figcaption>llm-token-visualizer --logprobs-file examples/logprobs/cuyp.json --threshold 0.6</figcaption></figure>
     <div>
-      <div class="cmd" style="margin-bottom:10px"><code>git clone https://github.com/Mattbusel/LLM-Hallucination-Detection-Script</code><button class="copy" data-copy="git clone https://github.com/Mattbusel/LLM-Hallucination-Detection-Script && cd LLM-Hallucination-Detection-Script">Copy</button></div>
+      <div class="cmd" style="margin-bottom:10px"><code>git clone https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script</code><button class="copy" data-copy="git clone https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script && cd LLM-Hallucination-Detection-Script">Copy</button></div>
       <pre><span class="c"># offline, on a bundled real response</span>
 cargo run -- --logprobs-file examples/logprobs/cuyp.json --threshold 0.6
 
@@ -265,7 +265,7 @@ cargo run -- --live "Who was the second person to walk on the Moon?" \
 </div></section>
 
 <footer><div class="wrap">
-  <span>MIT licensed. Built in Rust. <a href="https://github.com/Mattbusel/LLM-Hallucination-Detection-Script">Source</a> &middot; <a href="https://crates.io/crates/llm-token-visualizer">crates.io</a> &middot; <a href="https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/releases/latest">Releases</a></span>
+  <span>MIT licensed. Built in Rust. <a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script">Source</a> &middot; <a href="https://crates.io/crates/llm-token-visualizer">crates.io</a> &middot; <a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases">Releases</a></span>
   <span class="scale k">p 0 <span class="g"></span> p 1</span>
 </div></footer>
 <div class="tip" id="tip" role="tooltip"></div>

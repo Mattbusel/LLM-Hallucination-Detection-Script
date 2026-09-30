@@ -7,7 +7,7 @@ Thanks for helping. Small, focused PRs are easiest to review.
 You need a stable Rust toolchain.
 
 ```bash
-git clone https://github.com/Mattbusel/LLM-Hallucination-Detection-Script
+git clone https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script
 cd LLM-Hallucination-Detection-Script
 cargo test
 cargo run -- --logprobs-file examples/logprobs/cuyp.json --threshold 0.6

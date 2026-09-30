@@ -100,7 +100,7 @@ const GETTING_STARTED: &str = "llm-token-visualizer flags the words an LLM answe
 token log probabilities (logprobs) the API returns.
 
 Try it on a real sample answer (no API key needed):
-  curl -LO https://raw.githubusercontent.com/Mattbusel/LLM-Hallucination-Detection-Script/main/examples/logprobs/cuyp.json
+  curl -LO https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/raw/main/examples/logprobs/cuyp.json
   llm-token-visualizer --logprobs-file cuyp.json --threshold 0.6
 
 Check a live answer from any OpenAI-compatible API (set OPENAI_API_KEY first):
