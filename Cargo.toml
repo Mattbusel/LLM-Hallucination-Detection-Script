@@ -1,22 +1,39 @@
 [package]
 name = "llm-token-visualizer"
-version = "0.4.0"
+version = "0.5.0"
 edition = "2021"
+rust-version = "1.88"
 description = "Flag low-confidence spans in LLM output from token logprobs, and render per-token confidence as terminal, HTML or Markdown"
 license = "MIT"
 repository = "https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script"
 readme = "README.md"
-homepage = "https://hallucination-highlighter.vercel.app/"
 documentation = "https://docs.rs/llm-token-visualizer"
-exclude = ["docs/", ".github/"]
+include = ["src/**/*", "examples/**/*", "tests/**/*", "benches/**/*", "README.md", "CHANGELOG.md", "LICENSE", "Cargo.toml", "Cargo.lock"]
 keywords = ["llm", "hallucination", "logprobs", "confidence", "cli"]
 categories = ["command-line-utilities", "text-processing"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+# cargo binstall: prebuilt binaries from GitLab releases (Linux x86_64 and
+# Windows x86_64); other targets build from source.
+[package.metadata.binstall.overrides.x86_64-unknown-linux-gnu]
+pkg-url = "{ repo }/-/releases/v{ version }/downloads/llm-token-visualizer-linux-x86_64.tar.gz"
+bin-dir = "llm-token-visualizer-v{ version }-x86_64-unknown-linux-gnu/{ bin }{ binary-ext }"
+pkg-fmt = "tgz"
+
+[package.metadata.binstall.overrides.x86_64-pc-windows-msvc]
+pkg-url = "{ repo }/-/releases/v{ version }/downloads/llm-token-visualizer-windows-x86_64.exe"
+pkg-fmt = "bin"
 
 [features]
 default = ["live"]
 # Live mode: call an OpenAI-compatible API. Disable with --no-default-features
 # for an offline-only build without an HTTP client.
 live = ["dep:ureq"]
+# Interop: tokens from async-openai chat completion responses (types only).
+async-openai = ["dep:async-openai"]
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
@@ -24,8 +41,19 @@ serde_json = "1.0"
 clap = { version = "4.0", features = ["derive"] }
 colored = "2.0"
 anyhow = "1.0"
+# Unicode word boundaries (UAX #29) for grouping tokens into words.
+unicode-segmentation = "1.12"
 thiserror = "1.0"
 ureq = { version = "2", optional = true }
+async-openai = { version = "0.42", default-features = false, features = ["chat-completion-types"], optional = true }
 
 [dev-dependencies]
 tempfile = "3.0"
+proptest = "1"
+criterion = "0.5"
+# The previous release, for benches/vs_0_4.rs.
+llm-token-visualizer-prev = { package = "llm-token-visualizer", version = "=0.4.0", default-features = false }
+
+[[bench]]
+name = "vs_0_4"
+harness = false

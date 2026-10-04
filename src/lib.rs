@@ -1,3 +1,4 @@
+#![cfg_attr(docsrs, feature(doc_cfg))]
 //! Flag the words an LLM answer was unsure about, from the token log
 //! probabilities (logprobs) that OpenAI-compatible APIs return.
 //!
@@ -35,19 +36,32 @@
 //! HTML page or Markdown. The command-line tool is `llm-token-visualizer`
 //! (`cargo install llm-token-visualizer`).
 
+#![deny(missing_docs)]
+
+/// The README's Rust examples, compiled and run as doctests.
+#[cfg(doctest)]
+#[doc = include_str!("../README.md")]
+pub struct ReadmeDoctests;
+
+/// Input types for the visualizer renderers.
 pub mod data;
 pub mod detect;
+pub mod interop;
 #[cfg(feature = "live")]
 pub mod live;
+/// Terminal, HTML and Markdown renderers for [`TokenAnalysis`] input (visualizer mode).
 pub mod renderer;
 pub mod report;
+/// Helpers for the visualizer: a simple tokenizer, metrics and issue detection.
 pub mod utils;
 
 pub use data::{
     ConfidenceLevel, FlagType, TokenAnalysis, TokenFlag, TokenInfo, VisualizationConfig,
 };
 pub use renderer::{HtmlRenderer, MarkdownRenderer, Renderer, TerminalRenderer};
-pub use utils::{create_mock_analysis, detect_issues, simple_tokenize, AnalysisMetrics};
+#[allow(deprecated)]
+pub use utils::create_mock_analysis;
+pub use utils::{detect_issues, simple_tokenize, AnalysisMetrics};
 
 use anyhow::Result;
 
@@ -77,7 +91,13 @@ pub fn visualize_tokens(
     }
 }
 
-/// Quick analysis function for testing - creates mock data and visualizes
+/// Renders made-up scores (see [`utils::create_mock_analysis`]); the
+/// confidence values are a hash of each word, not anything a model said.
+#[deprecated(
+    since = "0.5.0",
+    note = "renders made-up scores; use detect::parse_logprobs and detect::detect on a real response"
+)]
+#[allow(deprecated)]
 pub fn quick_analyze(text: &str, format: &str) -> Result<String> {
     let analysis = utils::create_mock_analysis(text);
     let config = VisualizationConfig::default();
@@ -117,6 +137,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(deprecated)]
     fn test_quick_analyze() {
         let result = quick_analyze("This is a test", "markdown");
         assert!(result.is_ok());

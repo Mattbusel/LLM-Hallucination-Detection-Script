@@ -131,6 +131,7 @@ pub fn terminal(tokens: &[LogprobToken], report: &Report, meta: &Meta) -> String
     }
     head.push(format!("{} tokens", report.token_count));
     head.push(format!("mean p {:.2}", report.mean_prob));
+    head.push(format!("perplexity {:.2}", report.perplexity));
     head.push(format!("threshold {:.2}", report.threshold));
     let _ = writeln!(out, "\n  {}\n", head.join("   ").dimmed());
 
@@ -243,6 +244,7 @@ pub fn markdown(tokens: &[LogprobToken], report: &Report, meta: &Meta) -> String
     }
     facts.push(format!("{} tokens", report.token_count));
     facts.push(format!("mean p {:.2}", report.mean_prob));
+    facts.push(format!("perplexity {:.2}", report.perplexity));
     facts.push(format!("threshold {:.2}", report.threshold));
     let _ = writeln!(md, "{}\n", facts.join(" · "));
 

@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.5.0 (2026-10-04)
+
+- **Fixed: answers without spaces were flagged as one span.** A word was "everything up to the next space or ASCII punctuation", so in a Chinese or Japanese answer one unsure character flagged the whole sentence. Words now come from Unicode word segmentation (UAX #29, `unicode-segmentation`). English results on the bundled samples are unchanged.
+- **New metrics:** each report has the answer's perplexity (`exp(-mean logprob)`, shown in the terminal and Markdown headers and in JSON), and each flagged span the entropy in bits of the alternatives at its weakest token (`entropy_bits`, a lower bound since only the top-k are returned).
+- **Google Gemini responses** (`candidates[0].logprobsResult`, from `responseLogprobs: true`) are read by `--logprobs-file` and `parse_logprobs`.
+- **`async-openai` feature:** `interop::async_openai::tokens_from_response`, tested to give the same tokens as the JSON parser on a bundled sample.
+- **Fixed: `--live` could hang forever** on a stalled server (ureq has no overall timeout by default); requests now time out after 120 s.
+- **Faster:** parsing no longer copies the logprobs JSON before deserializing. A 4,000-token response is parsed and checked in 9.0 ms, against 14.6 ms with 0.4.0 (`benches/vs_0_4.rs`, criterion, i7-13700KF).
+- `TokenAnalysis::get_confidence_stats` returned `(inf, -inf, NaN)` for an empty analysis; it returns zeros.
+- `quick_analyze` and `utils::create_mock_analysis` are deprecated: their "confidence" is a hash of each word, not anything a model produced. The docs now say so.
+- Property tests (proptest): the parser never panics on arbitrary text, spans are ordered, in bounds and below the threshold, and token lists round-trip through JSON. The README's Rust example runs as a doctest.
+- Every public item is documented (`deny(missing_docs)`); docs.rs builds all features.
+- Examples: `ci_gate` (a directory of answers, exit 2 when any is flagged) and `html_report`, next to `detect`.
+- `cargo binstall llm-token-visualizer` downloads the GitLab release binary (checked with a dry run against 0.4.0).
+- Removed from the repository: the `rust_mvps/` sketches, the C++ fact-graph sketch, `templates/`, `partners.md`, `sponsors.md` and the dead GitHub workflows (none were built or used). The packaged crate lists what it ships; minimum Rust version 1.88 (checked).
+- README: the "try it in your browser" link pointed at a page that is not deployed (`/try/` returns 404); it now points at the page source.
+- GitLab CI runs tests with all and with no default features, clippy and rustdoc with `-D warnings`, and an MSRV check.
+
 ## 0.4.0 (2026-09-30)
 
 - New: `--provider openai|openrouter|together|vllm|ollama` for `--live`, each with its default base URL, API key variable and (for openai and openrouter) a default model; `--base-url` overrides the address. Without `--provider`, `--live` behaves as before (OpenAI, `OPENAI_API_KEY`, `OPENAI_BASE_URL`).

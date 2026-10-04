@@ -29,8 +29,12 @@ pub fn simple_tokenize(text: &str) -> Vec<String> {
     tokens
 }
 
-/// Create a basic token analysis from text with random confidence scores
-/// This is useful for testing when you don't have actual LLM confidence data
+/// Made-up confidence scores (a hash of each word), for exercising the
+/// renderers without model data. The numbers mean nothing.
+#[deprecated(
+    since = "0.5.0",
+    note = "scores are a hash of each word, not model confidence; use detect::parse_logprobs on a real response"
+)]
 pub fn create_mock_analysis(text: &str) -> TokenAnalysis {
     use std::collections::hash_map::DefaultHasher;
     use std::hash::{Hash, Hasher};
@@ -79,15 +83,22 @@ pub fn create_mock_analysis(text: &str) -> TokenAnalysis {
 
 /// Calculate various metrics from token analysis
 pub struct AnalysisMetrics {
+    /// Number of tokens.
     pub total_tokens: usize,
+    /// Mean confidence.
     pub avg_confidence: f64,
+    /// Lowest confidence.
     pub min_confidence: f64,
+    /// Highest confidence.
     pub max_confidence: f64,
+    /// Tokens below 0.5 confidence.
     pub low_confidence_tokens: usize,
+    /// Tokens covered by at least one flag.
     pub flagged_tokens: usize,
 }
 
 impl AnalysisMetrics {
+    /// Compute the metrics of `analysis`.
     pub fn from_analysis(analysis: &TokenAnalysis) -> Self {
         let confidences: Vec<f64> = analysis.tokens.iter().map(|t| t.confidence).collect();
 
@@ -179,6 +190,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(deprecated)]
     fn test_create_mock_analysis() {
         let text = "This is a test sentence.";
         let analysis = create_mock_analysis(text);

@@ -27,20 +27,17 @@ src/
   data.rs       TokenAnalysis, TokenInfo, TokenFlag, ConfidenceLevel
   renderer.rs   Terminal, HTML and Markdown renderers for the visualizer mode
   utils.rs      tokenizer for demos, metrics, issue detection
+  interop.rs    adapters for other crates (feature "async-openai")
 examples/logprobs/                real Llama 3.1 8B responses with logprobs
-examples/detect.rs                library example over those samples
-docs/                             project site (GitHub Pages), README images and these docs
+examples/                         library examples over those samples
+tests/properties.rs               property tests (proptest) for the parser and detector
+benches/vs_0_4.rs                 criterion benchmark against the 0.4.0 release
+docs/                             project site, README images and these docs
 demo_data.json, sample_text.txt   example input for the visualizer
-rust_mvps/                        design sketches, see below
-real-time fact-checking DAG engine.cpp   standalone C++ sketch, see below
 ```
 
 ## Status and limitations
 
-The Rust crate in `src/` is the working part of this repo: it builds, has unit tests, and CI runs fmt, clippy, tests and detector smoke tests (JSON, HTML and Markdown) on every push.
+The Rust crate in `src/` is the whole project: it builds, has unit and property tests, and GitLab CI runs the tests, clippy and rustdoc on every push to the default branch.
 
-The rest is exploratory and should be read as design notes, not shipped features:
-
-- `rust_mvps/` holds source sketches for a BERT-based detector (candle), multi-language phrase patterns, a streaming detector with a WebSocket server, and a web dashboard. They have no Cargo manifests and are not wired into the build. The neural detector expects model weights that are not published.
-- `real-time fact-checking DAG engine.cpp` is a single-file C++ sketch of a Boost Graph based fact graph. It is not part of any build here and needs Boost to compile.
-- Earlier versions of this README described a Python `hallucination_detector.py` module. That file is not in the repository, so its documentation has been removed.
+Earlier versions of the repository also held design sketches (a BERT-based detector, a WebSocket streaming detector, a C++ fact graph) that were never built or wired in; 0.5.0 removed them. They are still in the git history.

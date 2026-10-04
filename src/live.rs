@@ -12,8 +12,13 @@
 use anyhow::{bail, Context, Result};
 use serde_json::{json, Value};
 
+/// OpenAI's API base URL.
 pub const DEFAULT_BASE_URL: &str = "https://api.openai.com/v1";
+/// Model used with the OpenAI preset when none is given.
 pub const DEFAULT_MODEL: &str = "gpt-4o-mini";
+
+/// Seconds before a `--live` request is abandoned.
+pub const REQUEST_TIMEOUT_SECS: u64 = 120;
 
 /// Number of alternatives requested per token.
 pub const TOP_LOGPROBS: u32 = 3;
@@ -30,14 +35,20 @@ pub enum LogprobsParam {
 /// A provider preset.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Provider {
+    /// OpenAI (`OPENAI_API_KEY`).
     OpenAi,
+    /// OpenRouter (`OPENROUTER_API_KEY`).
     OpenRouter,
+    /// Together AI (`TOGETHER_API_KEY`).
     Together,
+    /// A vLLM server (`VLLM_API_KEY` if it was started with one).
     Vllm,
+    /// A local Ollama (no key).
     Ollama,
 }
 
 impl Provider {
+    /// Every preset, in `--provider` order.
     pub const ALL: [Provider; 5] = [
         Provider::OpenAi,
         Provider::OpenRouter,
@@ -46,6 +57,7 @@ impl Provider {
         Provider::Ollama,
     ];
 
+    /// The `--provider` name.
     pub fn name(self) -> &'static str {
         match self {
             Provider::OpenAi => "openai",
@@ -56,6 +68,7 @@ impl Provider {
         }
     }
 
+    /// Preset for a `--provider` name (case-insensitive).
     pub fn from_name(name: &str) -> Option<Provider> {
         let n = name.trim().to_ascii_lowercase();
         Provider::ALL.into_iter().find(|p| p.name() == n)
@@ -108,6 +121,7 @@ impl Provider {
         }
     }
 
+    /// How this provider wants logprobs requested.
     pub fn logprobs_param(self) -> LogprobsParam {
         match self {
             Provider::Together => LogprobsParam::Integer,
@@ -119,9 +133,13 @@ impl Provider {
 /// Resolved settings for one request.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Target {
+    /// Provider preset.
     pub provider: Provider,
+    /// Base URL, the part before `/chat/completions`.
     pub base_url: String,
+    /// Model id.
     pub model: String,
+    /// API key, if the provider uses one.
     pub api_key: Option<String>,
 }
 
@@ -180,6 +198,7 @@ impl Target {
         })
     }
 
+    /// The Chat Completions URL.
     pub fn url(&self) -> String {
         format!("{}/chat/completions", self.base_url)
     }
@@ -274,7 +293,11 @@ pub fn check_has_logprobs(raw: &str, target: &Target) -> Result<()> {
 /// Send the prompt and return the raw JSON response text.
 pub fn fetch_target(target: &Target, prompt: &str, max_tokens: u32) -> Result<String> {
     let url = target.url();
-    let mut req = ureq::post(&url).set("Content-Type", "application/json");
+    // ureq has no overall timeout by default, so a stalled server would hang
+    // the CLI (and a CI job) forever.
+    let mut req = ureq::post(&url)
+        .timeout(std::time::Duration::from_secs(REQUEST_TIMEOUT_SECS))
+        .set("Content-Type", "application/json");
     if let Some(key) = &target.api_key {
         req = req.set("Authorization", &format!("Bearer {}", key));
     }

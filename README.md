@@ -4,7 +4,7 @@
 
 For anyone who ships or checks LLM answers: developers, evaluators, and CI pipelines. Works with OpenAI, OpenRouter, Together, vLLM, Ollama and any OpenAI-compatible API that returns token logprobs. Rust CLI and library (`llm-token-visualizer`).
 
-**No install:** [try it in your browser](https://hallucination-highlighter.vercel.app/try/) (page source in [`docs/try/`](docs/try/index.html)). Play with the real sample answers and a threshold slider, or paste your own OpenAI, OpenRouter or Together key and ask a question. The key goes only from your browser to that provider.
+Works on answers in any language: words are found with Unicode word segmentation, so a single unsure character in a Chinese or Japanese answer is flagged on its own. Reads OpenAI-style, completions-style and Google Gemini (`logprobsResult`) responses.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/hero-dark.png">
@@ -13,7 +13,6 @@ For anyone who ships or checks LLM answers: developers, evaluators, and CI pipel
 
 <p align="center">
   <a href="https://crates.io/crates/llm-token-visualizer"><img alt="crates.io" src="https://img.shields.io/crates/v/llm-token-visualizer.svg"></a>
-  &nbsp;<a href="https://hallucination-highlighter.vercel.app/try/"><b>Try it in the browser</b></a>
 </p>
 
 ## Install
@@ -27,7 +26,8 @@ mkdir -p ~/.local/bin && curl -fsSL https://gitlab.com/mattbusel/LLM-Hallucinati
 | Other systems | |
 |---|---|
 | **Windows** | [Download llm-token-visualizer-windows-x86_64.exe](https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases/permalink/latest/downloads/llm-token-visualizer-windows-x86_64.exe) and run it. (Unsigned, so SmartScreen may ask: *More info*, then *Run anyway*.) |
-| **macOS, or from source** | `cargo install --locked llm-token-visualizer` |
+| **Any system with Rust** | `cargo binstall llm-token-visualizer` (prebuilt Linux and Windows binaries) or `cargo install --locked llm-token-visualizer` |
+| **As a library** | `cargo add llm-token-visualizer --no-default-features` (no HTTP client) |
 
 The release archives also include the sample answers under `samples/`. Every release, with SHA-256 checksums: [Releases](https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases).
 
@@ -70,6 +70,10 @@ The terminal report for the first one (`--logprobs-file examples/logprobs/cuyp.j
 
 Models can be confidently wrong. In `moonwalk.json` the model says "Pete Conrad was the second person to walk on the Moon" (it was Buzz Aldrin) with at least 72% probability on every token of the name, so the wrong name is not flagged. Use this to decide where to look first, not to certify an answer.
 
+## Why this tool
+
+There is no other Rust crate for logprob-based confidence checks. In Python, [LM-Polygraph](https://github.com/IINemo/lm-polygraph) and [UQLM](https://github.com/cvs-health/uqlm) offer many more uncertainty methods (sampling consistency, claim-level scoring, trained estimators), and need the model loaded or several generations per answer. This tool does one cheap thing from a single saved response: show which words had low probability and what else the model considered, as a terminal heatmap, an HTML page, Markdown for a merge request, JSON, or a CI exit code. Each report also gives the answer's perplexity, and each flagged span the entropy of the alternatives at its weakest token.
+
 ## Use it in 3 steps
 
 1. **Get a response with logprobs.** Ask your API for `"logprobs": true, "top_logprobs": 3` and save the JSON, or let the tool do it: set `OPENAI_API_KEY` and run `llm-token-visualizer --live "your question" --save answer.json`.
@@ -96,7 +100,36 @@ llm-token-visualizer --live "..." --provider vllm --model my-model --base-url ht
 
 No hosted provider was called with a real key for this release. If a provider or model answers without logprobs, the CLI stops with an error that says so (and shows the answer) instead of printing an empty report. Anthropic's API does not return logprobs, so it has no preset.
 
+Google Gemini's native API returns logprobs too (`generationConfig: {responseLogprobs: true, logprobs: 3}`); save the response and pass it with `--logprobs-file`.
+
 No API key handy? Grab a sample first: `curl -LO https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/raw/main/examples/logprobs/cuyp.json`
+
+## Library
+
+```rust
+use llm_token_visualizer::detect::{detect, parse_logprobs};
+
+let json = std::fs::read_to_string("examples/logprobs/cuyp.json")?;
+let report = detect(&parse_logprobs(&json)?, 0.6);
+for span in &report.spans {
+    println!("{:?}: {}", span.text.trim(), span.describe());
+}
+println!("perplexity {:.2}", report.perplexity);
+# Ok::<(), anyhow::Error>(())
+```
+
+| Feature | Default | What it adds |
+|---|---|---|
+| `live` | on | `--live` and the `live` module: asks an OpenAI-compatible API (ureq, rustls; 120 s timeout) |
+| `async-openai` | off | `interop::async_openai::tokens_from_response` for `async_openai` chat completion responses (types only, no HTTP client) |
+
+Examples (`cargo run --example <name>`): `detect` (every bundled sample), `ci_gate` (a directory of answers, exit 2 when any is flagged), `html_report` (write the HTML page for one answer).
+
+Already using **async-openai**? Enable the feature and pass your `CreateChatCompletionResponse` to `interop::async_openai::tokens_from_response`, then `detect`. Using another client? Serialize its response to JSON and call `parse_logprobs`.
+
+## Performance
+
+`cargo bench --bench vs_0_4` parses a 4,000-token response and flags spans: 9.0 ms with 0.5.0 against 14.6 ms with 0.4.0 (criterion medians, i7-13700KF, Windows 11, Rust 1.91). 0.5.0 deserializes the logprobs without copying the JSON first, which more than pays for the Unicode word segmentation.
 
 ## Documentation
 
@@ -105,8 +138,8 @@ No API key handy? Grab a sample first: `curl -LO https://gitlab.com/mattbusel/LL
 | [Reference](docs/REFERENCE.md) | Every flag, output formats (terminal, HTML, Markdown, JSON), CI use, input formats, live mode, your own confidence scores, library API |
 | [How it works and repo layout](docs/ARCHITECTURE.md) | The detection rules and color scale in detail, source layout, what is a sketch and what ships |
 | [API docs on docs.rs](https://docs.rs/llm-token-visualizer) | The Rust library |
-| [Project site](https://hallucination-highlighter.vercel.app/) | Overview, with the samples and a threshold slider |
-| [Try it in the browser](https://hallucination-highlighter.vercel.app/try/) | Samples, or ask OpenAI, OpenRouter or Together with your own key |
+| [Project site](https://hallucination-highlighter.vercel.app/) | Overview |
+| [Browser version (source)](docs/try/index.html) | The samples with a threshold slider, or ask a provider with your own key; open the file from a clone |
 | [Changelog](CHANGELOG.md) | What changed in each release |
 
 ## License

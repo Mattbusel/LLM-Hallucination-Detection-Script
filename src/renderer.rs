@@ -3,7 +3,9 @@ use colored::{ColoredString, Colorize};
 
 use crate::data::{ConfidenceLevel, FlagType, TokenAnalysis, TokenInfo, VisualizationConfig};
 
+/// Renders a [`crate::TokenAnalysis`] as text.
 pub trait Renderer {
+    /// Render `analysis` of `text` with `config`.
     fn render(
         &self,
         text: &str,
@@ -12,6 +14,7 @@ pub trait Renderer {
     ) -> Result<String>;
 }
 
+/// Colored terminal output.
 pub struct TerminalRenderer;
 
 impl Default for TerminalRenderer {
@@ -21,6 +24,7 @@ impl Default for TerminalRenderer {
 }
 
 impl TerminalRenderer {
+    /// A terminal renderer.
     pub fn new() -> Self {
         Self
     }
@@ -157,6 +161,7 @@ impl Renderer for TerminalRenderer {
     }
 }
 
+/// A self-contained HTML page.
 pub struct HtmlRenderer;
 
 impl Default for HtmlRenderer {
@@ -166,6 +171,7 @@ impl Default for HtmlRenderer {
 }
 
 impl HtmlRenderer {
+    /// An HTML renderer.
     pub fn new() -> Self {
         Self
     }
@@ -318,6 +324,7 @@ impl Renderer for HtmlRenderer {
     }
 }
 
+/// Markdown.
 pub struct MarkdownRenderer;
 
 impl Default for MarkdownRenderer {
@@ -327,6 +334,7 @@ impl Default for MarkdownRenderer {
 }
 
 impl MarkdownRenderer {
+    /// A Markdown renderer.
     pub fn new() -> Self {
         Self
     }
