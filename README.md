@@ -1,5 +1,7 @@
 # LLM Hallucination Detector
 
+English | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
+
 **Highlights the words an AI chatbot was unsure about, so you know which parts of its answer to double-check.**
 
 For anyone who ships or checks LLM answers: developers, evaluators, and CI pipelines. Works with OpenAI, OpenRouter, Together, vLLM, Ollama and any OpenAI-compatible API that returns token logprobs. Rust CLI and library (`llm-token-visualizer`).
