@@ -1,16 +1,16 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<title>Try the Hallucination Highlighter</title>
-<meta name="description" content="Paste nothing, install nothing: see which words an LLM answer was unsure about, from real token logprobs. Try the bundled samples, or ask OpenAI, OpenRouter or Together with your own key, straight from your browser.">
-<link rel="canonical" href="https://hallucination-highlighter.vercel.app/try/">
+<title>LLM 환각 탐지기 바로 사용해 보기 (무료, 설치 없음)</title>
+<meta name="description" content="붙여 넣을 것도, 설치할 것도 없습니다: 실제 토큰 logprobs로 LLM 답변에서 모델이 확신하지 못한 단어를 확인하세요. 포함된 샘플을 써 보거나, 내 API 키로 OpenAI, OpenRouter, Together에 브라우저에서 바로 질문할 수 있습니다. 무료 LLM 환각 탐지 도구.">
+<link rel="canonical" href="https://hallucination-highlighter.vercel.app/ko/try/">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://hallucination-highlighter.vercel.app/try/">
-<meta property="og:title" content="Try the Hallucination Highlighter">
-<meta property="og:description" content="See which words an LLM answer was unsure about, from real token logprobs, in your browser.">
+<meta property="og:url" content="https://hallucination-highlighter.vercel.app/ko/try/">
+<meta property="og:title" content="LLM 환각 탐지기 사용해 보기">
+<meta property="og:description" content="실제 토큰 logprobs로 LLM 답변에서 확신 없는 단어를 브라우저에서 확인하세요.">
 <meta property="og:image" content="https://hallucination-highlighter.vercel.app/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23f4efe4'/%3E%3Crect x='6' y='16' width='5' height='10' rx='1' fill='%23d6d0c4'/%3E%3Crect x='13.5' y='9' width='5' height='17' rx='1' fill='%23d6d0c4'/%3E%3Crect x='21' y='20' width='5' height='6' rx='1' fill='%23e84830'/%3E%3C/svg%3E">
@@ -150,34 +150,34 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
 <link rel="alternate" hreflang="ja" href="https://hallucination-highlighter.vercel.app/ja/try/">
 <link rel="alternate" hreflang="ko" href="https://hallucination-highlighter.vercel.app/ko/try/">
 <link rel="alternate" hreflang="x-default" href="https://hallucination-highlighter.vercel.app/try/">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:locale:alternate" content="en_US">
 <meta property="og:locale:alternate" content="zh_CN">
 <meta property="og:locale:alternate" content="ja_JP">
-<meta property="og:locale:alternate" content="ko_KR">
 <style>.i18n-switch{display:block!important;position:relative;z-index:40;box-sizing:border-box;max-width:1200px;margin:0 auto!important;padding:6px 16px 0!important;border:0!important;background:none!important;text-align:right!important;font:13px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif!important;letter-spacing:normal!important;text-transform:none!important;opacity:.8}.i18n-switch a,.i18n-switch span{display:inline!important;margin:0!important;padding:0!important;font:inherit!important;color:inherit!important;background:none!important;border:0!important}.i18n-switch a{text-decoration:underline!important;text-underline-offset:2px}.i18n-switch [aria-current]{font-weight:600!important}</style>
 <!-- /i18n -->
 </head>
 <body>
-<div class="i18n-switch" role="navigation" aria-label="Language"><span aria-current="true">English</span> | <a href="../zh/try/" hreflang="zh-CN" lang="zh-CN">简体中文</a> | <a href="../ja/try/" hreflang="ja" lang="ja">日本語</a> | <a href="../ko/try/" hreflang="ko" lang="ko">한국어</a></div>
+<div class="i18n-switch" role="navigation" aria-label="언어"><a href="../../try/" hreflang="en" lang="en">English</a> | <a href="../../zh/try/" hreflang="zh-CN" lang="zh-CN">简体中文</a> | <a href="../../ja/try/" hreflang="ja" lang="ja">日本語</a> | <span aria-current="true">한국어</span></div>
 <div class="wrap">
   <nav>
     <a class="mark" href="../"><svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="14" width="7" height="15" rx="1.5" fill="#d6d0c4"/><rect x="12.5" y="5" width="7" height="24" rx="1.5" fill="#ecc05c"/><rect x="22" y="20" width="7" height="9" rx="1.5" fill="#e84830"/></svg>llm-token-visualizer</a>
     <ul>
-      <li><a href="./" aria-current="page">Try it</a></li>
-      <li class="opt"><a href="../#how">How it works</a></li>
+      <li><a href="./" aria-current="page">사용해 보기</a></li>
+      <li class="opt"><a href="../#how">동작 원리</a></li>
       <li><a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script">GitLab</a></li>
     </ul>
   </nav>
 
   <header class="hero">
-    <div class="k">Try it in your browser &nbsp;/&nbsp; no install</div>
-    <h1>Which words was the model <em>unsure</em> about?</h1>
-    <p class="lede">Every word an AI writes comes with a probability. Low ones are where it was guessing. Pick a real answer below and drag the threshold, or ask your own question further down.</p>
+    <div class="k">브라우저에서 사용 &nbsp;/&nbsp; 설치 필요 없음</div>
+    <h1>모델이 <em>확신하지 못한</em> 단어는 무엇일까요?</h1>
+    <p class="lede">AI가 쓰는 모든 단어에는 확률이 붙어 있습니다. 확률이 낮은 곳은 추측한 부분입니다. 아래에서 실제 답변을 골라 임계값을 움직여 보거나, 더 아래에서 직접 질문해 보세요.</p>
 
     <div class="spec" id="spec">
       <div class="bar-top">
-        <div class="tabs" role="tablist" aria-label="Answers" id="tabs"></div>
-        <label class="thr">threshold <input type="range" id="thr" min="0.05" max="0.95" step="0.05" value="0.6" aria-label="Detection threshold"><output id="thrv">0.60</output></label>
+        <div class="tabs" role="tablist" aria-label="답변" id="tabs"></div>
+        <label class="thr">임계값 <input type="range" id="thr" min="0.05" max="0.95" step="0.05" value="0.6" aria-label="탐지 임계값"><output id="thrv">0.60</output></label>
       </div>
       <div class="spec-body">
         <div class="spec-text">
@@ -185,49 +185,49 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
           <p class="answer" id="answer" aria-live="polite"></p>
           <div class="trace" id="trace" aria-hidden="true"></div>
           <div class="stats k" id="stats"></div>
-          <a class="dlraw" id="dlraw" href="#" download="answer.json" hidden>Download the raw response (for the CLI)</a>
+          <a class="dlraw" id="dlraw" href="#" download="answer.json" hidden>원본 응답 다운로드 (CLI용)</a>
         </div>
         <div class="spec-side">
-          <div class="k" style="margin-bottom:10px">Unsure words and what the model weighed</div>
+          <div class="k" style="margin-bottom:10px">확신 없는 단어와 모델이 고려한 후보</div>
           <div id="spans"></div>
           <p class="verdict" id="verdict"></p>
         </div>
       </div>
     </div>
-    <p class="small" style="margin-top:12px">The samples are real Llama 3.1 8B Instruct responses from <code>examples/logprobs/</code>. A word is flagged when any of its pieces has a probability (p = e<sup style="color:inherit;font-weight:400">logprob</sup>) below the threshold, exactly as the CLI does it. Hover or tap a word for its probability and the alternatives.</p>
+    <p class="small" style="margin-top:12px">샘플은 <code>examples/logprobs/</code>에 있는 Llama 3.1 8B Instruct의 실제 응답입니다. 단어를 이루는 조각 중 하나라도 확률(p = e<sup style="color:inherit;font-weight:400">logprob</sup>)이 임계값보다 낮으면 그 단어가 표시되며, CLI와 똑같은 방식입니다. 단어에 마우스를 올리거나 탭하면 확률과 대안 후보가 보입니다.</p>
   </header>
 </div>
 
 <section id="ask"><div class="wrap">
-  <div class="k">Your own question</div>
-  <h2>Ask a model, with your own key.</h2>
-  <p>Only APIs that return token probabilities work here. Pick one, paste your key, ask something, and the answer shows up above with the unsure words marked.</p>
+  <div class="k">직접 질문하기</div>
+  <h2>내 키로 모델에게 질문하세요.</h2>
+  <p>토큰 확률을 반환하는 API만 여기서 쓸 수 있습니다. 하나를 고르고 키를 붙여 넣은 뒤 질문하면, 확신 없는 단어가 표시된 답변이 위에 나타납니다.</p>
   <div class="ask">
     <form class="card" id="askform" autocomplete="off">
       <div class="grid">
-        <label class="fld">Provider
+        <label class="fld">제공자
           <select id="prov">
             <option value="openai">OpenAI</option>
             <option value="openrouter">OpenRouter</option>
             <option value="together">Together AI</option>
-            <option value="custom">Custom OpenAI-compatible URL</option>
+            <option value="custom">사용자 지정 OpenAI 호환 URL</option>
           </select>
         </label>
-        <label class="fld">Model
+        <label class="fld">모델
           <input type="text" id="model" spellcheck="false" autocapitalize="off">
         </label>
-        <label class="fld full">API base URL
+        <label class="fld full">API 기본 URL
           <input type="url" id="base" spellcheck="false" autocapitalize="off" readonly>
         </label>
-        <label class="fld full">API key
+        <label class="fld full">API 키
           <input type="password" id="key" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="sk-...">
         </label>
-        <label class="check full"><input type="checkbox" id="remember"> <span>Remember this key on this device (saved in this browser's local storage for this site; untick to delete it)</span></label>
-        <label class="fld full">Question
+        <label class="check full"><input type="checkbox" id="remember"> <span>이 기기에서 키 기억하기 (이 브라우저의 이 사이트 로컬 스토리지에 저장, 체크를 해제하면 삭제됩니다)</span></label>
+        <label class="fld full">질문
           <textarea id="q" placeholder="Who was the second person to walk on the Moon?"></textarea>
         </label>
         <div class="actions full">
-          <button class="go" type="submit" id="go">Ask and highlight</button>
+          <button class="go" type="submit" id="go">질문하고 하이라이트</button>
           <p class="status" id="status" role="status"></p>
         </div>
       </div>
@@ -235,34 +235,34 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
 
     <div class="card">
       <div class="keynote">
-        <p><b>Your key stays in your browser.</b> This page has no server. It sends your key only to the provider you picked, directly from your browser, in the request that asks your question.</p>
-        <p>It is not saved anywhere unless you tick "Remember", and then only in this browser.</p>
+        <p><b>키는 브라우저 안에만 머뭅니다.</b> 이 페이지에는 서버가 없습니다. 키는 질문을 보내는 요청에 담겨, 브라우저에서 선택한 제공자에게 직접 전송될 뿐입니다.</p>
+        <p>“기억하기”에 체크하지 않으면 어디에도 저장되지 않으며, 체크해도 이 브라우저에만 저장됩니다.</p>
       </div>
-      <h3>Which providers work from a browser</h3>
+      <h3>브라우저에서 쓸 수 있는 제공자</h3>
       <table>
-        <thead><tr><th>Provider</th><th>Browser calls</th></tr></thead>
+        <thead><tr><th>제공자</th><th>브라우저 호출</th></tr></thead>
         <tbody>
-          <tr><td><b>OpenAI</b></td><td><span class="yes">Yes.</span> Answers cross-origin requests from this site. Use a model that returns logprobs, like <code>gpt-4o-mini</code>.</td></tr>
-          <tr><td><b>OpenRouter</b></td><td><span class="yes">Yes.</span> Allows any site. Only some upstream providers return logprobs, so the request asks OpenRouter to route to one that supports every parameter.</td></tr>
-          <tr><td><b>Together AI</b></td><td><span class="yes">Yes.</span> Allows any site. Asks with Together's own <code>"logprobs": 3</code> form.</td></tr>
-          <tr><td><b>Local Ollama</b></td><td><span class="no">Not by default.</span> Ollama refuses requests from other websites. Start it with <code>OLLAMA_ORIGINS=https://hallucination-highlighter.vercel.app</code> and use Custom with <code>http://localhost:11434/v1</code>. Your browser may also ask before letting a site reach your own machine. Or use the CLI, which has no such limit.</td></tr>
-          <tr><td><b>Anthropic</b></td><td><span class="no">No.</span> Its API does not return token probabilities, so there is nothing to highlight.</td></tr>
+          <tr><td><b>OpenAI</b></td><td><span class="yes">가능.</span> 이 사이트의 교차 출처 요청에 응답합니다. <code>gpt-4o-mini</code>처럼 logprobs를 반환하는 모델을 쓰세요.</td></tr>
+          <tr><td><b>OpenRouter</b></td><td><span class="yes">가능.</span> 모든 사이트를 허용합니다. 일부 업스트림 제공자만 logprobs를 반환하므로, 모든 매개변수를 지원하는 곳으로 라우팅하도록 OpenRouter에 요청합니다.</td></tr>
+          <tr><td><b>Together AI</b></td><td><span class="yes">가능.</span> 모든 사이트를 허용합니다. Together 고유의 <code>"logprobs": 3</code> 형식으로 요청합니다.</td></tr>
+          <tr><td><b>로컬 Ollama</b></td><td><span class="no">기본값으로는 불가.</span> Ollama는 다른 웹사이트의 요청을 거부합니다. <code>OLLAMA_ORIGINS=https://hallucination-highlighter.vercel.app</code>로 실행한 다음 “사용자 지정”에서 <code>http://localhost:11434/v1</code>을 쓰세요. 사이트가 내 컴퓨터에 접근하기 전에 브라우저가 확인을 요청할 수도 있습니다. 이런 제한이 없는 CLI를 써도 됩니다.</td></tr>
+          <tr><td><b>Anthropic</b></td><td><span class="no">불가.</span> API가 토큰 확률을 반환하지 않아 하이라이트할 것이 없습니다.</td></tr>
         </tbody>
       </table>
-      <p class="small" style="margin-top:12px">Browser access checked on 2026-09-30 with a CORS preflight from this site's address. Providers can change this.</p>
+      <p class="small" style="margin-top:12px">브라우저 접근 여부는 2026-09-30에 이 사이트 주소에서 CORS 프리플라이트로 확인했습니다. 제공자가 바꿀 수 있습니다.</p>
     </div>
   </div>
 
   <div class="card" style="margin-top:22px">
-    <h3>Same thing in a terminal</h3>
-    <p>The <a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script">CLI</a> does this too, with presets for the same providers plus vLLM and Ollama, and no browser limits:</p>
+    <h3>터미널에서도 똑같이</h3>
+    <p><a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script">CLI</a>로도 할 수 있습니다. 같은 제공자에 vLLM과 Ollama 프리셋까지 있고, 브라우저 제한도 없습니다:</p>
     <pre>llm-token-visualizer --live "Who painted The Night Watch?" --provider openrouter
 llm-token-visualizer --live "Who painted The Night Watch?" --provider ollama --model qwen2.5-coder:14b</pre>
   </div>
 </div></section>
 
 <footer><div class="wrap">
-  <span>MIT licensed. <a href="../">Home</a> &middot; <a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script">Source</a> &middot; <a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases">Releases</a></span>
+  <span>MIT 라이선스. <a href="../">홈</a> &middot; <a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script">소스 코드</a> &middot; <a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases">릴리스</a></span>
   <span class="scale k">p 0 <span class="g"></span> p 1</span>
 </div></footer>
 <div class="tip" id="tip" role="tooltip"></div>
@@ -293,13 +293,13 @@ class ParseError extends Error {}
 function parseLogprobs(value) {
   if (value && typeof value === 'object' && value.error) {
     const e = value.error;
-    throw new ParseError('The API returned an error: ' + (e.message || JSON.stringify(e)));
+    throw new ParseError('API가 오류를 반환했습니다: ' + (e.message || JSON.stringify(e)));
   }
   let tokens;
   const lp0 = value && value.choices && value.choices[0] && value.choices[0].logprobs;
   const legacy = (lp0 && lp0.tokens && lp0.token_logprobs) ? lp0 : (value && value.tokens && value.token_logprobs ? value : null);
   if (legacy) {
-    if (legacy.tokens.length !== legacy.token_logprobs.length) throw new ParseError('logprobs.tokens and token_logprobs differ in length.');
+    if (legacy.tokens.length !== legacy.token_logprobs.length) throw new ParseError('logprobs.tokens와 token_logprobs의 길이가 다릅니다.');
     tokens = legacy.tokens.map((t, i) => {
       const raw = legacy.top_logprobs && legacy.top_logprobs[i];
       let top = [];
@@ -313,12 +313,12 @@ function parseLogprobs(value) {
     if (Array.isArray(value)) content = value;
     else if (lp0 && 'content' in lp0) content = lp0.content;
     else if (value && 'content' in value && !value.choices) content = value.content;
-    else throw new ParseError('No token logprobs in the response.');
-    if (content == null) throw new ParseError('The response has no token logprobs (logprobs is null).');
+    else throw new ParseError('응답에 토큰 logprobs가 없습니다.');
+    if (content == null) throw new ParseError('응답에 토큰 logprobs가 없습니다 (logprobs가 null).');
     tokens = content.map(t => ({ token: t.token, logprob: t.logprob, top: (t.top_logprobs || []).map(a => ({ token: a.token, logprob: a.logprob })) }));
   }
   tokens = tokens.filter(t => !isSpecial(t.token));
-  if (!tokens.length) throw new ParseError('The logprobs contain no tokens.');
+  if (!tokens.length) throw new ParseError('logprobs에 토큰이 하나도 없습니다.');
   return tokens;
 }
 
@@ -380,10 +380,10 @@ function barsHTML(span) {
 
 // ---- Answers shown in the viewer ----
 const SAMPLES = [
-  ['cuyp', 'Right answer. The model still gave Düsseldorf 39%.'],
-  ['tour-de-france', 'Right answer. Flags land on phrasing: "Stephen" vs "The", and a hyphen.'],
-  ['eiffel', 'Mostly phrasing words, plus a 39% pull toward "French" instead of "Gustave".'],
-  ['moonwalk', 'Wrong answer (it was Buzz Aldrin), and the name is not flagged: low probability is a place to look, not a fact check.'],
+  ['cuyp', '정답. 그래도 모델은 Düsseldorf에 39%를 주었습니다.'],
+  ['tour-de-france', '정답. 표시는 표현에 붙었습니다: "Stephen"이냐 "The"냐, 그리고 하이픈.'],
+  ['eiffel', '대부분 표현 단어이고, "Gustave" 대신 "French"로 39% 기울었습니다.'],
+  ['moonwalk', '오답(정답은 Buzz Aldrin)인데 이름은 표시되지 않았습니다: 낮은 확률은 살펴볼 곳일 뿐, 사실 확인이 아닙니다.'],
 ];
 const answers = {};   // id -> {label, note, tokens, model, raw}
 let current = null;
@@ -407,13 +407,13 @@ function draw() {
     $('answer').innerHTML = answerHTML(T, spans);
     $('trace').innerHTML = T.map(t => { const p = prob(t.logprob); return `<i style="--h:${heat(p).join(',')};height:${Math.max(4, p * 100).toFixed(0)}%"></i>`; }).join('');
     const mean = T.reduce((s, t) => s + prob(t.logprob), 0) / T.length;
-    $('stats').innerHTML = `<span>${esc(A.model || 'unknown model')}</span><span>${T.length} tokens</span><span>mean p ${mean.toFixed(2)}</span>`;
+    $('stats').innerHTML = `<span>${esc(A.model || '알 수 없는 모델')}</span><span>토큰 ${T.length}개</span><span>평균 p ${mean.toFixed(2)}</span>`;
     $('spans').innerHTML = spans.length ? spans.map((sp, n) =>
-      `<div class="span" data-start="${sp.start}" data-end="${sp.end}" data-weak="${esc(sp.weak)}" data-p="${sp.p}"><h3><span class="n">${n + 1}</span><span class="st">${esc(sp.text.trim())}</span><span class="w">weakest ${esc(q(sp.weak))} at p ${sp.p.toFixed(2)}</span></h3>${barsHTML(sp)}</div>`).join('')
-      : '<p class="none">Nothing below this threshold.</p>';
+      `<div class="span" data-start="${sp.start}" data-end="${sp.end}" data-weak="${esc(sp.weak)}" data-p="${sp.p}"><h3><span class="n">${n + 1}</span><span class="st">${esc(sp.text.trim())}</span><span class="w">가장 약한 토큰 ${esc(q(sp.weak))}, p ${sp.p.toFixed(2)}</span></h3>${barsHTML(sp)}</div>`).join('')
+      : '<p class="none">이 임계값보다 낮은 단어가 없습니다.</p>';
     const n = spans.length;
-    $('verdict').textContent = n === 0 ? 'No unsure words at this threshold. That does not prove the answer is correct.'
-      : `${n} unsure span${n > 1 ? 's' : ''}. Check ${n > 1 ? 'these claims' : 'it'} before trusting the answer.`;
+    $('verdict').textContent = n === 0 ? '이 임계값에서는 확신 없는 단어가 없습니다. 그렇다고 답변이 맞다는 증거는 아닙니다.'
+      : `확신 없는 구간 ${n}개. 답변을 믿기 전에 ${n > 1 ? '이 내용들을' : '이 부분을'} 확인하세요.`;
   }
   if (A.raw) {
     if (dl.dataset.url) URL.revokeObjectURL(dl.dataset.url);
@@ -443,12 +443,12 @@ async function loadSamples() {
   SAMPLES.forEach(([id]) => addTab(id, id + '.json'));
   await Promise.all(SAMPLES.map(async ([id, note]) => {
     try {
-      const r = await fetch(`samples/${id}.json`);
+      const r = await fetch(`../../try/samples/${id}.json`);
       if (!r.ok) throw new Error('HTTP ' + r.status);
       const v = await r.json();
       answers[id] = { note, tokens: parseLogprobs(v), model: v.model };
     } catch (e) {
-      answers[id] = { note, error: `Could not load samples/${id}.json (${e.message}).`, text: '' };
+      answers[id] = { note, error: `samples/${id}.json을(를) 불러오지 못했습니다 (${e.message}).`, text: '' };
     }
   }));
   if (!current) select('cuyp'); else draw();
@@ -477,8 +477,8 @@ addEventListener('scroll', hideTip, { passive: true });
 const PROVIDERS = {
   openai: { base: 'https://api.openai.com/v1', model: 'gpt-4o-mini', style: 'bool', keyNeeded: true },
   openrouter: { base: 'https://openrouter.ai/api/v1', model: 'openai/gpt-4o-mini', style: 'bool', keyNeeded: true, extra: { provider: { require_parameters: true } } },
-  together: { base: 'https://api.together.ai/v1', model: '', modelHint: 'a Together model id', style: 'int', keyNeeded: true },
-  custom: { base: '', model: '', modelHint: 'model name', style: 'bool', keyNeeded: false },
+  together: { base: 'https://api.together.ai/v1', model: '', modelHint: 'Together 모델 ID', style: 'int', keyNeeded: true },
+  custom: { base: '', model: '', modelHint: '모델 이름', style: 'bool', keyNeeded: false },
 };
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
@@ -497,7 +497,7 @@ function onProvider() {
   const saved = store.get(keyName(id));
   $('key').value = saved || '';
   $('remember').checked = !!saved;
-  $('key').placeholder = P.keyNeeded ? 'Your API key' : 'API key, if your server needs one';
+  $('key').placeholder = P.keyNeeded ? '내 API 키' : 'API 키 (서버에서 필요한 경우)';
   setStatus('');
 }
 $('prov').addEventListener('change', onProvider);
@@ -516,9 +516,9 @@ $('askform').addEventListener('submit', async e => {
   const id = $('prov').value, P = PROVIDERS[id];
   const base = $('base').value.trim().replace(/\/+$/, ''), model = $('model').value.trim(), key = $('key').value.trim();
   const question = $('q').value.trim() || $('q').placeholder;
-  if (!/^https?:\/\//.test(base)) return setStatus('Enter the API base URL, for example https://your-server/v1.', 'err');
-  if (!model) return setStatus('Enter a model name.', 'err');
-  if (P.keyNeeded && !key) return setStatus('Paste your API key first.', 'err');
+  if (!/^https?:\/\//.test(base)) return setStatus('API 기본 URL을 입력하세요. 예: https://your-server/v1', 'err');
+  if (!model) return setStatus('모델 이름을 입력하세요.', 'err');
+  if (P.keyNeeded && !key) return setStatus('먼저 API 키를 붙여 넣으세요.', 'err');
   if (id === 'custom') store.set('hh-custom-base', base);
 
   const body = { model, messages: [{ role: 'user', content: question }], max_tokens: 200, temperature: 0 };
@@ -528,7 +528,7 @@ $('askform').addEventListener('submit', async e => {
   if (key) headers.Authorization = 'Bearer ' + key;
   if (id === 'openrouter') headers['X-Title'] = 'Hallucination Highlighter';
 
-  $('go').disabled = true; setStatus('Asking ' + model + '...');
+  $('go').disabled = true; setStatus(model + '에 질문하는 중...');
   let raw, v;
   try {
     const r = await fetch(base + '/chat/completions', { method: 'POST', headers, body: JSON.stringify(body) });
@@ -538,12 +538,12 @@ $('askform').addEventListener('submit', async e => {
       const m = v && v.error ? (v.error.message || JSON.stringify(v.error)) : raw.slice(0, 300);
       throw new Error(`HTTP ${r.status}: ${m}`);
     }
-    if (!v) throw new Error('The response was not JSON.');
+    if (!v) throw new Error('응답이 JSON이 아닙니다.');
   } catch (err) {
     $('go').disabled = false;
     const blocked = err instanceof TypeError;
     return setStatus(blocked
-      ? `The browser could not reach ${base}. The server may not allow requests from this page (CORS), or it is not running.`
+      ? `브라우저가 ${base}에 연결하지 못했습니다. 서버가 이 페이지의 요청을 허용하지 않거나(CORS) 실행 중이 아닐 수 있습니다.`
       : err.message, 'err');
   }
   $('go').disabled = false;
@@ -551,15 +551,15 @@ $('askform').addEventListener('submit', async e => {
   const text = (v.choices && v.choices[0] && v.choices[0].message && v.choices[0].message.content) || '';
   const n = Object.keys(answers).filter(k => k.startsWith('mine')).length + 1;
   const tid = 'mine' + n;
-  const label = `your answer ${n}`;
-  const note = 'You asked: ' + question;
+  const label = `내 답변 ${n}`;
+  const note = '내 질문: ' + question;
   try {
     answers[tid] = { note, tokens: parseLogprobs(v), model: v.model || model, raw };
-    setStatus('Done. Your answer is in the viewer above.', 'ok');
+    setStatus('완료. 답변이 위쪽 뷰어에 표시되었습니다.', 'ok');
   } catch (err) {
     answers[tid] = { note, text, model: v.model || model, raw,
-      error: `${model} answered, but returned no token probabilities, so there is nothing to highlight. Pick a model or provider that returns logprobs. (${err.message})` };
-    setStatus('The answer came back without token probabilities. See above.', 'err');
+      error: `${model}이(가) 답변했지만 토큰 확률을 반환하지 않아 하이라이트할 것이 없습니다. logprobs를 반환하는 모델이나 제공자를 고르세요. (${err.message})` };
+    setStatus('답변에 토큰 확률이 없습니다. 위를 확인하세요.', 'err');
   }
   addTab(tid, label, true);
   select(tid);

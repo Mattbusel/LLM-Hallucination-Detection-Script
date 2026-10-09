@@ -1,23 +1,23 @@
 <!doctype html>
-<html lang="en">
+<html lang="ja">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<title>LLM Hallucination Detector: flag unsure words</title>
-<meta name="description" content="Free LLM hallucination detector: reads token logprobs from OpenAI-compatible APIs and highlights the words the model was unsure about. Rust CLI, Windows .exe.">
-<link rel="canonical" href="https://hallucination-highlighter.vercel.app/">
+<title>LLM ハルシネーション検出ツール：自信のない単語をハイライト（無料・オープンソース）</title>
+<meta name="description" content="無料・オープンソースの LLM ハルシネーション検出ツール。OpenAI 互換 API のトークン logprobs を読み、モデルが自信を持てなかった単語をハイライトします。Rust 製 CLI、Windows 版 .exe あり。">
+<link rel="canonical" href="https://hallucination-highlighter.vercel.app/ja/">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://hallucination-highlighter.vercel.app/">
-<meta property="og:title" content="LLM Hallucination Detector">
-<meta property="og:description" content="Find the words your model wasn't sure about. Token logprobs in, flagged spans and alternatives out.">
+<meta property="og:url" content="https://hallucination-highlighter.vercel.app/ja/">
+<meta property="og:title" content="LLM ハルシネーション検出ツール">
+<meta property="og:description" content="モデルが自信を持てなかった単語を見つけます。トークン logprobs を入れると、フラグ付きのスパンと候補が出てきます。">
 <meta property="og:image" content="https://hallucination-highlighter.vercel.app/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="A Llama 3.1 answer as a confidence heatmap with Aelbert and Dordrecht flagged">
+<meta property="og:image:alt" content="信頼度ヒートマップで表示した Llama 3.1 の回答。Aelbert と Dordrecht にフラグ付き">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="LLM Hallucination Detector">
-<meta name="twitter:description" content="Find the words your model wasn't sure about. Token logprobs in, flagged spans and alternatives out.">
+<meta name="twitter:title" content="LLM ハルシネーション検出ツール">
+<meta name="twitter:description" content="モデルが自信を持てなかった単語を見つけます。トークン logprobs を入れると、フラグ付きのスパンと候補が出てきます。">
 <meta name="twitter:image" content="https://hallucination-highlighter.vercel.app/assets/og-image.png">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"SoftwareApplication","name":"LLM Hallucination Detector (llm-token-visualizer)","description":"Command-line tool and Rust library that reads an LLM answer's token log probabilities, flags the words the model was unsure about, and shows the alternatives it weighed.","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux","url":"https://hallucination-highlighter.vercel.app/","codeRepository":"https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script","downloadUrl":"https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases/permalink/latest/downloads/llm-token-visualizer-windows-x86_64.exe","programmingLanguage":"Rust","license":"https://opensource.org/licenses/MIT","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Matthew Busel","url":"https://gitlab.com/mattbusel"}}
@@ -163,41 +163,41 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
 <link rel="alternate" hreflang="ja" href="https://hallucination-highlighter.vercel.app/ja/">
 <link rel="alternate" hreflang="ko" href="https://hallucination-highlighter.vercel.app/ko/">
 <link rel="alternate" hreflang="x-default" href="https://hallucination-highlighter.vercel.app/">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:locale:alternate" content="en_US">
 <meta property="og:locale:alternate" content="zh_CN">
-<meta property="og:locale:alternate" content="ja_JP">
 <meta property="og:locale:alternate" content="ko_KR">
 <style>.i18n-switch{display:block!important;position:relative;z-index:40;box-sizing:border-box;max-width:1200px;margin:0 auto!important;padding:6px 16px 0!important;border:0!important;background:none!important;text-align:right!important;font:13px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif!important;letter-spacing:normal!important;text-transform:none!important;opacity:.8}.i18n-switch a,.i18n-switch span{display:inline!important;margin:0!important;padding:0!important;font:inherit!important;color:inherit!important;background:none!important;border:0!important}.i18n-switch a{text-decoration:underline!important;text-underline-offset:2px}.i18n-switch [aria-current]{font-weight:600!important}</style>
 <!-- /i18n -->
 </head>
 <body>
-<div class="i18n-switch" role="navigation" aria-label="Language"><span aria-current="true">English</span> | <a href="zh/" hreflang="zh-CN" lang="zh-CN">简体中文</a> | <a href="ja/" hreflang="ja" lang="ja">日本語</a> | <a href="ko/" hreflang="ko" lang="ko">한국어</a></div>
+<div class="i18n-switch" role="navigation" aria-label="言語"><a href="../" hreflang="en" lang="en">English</a> | <a href="../zh/" hreflang="zh-CN" lang="zh-CN">简体中文</a> | <span aria-current="true">日本語</span> | <a href="../ko/" hreflang="ko" lang="ko">한국어</a></div>
 <div class="wrap">
   <nav>
     <a class="mark" href="./"><svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="14" width="7" height="15" rx="1.5" fill="#d6d0c4"/><rect x="12.5" y="5" width="7" height="24" rx="1.5" fill="#ecc05c"/><rect x="22" y="20" width="7" height="9" rx="1.5" fill="#e84830"/></svg>llm-token-visualizer</a>
     <ul>
-      <li><a href="try/">Try it</a></li>
-      <li class="opt"><a href="#how">How it works</a></li>
-      <li class="opt"><a href="#formats">Formats</a></li>
+      <li><a href="try/">試してみる</a></li>
+      <li class="opt"><a href="#how">仕組み</a></li>
+      <li class="opt"><a href="#formats">出力形式</a></li>
       <li class="opt"><a href="https://crates.io/crates/llm-token-visualizer">crates.io</a></li>
       <li><a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script">GitLab</a></li>
     </ul>
   </nav>
 
   <header class="hero">
-    <div class="k">Rust CLI and library &nbsp;/&nbsp; MIT</div>
-    <h1>Find the words your model <em>wasn&rsquo;t sure</em> about.</h1>
-    <p class="lede">Hand it an LLM answer with token log probabilities. It flags the words where the model's confidence dropped and shows what it almost said instead. Offline on a saved response, or live against any OpenAI-compatible API.</p>
+    <div class="k">Rust 製 CLI とライブラリ &nbsp;/&nbsp; MIT</div>
+    <h1>モデルが<em>自信を持てなかった</em>単語を見つける。</h1>
+    <p class="lede">トークンの対数確率（logprobs）付きの LLM の回答を渡すだけ。モデルの信頼度が下がった単語にフラグを付け、代わりに言いかけていた候補を表示します。保存したレスポンスをオフラインで解析することも、OpenAI 互換 API にその場で問い合わせることもできます。</p>
     <div class="install">
-      <div class="cmd"><code>cargo install llm-token-visualizer</code><button class="copy" data-copy="cargo install llm-token-visualizer">Copy</button></div>
+      <div class="cmd"><code>cargo install llm-token-visualizer</code><button class="copy" data-copy="cargo install llm-token-visualizer">コピー</button></div>
     </div>
-    <p class="dl"><a class="dlbtn" href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases/permalink/latest/downloads/llm-token-visualizer-windows-x86_64.exe">Download for Windows (.exe)</a></p>
-    <p class="small">Or with Rust installed: the command above. macOS and Linux builds are on the <a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases">latest release</a>.</p>
+    <p class="dl"><a class="dlbtn" href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases/permalink/latest/downloads/llm-token-visualizer-windows-x86_64.exe">Windows 版をダウンロード (.exe)</a></p>
+    <p class="small">Rust が入っていれば上のコマンドでも OK。macOS と Linux 版は<a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases">最新リリース</a>にあります。</p>
 
     <div class="spec" id="spec">
       <div class="bar-top">
-        <div class="tabs" role="tablist" aria-label="Sample answers"></div>
-        <label class="thr">threshold <input type="range" id="thr" min="0.05" max="0.95" step="0.05" value="0.6" aria-label="Detection threshold"><output id="thrv">0.60</output></label>
+        <div class="tabs" role="tablist" aria-label="サンプル回答"></div>
+        <label class="thr">しきい値 <input type="range" id="thr" min="0.05" max="0.95" step="0.05" value="0.6" aria-label="検出しきい値"><output id="thrv">0.60</output></label>
       </div>
       <div class="spec-body">
         <div class="spec-text">
@@ -207,24 +207,24 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
           <div class="stats k" id="stats"></div>
         </div>
         <div class="spec-side">
-          <div class="k" style="margin-bottom:10px">Flagged spans and what the model weighed</div>
+          <div class="k" style="margin-bottom:10px">フラグ付きのスパンと、モデルが検討した候補</div>
           <div id="spans"></div>
           <p class="verdict" id="verdict"></p>
         </div>
       </div>
     </div>
-    <p class="small" style="margin-top:12px">Real responses from Llama 3.1 8B Instruct, bundled in <code>examples/logprobs/</code>. The detection runs in your browser with the same rules as the CLI; hover or tap any word for its probability and alternatives. <a href="try/"><b>Ask your own question</b></a> with an OpenAI, OpenRouter or Together key, right in the browser.</p>
+    <p class="small" style="margin-top:12px">Llama 3.1 8B Instruct の実際のレスポンスで、<code>examples/logprobs/</code> に同梱しています。検出は CLI と同じルールでブラウザ内で動きます。単語にカーソルを合わせるかタップすると、確率と候補が表示されます。OpenAI、OpenRouter、Together の API キーがあれば、ブラウザから<a href="try/"><b>自分の質問を試せます</b></a>。</p>
   </header>
 </div>
 
 <section id="terminal"><div class="wrap">
-  <div class="k">In your terminal</div>
-  <h2>One command, no API key.</h2>
-  <p>Point it at a saved Chat Completions response. The answer comes back as a heatmap, every flagged span lists the candidates at its weakest token, and <code>--fail-on-flag</code> turns it into a CI gate.</p>
+  <div class="k">ターミナルで</div>
+  <h2>コマンドひとつ、API キー不要。</h2>
+  <p>保存済みの Chat Completions レスポンスを指定するだけ。回答はヒートマップで表示され、フラグ付きの各スパンには最も弱いトークンでの候補が並びます。<code>--fail-on-flag</code> を付ければ CI のゲートになります。</p>
   <div class="two">
-    <figure><img src="assets/terminal-cuyp.png" width="822" height="455" alt="Terminal output for the cuyp sample: the answer with Aelbert and Dordrecht underlined, then bars for the alternatives A 0.49, The 0.43, D 0.08 and ord 0.57, üsseldorf 0.39, elf 0.03." loading="lazy"><figcaption>llm-token-visualizer --logprobs-file examples/logprobs/cuyp.json --threshold 0.6</figcaption></figure>
+    <figure><img src="../assets/terminal-cuyp.png" width="822" height="455" alt="cuyp サンプルのターミナル出力。回答の Aelbert と Dordrecht に下線が引かれ、その下に候補のバー：A 0.49、The 0.43、D 0.08 と ord 0.57、üsseldorf 0.39、elf 0.03。" loading="lazy"><figcaption>llm-token-visualizer --logprobs-file examples/logprobs/cuyp.json --threshold 0.6</figcaption></figure>
     <div>
-      <div class="cmd" style="margin-bottom:10px"><code>git clone https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script</code><button class="copy" data-copy="git clone https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script && cd LLM-Hallucination-Detection-Script">Copy</button></div>
+      <div class="cmd" style="margin-bottom:10px"><code>git clone https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script</code><button class="copy" data-copy="git clone https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script && cd LLM-Hallucination-Detection-Script">コピー</button></div>
       <pre><span class="c"># offline, on a bundled real response</span>
 cargo run -- --logprobs-file examples/logprobs/cuyp.json --threshold 0.6
 
@@ -235,51 +235,51 @@ cargo run --example detect
 export OPENAI_API_KEY=sk-...
 cargo run -- --live "Who was the second person to walk on the Moon?" \
   --save answer.json</pre>
-      <p class="small" style="margin-top:12px">Live mode has presets: <code>--provider openai</code>, <code>openrouter</code>, <code>together</code>, <code>vllm</code> or <code>ollama</code> (local, no key). Any other server that returns <code>logprobs</code> works with <code>--base-url</code>. Anthropic's API does not return logprobs.</p>
+      <p class="small" style="margin-top:12px">ライブモードにはプリセットがあります：<code>--provider openai</code>、<code>openrouter</code>、<code>together</code>、<code>vllm</code>、<code>ollama</code>（ローカル、キー不要）。<code>logprobs</code> を返すサーバーなら <code>--base-url</code> でどれでも使えます。Anthropic の API は logprobs を返しません。</p>
     </div>
   </div>
 </div></section>
 
 <section id="how"><div class="wrap">
-  <div class="k">How it works</div>
-  <h2>Four rules, no model of its own.</h2>
-  <p>No second LLM, no embeddings, no network call in offline mode. Just the numbers the model already gave you, read carefully.</p>
-  <img class="how-img" src="img/how-it-works.svg" width="1200" height="1130" loading="lazy" alt="Animated diagram: each token of a real Llama 3.1 answer gets p = e^logprob and a color from red to grey; tokens join into words and a word with a token below the 0.6 threshold is flagged (Aelbert p 0.49, Dordrecht p 0.57); each flagged span lists the alternatives the model weighed, The 0.43 and üsseldorf 0.39.">
+  <div class="k">仕組み</div>
+  <h2>ルールは四つだけ。独自のモデルは使いません。</h2>
+  <p>別の LLM も、埋め込みも、オフラインモードでのネットワーク通信もなし。モデルがすでに返している数値を丁寧に読むだけです。</p>
+  <img class="how-img" src="../img/how-it-works.svg" width="1200" height="1130" loading="lazy" alt="アニメーション図：実際の Llama 3.1 の回答の各トークンに p = e^logprob と赤からグレーまでの色が付く。トークンが単語にまとまり、しきい値 0.6 を下回るトークンを含む単語にフラグが付く（Aelbert p 0.49、Dordrecht p 0.57）。フラグ付きの各スパンにはモデルが検討した候補 The 0.43 と üsseldorf 0.39 が並ぶ。">
   <div class="steps" id="steps"></div>
 </div></section>
 
 <section id="honest"><div class="wrap">
-  <div class="k">What it cannot tell you</div>
-  <h2>Models can be confidently wrong.</h2>
-  <p>Low token probability is a place to look, not a fact check. This bundled answer is wrong, and the detector does not catch it.</p>
+  <div class="k">わからないこと</div>
+  <h2>モデルは自信満々に間違えることがある。</h2>
+  <p>トークン確率の低さは「見るべき場所」を示すだけで、ファクトチェックではありません。この同梱の回答は間違っていますが、検出ツールは見抜けません。</p>
   <div class="card"><p class="answer" id="wrong-answer" style="margin:0"></p>
     <div class="honest">
-      <div><h4 class="b">The wrong name is not flagged</h4><div id="wrong-name"></div>
-        <p>The second person on the Moon was <b>Buzz Aldrin</b>. The model put at least 0.72 on every token of <b>Pete Conrad</b>, and Aldrin is not among the top 3 alternatives it returned at any of them.</p></div>
-      <div><h4>What got flagged instead</h4><div id="wrong-flags"></div>
-        <p>Phrasing words. Use the flags to decide where to look first, never to certify an answer.</p></div>
+      <div><h4 class="b">間違った名前にはフラグが付かない</h4><div id="wrong-name"></div>
+        <p>月面を歩いた二人目は <b>Buzz Aldrin</b> です。モデルは <b>Pete Conrad</b> のどのトークンにも 0.72 以上の確率を付けており、どの位置で返された上位 3 つの候補にも Aldrin は入っていません。</p></div>
+      <div><h4>代わりにフラグが付いたもの</h4><div id="wrong-flags"></div>
+        <p>言い回しの単語です。フラグは最初にどこを確認するか決めるために使い、回答の正しさの保証には決して使わないでください。</p></div>
     </div>
   </div>
 </div></section>
 
 <section id="formats"><div class="wrap">
-  <div class="k">Output formats</div>
-  <h2>Terminal, HTML, Markdown, JSON.</h2>
-  <p>The same report in the shape your workflow needs. All four are produced by the CLI from the same detection.</p>
+  <div class="k">出力形式</div>
+  <h2>ターミナル、HTML、Markdown、JSON。</h2>
+  <p>同じレポートを、ワークフローに合った形で。どれも CLI が同じ検出結果から出力します。</p>
   <div class="fmt">
-    <div class="card"><h3>--format html</h3><p>A single self-contained page: no scripts, no external assets, light and dark. Hover any word for its alternatives.</p>
-      <figure><img src="assets/report-html.png" width="900" height="1313" alt="HTML report for the eiffel sample in dark mode with four flagged spans and probability bars." loading="lazy"></figure>
-      <div class="cmd" style="margin-top:14px"><code>llm-token-visualizer --logprobs-file answer.json --format html -o report.html</code><button class="copy" data-copy="llm-token-visualizer --logprobs-file answer.json --format html -o report.html">Copy</button></div></div>
-    <div class="card"><h3>--format markdown</h3><p>Paste into a pull request, an issue, or <code>$GITHUB_STEP_SUMMARY</code>.</p>
+    <div class="card"><h3>--format html</h3><p>単体で完結するページ。スクリプトも外部アセットもなし、ライト／ダーク両対応。単語にカーソルを合わせると候補が出ます。</p>
+      <figure><img src="../assets/report-html.png" width="900" height="1313" alt="eiffel サンプルのダークモード HTML レポート。フラグ付きスパン 4 つと確率バー。" loading="lazy"></figure>
+      <div class="cmd" style="margin-top:14px"><code>llm-token-visualizer --logprobs-file answer.json --format html -o report.html</code><button class="copy" data-copy="llm-token-visualizer --logprobs-file answer.json --format html -o report.html">コピー</button></div></div>
+    <div class="card"><h3>--format markdown</h3><p>プルリクエストや Issue、<code>$GITHUB_STEP_SUMMARY</code> にそのまま貼り付けられます。</p>
       <pre id="md"></pre>
-      <h3 style="margin-top:22px">--format json and --fail-on-flag</h3><p>Machine-readable spans, and exit status 2 when anything is flagged, so a pipeline can route answers to review.</p>
+      <h3 style="margin-top:22px">--format json と --fail-on-flag</h3><p>機械可読なスパンを出力し、何かにフラグが付けば終了ステータス 2 を返すので、パイプラインで回答をレビューに回せます。</p>
       <pre>llm-token-visualizer --logprobs-file answer.json \
   --fail-on-flag --format json -o report.json</pre></div>
   </div>
 </div></section>
 
 <footer><div class="wrap">
-  <span>MIT licensed. Built in Rust. <a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script">Source</a> &middot; <a href="https://crates.io/crates/llm-token-visualizer">crates.io</a> &middot; <a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases">Releases</a></span>
+  <span>MIT ライセンス。Rust 製。<a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script">ソースコード</a> &middot; <a href="https://crates.io/crates/llm-token-visualizer">crates.io</a> &middot; <a href="https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases">リリース</a></span>
   <span class="scale k">p 0 <span class="g"></span> p 1</span>
 </div></footer>
 <div class="tip" id="tip" role="tooltip"></div>
@@ -335,10 +335,10 @@ function barsHTML(span) {
 const DATA = {"cuyp": {"model": "meta-llama/llama-3.1-8b-instruct", "tokens": [["A", 0.4897, [["The", 0.4322], ["D", 0.0751]]], ["el", 0.9992, [[" Dutch", 0.0006], ["e", 0.0001]]], ["bert", 1.0, [["ert", 0.0], ["BERT", 0.0]]], [" Cu", 0.993, [[" Jacobs", 0.0059], [" Jacob", 0.0004]]], ["yp", 0.9999, [["yps", 0.0001], ["yl", 0.0]]], [" died", 0.6573, [[",", 0.3105], [" passed", 0.0225]]], [" in", 0.9941, [[" on", 0.0036], [" ", 0.0015]]], [" ", 0.9746, [[" D", 0.0229], [" the", 0.0017]]], ["169", 0.9881, [["166", 0.011], ["179", 0.0004]]], ["1", 0.9976, [["2", 0.0022], ["0", 0.0001]]], [" in", 0.9056, [[",", 0.0842], [" at", 0.0042]]], [" D", 0.9848, [[" Meg", 0.0016], [" N", 0.001]]], ["ord", 0.5701, [["üsseldorf", 0.3918], ["elf", 0.0284]]], ["recht", 0.9996, [["t", 0.0002], ["trecht", 0.0001]]], [",", 0.6158, [[".", 0.3735], [" city", 0.0047]]], [" Netherlands", 0.7963, [[" a", 0.1078], [" the", 0.0577]]], [".", 0.9846, [[",", 0.0097], ["<|eot_id|>", 0.0036]]]], "spans": [{"start": 0, "end": 3, "text": "Aelbert", "weak": "A", "p": 0.4897, "alts": [["A", 0.4897], ["The", 0.4322], ["D", 0.0751]]}, {"start": 11, "end": 14, "text": " Dordrecht", "weak": "ord", "p": 0.5701, "alts": [["ord", 0.5701], ["üsseldorf", 0.3918], ["elf", 0.0284]]}], "mean": 0.8794, "count": 17}, "tour-de-france": {"model": "meta-llama/llama-3.1-8b-instruct", "tokens": [["Stephen", 0.4888, [["The", 0.4313], ["Steven", 0.0276]]], [" Ro", 0.9995, [[" Roth", 0.0001], ["Ro", 0.0001]]], ["che", 1.0, [["ach", 0.0], ["ache", 0.0]]], [" won", 0.9479, [[" from", 0.0324], [" of", 0.0093]]], [" the", 1.0, [[" ", 0.0], [" both", 0.0]]], [" ", 0.9999, [[" Tour", 0.0001], [" general", 0.0]]], ["198", 0.9999, [[" ", 0.0001], ["100", 0.0]]], ["7", 1.0, [["6", 0.0], ["8", 0.0]]], [" Tour", 0.9998, [[" edition", 0.0002], ["Tour", 0.0]]], [" de", 1.0, [[" De", 0.0], ["-de", 0.0]]], [" France", 1.0, [["France", 0.0], [" French", 0.0]]], [",", 0.6568, [[" for", 0.2738], [" while", 0.0327]]], [" riding", 0.7163, [[" competing", 0.0856], [" representing", 0.0856]]], [" for", 0.9946, [[" as", 0.0052], [" in", 0.0001]]], [" the", 0.9167, [[" Carr", 0.0456], [" La", 0.019]]], [" Carr", 0.9716, [[" Lan", 0.0037], [" Panasonic", 0.0023]]], ["era", 0.9978, [["eras", 0.0009], ["éra", 0.0006]]], [" Jeans", 0.9268, [[" team", 0.0359], ["-V", 0.0192]]], ["-V", 0.5725, [["–", 0.2106], [" -", 0.1448]]], ["ag", 0.9346, [["iag", 0.0063], ["iv", 0.0059]]], ["ab", 0.996, [["abl", 0.0028], ["abo", 0.0003]]], ["ond", 0.9992, [["OND", 0.0003], ["onds", 0.0002]]], [" team", 0.9829, [[" cycling", 0.0052], [" and", 0.0046]]], [".", 0.964, [[",", 0.0156], [" and", 0.0045]]]], "spans": [{"start": 0, "end": 1, "text": "Stephen", "weak": "Stephen", "p": 0.4888, "alts": [["Stephen", 0.4888], ["The", 0.4313], ["Steven", 0.0276]]}, {"start": 18, "end": 22, "text": "-Vagabond", "weak": "-V", "p": 0.5725, "alts": [["-V", 0.5725], ["–", 0.2106], [" -", 0.1448]]}], "mean": 0.9194, "count": 24}, "eiffel": {"model": "meta-llama/llama-3.1-8b-instruct", "tokens": [["The", 0.9885, [["G", 0.011], ["Built", 0.0001]]], [" E", 0.9969, [[" iconic", 0.0028], [" famous", 0.0001]]], ["iff", 1.0, [["IFF", 0.0], ["if", 0.0]]], ["el", 1.0, [["elt", 0.0], ["ел", 0.0]]], [" Tower", 1.0, [["Tower", 0.0], [" Iron", 0.0]]], [" was", 0.9668, [[",", 0.0331], [" in", 0.0]]], [" designed", 0.9998, [[" primarily", 0.0], [" originally", 0.0]]], [" by", 0.9987, [[" and", 0.0013], [" in", 0.0]]], [" Gust", 0.5699, [[" French", 0.3917], [" the", 0.0284]]], ["ave", 1.0, [["av", 0.0], ["AVE", 0.0]]], [" E", 1.0, [[" Alexandre", 0.0], ["E", 0.0]]], ["iff", 1.0, [["IFF", 0.0], ["iffe", 0.0]]], ["el", 1.0, [["EL", 0.0], ["els", 0.0]]], [" and", 0.8776, [[",", 0.072], ["'s", 0.0495]]], [" his", 0.967, [[" was", 0.0048], [" opened", 0.0037]]], [" engineering", 0.9484, [[" company", 0.0472], [" engineer", 0.003]]], [" company", 0.9988, [[" firm", 0.0012], ["company", 0.0]]], [",", 0.9137, [[" Comp", 0.0515], [" E", 0.0215]]], [" Comp", 0.5335, [[" and", 0.2856], [" E", 0.1191]]], ["agn", 1.0, [["aign", 0.0], ["ang", 0.0]]], ["ie", 1.0, [["ied", 0.0], ["ies", 0.0]]], [" des", 1.0, [[" Des", 0.0], ["-des", 0.0]]], [" É", 0.9863, [[" E", 0.0124], [" Entre", 0.0003]]], ["tabl", 0.9777, [["ta", 0.0123], ["tas", 0.0031]]], ["isse", 0.9996, [["iss", 0.0004], ["issement", 0.0]]], ["ments", 1.0, [["MENTS", 0.0], ["mts", 0.0]]], [" E", 1.0, [[" Gust", 0.0], [" Eug", 0.0]]], ["iff", 0.9991, [["IFF", 0.0008], ["ifu", 0.0]]], ["el", 1.0, [["ell", 0.0], ["ель", 0.0]]], [",", 0.9997, [[" (", 0.0002], [";", 0.0001]]], [" and", 0.9442, [[" which", 0.047], [" for", 0.003]]], [" it", 0.9801, [[" opened", 0.0158], [" was", 0.0024]]], [" opened", 0.859, [[" officially", 0.0905], [" was", 0.0377]]], [" on", 0.4911, [[" to", 0.4911], [" in", 0.0116]]], [" March", 0.9846, [[" May", 0.014], [" April", 0.001]]], [" ", 1.0, [[",", 0.0], [" ", 0.0]]], ["31", 0.9994, [["15", 0.0005], ["30", 0.0001]]], [",", 0.9999, [["st", 0.0001], [" ", 0.0]]], [" ", 1.0, [["188", 0.0], ["189", 0.0]]], ["188", 1.0, [["189", 0.0], ["193", 0.0]]], ["9", 1.0, [["7", 0.0], ["8", 0.0]]], [",", 0.6483, [[".", 0.347], [" for", 0.003]]], [" during", 0.3206, [[" for", 0.3206], [" at", 0.2497]]], [" the", 0.9999, [[" World", 0.0], [" a", 0.0]]], [" World", 0.9624, [[" Ex", 0.0291], [" ", 0.0039]]], ["'s", 0.9999, [[" Ex", 0.0001], [" Fair", 0.0]]], [" Fair", 0.9997, [[" Colum", 0.0002], ["Fair", 0.0001]]], [" in", 0.9817, [[" held", 0.0096], [" (", 0.0066]]], [" Paris", 1.0, [["Paris", 0.0], [" France", 0.0]]], [",", 0.8348, [[".", 0.1644], [" to", 0.0007]]], [" France", 0.9957, [[" held", 0.0013], [" which", 0.0007]]], [".", 0.9857, [[",", 0.0141], [" to", 0.0002]]]], "spans": [{"start": 8, "end": 10, "text": " Gustave", "weak": " Gust", "p": 0.5699, "alts": [[" Gust", 0.5699], [" French", 0.3917], [" the", 0.0284]]}, {"start": 18, "end": 21, "text": " Compagnie", "weak": " Comp", "p": 0.5335, "alts": [[" Comp", 0.5335], [" and", 0.2856], [" E", 0.1191]]}, {"start": 33, "end": 34, "text": " on", "weak": " on", "p": 0.4911, "alts": [[" on", 0.4911], [" to", 0.4911], [" in", 0.0116]]}, {"start": 42, "end": 43, "text": " during", "weak": " during", "p": 0.3206, "alts": [[" during", 0.3206], [" for", 0.3206], [" at", 0.2497]]}], "mean": 0.9367, "count": 52}, "moonwalk": {"model": "meta-llama/llama-3.1-8b-instruct", "tokens": [["P", 0.7174, [["The", 0.1413], ["Charles", 0.052]]], ["ete", 0.7573, [["ilot", 0.1316], ["il", 0.0798]]], [" Conrad", 0.9989, [[" Richardson", 0.0004], [" Davidson", 0.0002]]], [" was", 0.5989, [[",", 0.3633], [" became", 0.0338]]], [" the", 0.9987, [[" not", 0.0012], [" indeed", 0.0]]], [" second", 0.9987, [[" third", 0.001], [" ", 0.0001]]], [" person", 1.0, [[" astronaut", 0.0], [" man", 0.0]]], [" to", 0.9998, [[",", 0.0002], [" and", 0.0]]], [" walk", 1.0, [[" set", 0.0], [" walked", 0.0]]], [" on", 1.0, [[" the", 0.0], [" in", 0.0]]], [" the", 1.0, [[" Moon", 0.0], [" Earth", 0.0]]], [" Moon", 0.9972, [[" moon", 0.0028], [" lunar", 0.0]]], [",", 0.8259, [[" as", 0.0528], [" and", 0.0466]]], [" which", 0.144, [[" on", 0.1271], [" and", 0.1271]]], [" occurred", 0.6353, [[" he", 0.2648], [" happened", 0.086]]], [" on", 0.9946, [[" during", 0.0046], [" as", 0.0002]]], [" November", 0.6471, [[" July", 0.3057], [" February", 0.0251]]], [" ", 1.0, [[",", 0.0], [".", 0.0]]], ["19", 0.9971, [["20", 0.0022], ["21", 0.0003]]], [",", 0.9934, [["-", 0.0041], ["th", 0.0017]]], [" ", 0.9995, [["196", 0.0002], [" during", 0.0001]]], ["196", 1.0, [["199", 0.0], ["69", 0.0]]], ["9", 1.0, [["7", 0.0], ["8", 0.0]]], [",", 0.6095, [[".", 0.3697], [" during", 0.0143]]], [" during", 0.5549, [[" as", 0.4322], [" while", 0.0042]]], [" the", 0.9985, [[" Apollo", 0.001], [" NASA", 0.0004]]], [" Apollo", 0.9894, [[" second", 0.0031], [" mission", 0.0028]]], [" ", 1.0, [[" missions", 0.0], ["-", 0.0]]], ["12", 1.0, [["16", 0.0], ["11", 0.0]]], [" mission", 0.999, [[" Mission", 0.0003], [" lunar", 0.0003]]], [".", 0.9922, [[",", 0.0067], [" as", 0.0003]]]], "spans": [{"start": 3, "end": 4, "text": " was", "weak": " was", "p": 0.5989, "alts": [[" was", 0.5989], [",", 0.3633], [" became", 0.0338]]}, {"start": 13, "end": 14, "text": " which", "weak": " which", "p": 0.144, "alts": [[" which", 0.144], [" on", 0.1271], [" and", 0.1271]]}, {"start": 24, "end": 25, "text": " during", "weak": " during", "p": 0.5549, "alts": [[" during", 0.5549], [" as", 0.4322], [" while", 0.0042]]}], "mean": 0.8854, "count": 31}};
 const MD = "### Token confidence report\n\n`cuyp.json` · `meta-llama/llama-3.1-8b-instruct` · 17 tokens · mean p 0.88 · threshold 0.60\n\n> **Aelbert**<sup>1</sup> Cuyp died in 1691 in **Dordrecht**<sup>2</sup>, Netherlands.\n\n| # | Span | Weakest token | p | Model also considered |\n|---|---|---|---|---|\n| 1 | Aelbert | `A` | 0.49 | `The` 0.43, `D` 0.08 |\n| 2 | Dordrecht | `ord` | 0.57 | `üsseldorf` 0.39, `elf` 0.03 |\n\n2 low-confidence spans. Check these claims before trusting the answer.";
 const NOTES = {
-  'cuyp': 'Right answer. The model still gave Düsseldorf 39%.',
-  'tour-de-france': 'Right answer. Flags land on phrasing: "Stephen" vs "The", and a hyphen.',
-  'eiffel': 'Mostly phrasing words, plus a 39% pull toward "French" instead of "Gustave".',
-  'moonwalk': 'Wrong answer (it was Buzz Aldrin), and the name is not flagged. See below.'
+  'cuyp': '正解。それでもモデルは Düsseldorf に 39% を割り振っていた。',
+  'tour-de-france': '正解。フラグは言い回しに付いている："Stephen" か "The" か、そしてハイフン。',
+  'eiffel': 'ほとんどは言い回しの単語。加えて "Gustave" ではなく "French" に 39% 傾いていた。',
+  'moonwalk': '不正解（正しくは Buzz Aldrin）で、しかも名前にはフラグが付かない。詳しくは下へ。'
 };
 const ORDER = ['cuyp', 'tour-de-france', 'eiffel', 'moonwalk'];
 
@@ -375,13 +375,13 @@ function draw() {
   $('note').textContent = NOTES[current];
   $('answer').innerHTML = answerHTML(view);
   $('trace').innerHTML = traceHTML(view);
-  $('stats').innerHTML = `<span>${s.model}</span><span>${s.count} tokens</span><span>mean p ${s.mean.toFixed(2)}</span>`;
+  $('stats').innerHTML = `<span>${s.model}</span><span>${s.count} トークン</span><span>平均 p ${s.mean.toFixed(2)}</span>`;
   $('spans').innerHTML = view.spans.length ? view.spans.map((sp, n) =>
-    `<div class="span"><h3><span class="n">${n + 1}</span>${esc(sp.text.trim())}<span class="w">weakest ${esc(q(sp.weak))} at p ${sp.p.toFixed(2)}</span></h3>${barsHTML(sp)}</div>`).join('')
-    : '<p class="none">Nothing below this threshold.</p>';
+    `<div class="span"><h3><span class="n">${n + 1}</span>${esc(sp.text.trim())}<span class="w">最も弱いトークン ${esc(q(sp.weak))}（p ${sp.p.toFixed(2)}）</span></h3>${barsHTML(sp)}</div>`).join('')
+    : '<p class="none">このしきい値を下回る単語はありません。</p>';
   const n = view.spans.length;
-  $('verdict').textContent = n === 0 ? 'No low-confidence spans. That does not prove the answer is correct.'
-    : `${n} low-confidence span${n > 1 ? 's' : ''}. Check ${n > 1 ? 'these claims' : 'it'} before trusting the answer.`;
+  $('verdict').textContent = n === 0 ? '信頼度の低いスパンはありません。ただし、回答が正しいという証明にはなりません。'
+    : `信頼度の低いスパンが ${n} 個あります。回答を信じる前に${n > 1 ? 'これらの記述' : 'この箇所'}を確認してください。`;
 }
 const tabs = document.querySelector('.tabs');
 ORDER.forEach(k => {
@@ -416,10 +416,10 @@ addEventListener('scroll', hideTip, { passive: true });
   const chip = ([t, p]) => { const a = Math.pow(Math.max(0, (0.95 - p) / 0.95), 0.7);
     return `<span class="chip" style="--h:${heat(p).join(',')};--a:${a.toFixed(3)}">${esc(q(t))}<small>p ${p.toFixed(2)}</small></span>`; };
   const steps = [
-    ['1 &nbsp;Probability', `<div class="chips">${T.map(chip).join('')}</div>`, 'Each token\'s probability is exp(logprob), read from the response.'],
-    ['2 &nbsp;Words', `<div class="word">&nbsp;D<span style="color:rgb(${heat(0.57).join(',')})">ord</span>recht</div>`, 'Subword tokens are grouped into the word they belong to.'],
-    ['3 &nbsp;Threshold', `<div class="word"><span class="f">Dordrecht</span></div><div class="k" style="margin-top:6px">p 0.57 &lt; threshold 0.60</div>`, 'A word is flagged if any token with letters or digits falls below the threshold. Punctuation never triggers.'],
-    ['4 &nbsp;Spans', `<div class="chips"><span class="chip" style="--h:${heat(0.39).join(',')};--a:.5">"&uuml;sseldorf"<small>p 0.39</small></span><span class="chip" style="--h:${heat(0.03).join(',')};--a:.8">"elf"<small>p 0.03</small></span></div>`, 'Neighbouring flagged words merge. Each span reports its weakest token and the alternatives there.']
+    ['1 &nbsp;確率', `<div class="chips">${T.map(chip).join('')}</div>`, '各トークンの確率は exp(logprob)。レスポンスから読み取ります。'],
+    ['2 &nbsp;単語', `<div class="word">&nbsp;D<span style="color:rgb(${heat(0.57).join(',')})">ord</span>recht</div>`, 'サブワードのトークンを、それが属する単語にまとめます。'],
+    ['3 &nbsp;しきい値', `<div class="word"><span class="f">Dordrecht</span></div><div class="k" style="margin-top:6px">p 0.57 &lt; しきい値 0.60</div>`, '文字や数字を含むトークンがひとつでもしきい値を下回れば、その単語にフラグが付きます。句読点では反応しません。'],
+    ['4 &nbsp;スパン', `<div class="chips"><span class="chip" style="--h:${heat(0.39).join(',')};--a:.5">"&uuml;sseldorf"<small>p 0.39</small></span><span class="chip" style="--h:${heat(0.03).join(',')};--a:.8">"elf"<small>p 0.03</small></span></div>`, '隣り合うフラグ付きの単語はまとめられます。各スパンは最も弱いトークンと、そこでの候補を示します。']
   ];
   $('steps').innerHTML = steps.map(([k, v, p]) => `<div class="step"><span class="k">${k}</span>${v}<p>${p}</p></div>`).join('');
 })();
@@ -439,9 +439,9 @@ addEventListener('scroll', hideTip, { passive: true });
 $('md').textContent = MD;
 
 document.querySelectorAll('button.copy').forEach(b => b.addEventListener('click', async () => {
-  try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = 'Copied'; b.classList.add('ok'); }
-  catch { b.textContent = 'Select'; }
-  setTimeout(() => { b.textContent = 'Copy'; b.classList.remove('ok'); }, 1600);
+  try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = 'コピーしました'; b.classList.add('ok'); }
+  catch { b.textContent = '手動で選択'; }
+  setTimeout(() => { b.textContent = 'コピー'; b.classList.remove('ok'); }, 1600);
 }));
 </script>
 </body>

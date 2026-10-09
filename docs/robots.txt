@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hallucination-highlighter.vercel.app/sitemap.xml

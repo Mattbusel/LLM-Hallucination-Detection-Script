@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://hallucination-highlighter.vercel.app/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hallucination-highlighter.vercel.app/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://hallucination-highlighter.vercel.app/zh/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://hallucination-highlighter.vercel.app/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://hallucination-highlighter.vercel.app/ko/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://hallucination-highlighter.vercel.app/"/>
+  </url>
+  <url>
+    <loc>https://hallucination-highlighter.vercel.app/zh/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hallucination-highlighter.vercel.app/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://hallucination-highlighter.vercel.app/zh/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://hallucination-highlighter.vercel.app/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://hallucination-highlighter.vercel.app/ko/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://hallucination-highlighter.vercel.app/"/>
+  </url>
+  <url>
+    <loc>https://hallucination-highlighter.vercel.app/ja/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hallucination-highlighter.vercel.app/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://hallucination-highlighter.vercel.app/zh/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://hallucination-highlighter.vercel.app/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://hallucination-highlighter.vercel.app/ko/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://hallucination-highlighter.vercel.app/"/>
+  </url>
+  <url>
+    <loc>https://hallucination-highlighter.vercel.app/ko/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hallucination-highlighter.vercel.app/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://hallucination-highlighter.vercel.app/zh/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://hallucination-highlighter.vercel.app/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://hallucination-highlighter.vercel.app/ko/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://hallucination-highlighter.vercel.app/"/>
+  </url>
+  <url>
+    <loc>https://hallucination-highlighter.vercel.app/try/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hallucination-highlighter.vercel.app/try/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://hallucination-highlighter.vercel.app/zh/try/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://hallucination-highlighter.vercel.app/ja/try/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://hallucination-highlighter.vercel.app/ko/try/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://hallucination-highlighter.vercel.app/try/"/>
+  </url>
+  <url>
+    <loc>https://hallucination-highlighter.vercel.app/zh/try/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hallucination-highlighter.vercel.app/try/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://hallucination-highlighter.vercel.app/zh/try/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://hallucination-highlighter.vercel.app/ja/try/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://hallucination-highlighter.vercel.app/ko/try/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://hallucination-highlighter.vercel.app/try/"/>
+  </url>
+  <url>
+    <loc>https://hallucination-highlighter.vercel.app/ja/try/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hallucination-highlighter.vercel.app/try/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://hallucination-highlighter.vercel.app/zh/try/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://hallucination-highlighter.vercel.app/ja/try/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://hallucination-highlighter.vercel.app/ko/try/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://hallucination-highlighter.vercel.app/try/"/>
+  </url>
+  <url>
+    <loc>https://hallucination-highlighter.vercel.app/ko/try/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://hallucination-highlighter.vercel.app/try/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://hallucination-highlighter.vercel.app/zh/try/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://hallucination-highlighter.vercel.app/ja/try/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://hallucination-highlighter.vercel.app/ko/try/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://hallucination-highlighter.vercel.app/try/"/>
+  </url>
+</urlset>
