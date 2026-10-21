@@ -1,5 +1,13 @@
 # LLM Hallucination Detector
 
+<!-- outcome-block -->
+**Know which words of an AI answer to double-check: every word the model was unsure about is highlighted, in any language.**
+
+**Why this over the alternatives:** It reads the model's own token probabilities, so it needs no second LLM call and adds no cost.
+
+**Guarantee:** if it doesn't do what this README says, [open an issue](https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/issues) and I'll fix it.
+<!-- outcome-block -->
+
 English | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
 
 **Highlights the words an AI chatbot was unsure about, so you know which parts of its answer to double-check.**
