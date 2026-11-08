@@ -1,20 +1,18 @@
 # LLM Hallucination Detector
 
 <!-- outcome-block -->
-**Know which words of an AI answer to double-check: every word the model was unsure about is highlighted, in any language.**
+**Shows which words of an AI answer to double-check. Every word the model was unsure about gets highlighted, in any language.**
 
-**Why this over the alternatives:** It reads the model's own token probabilities, so it needs no second LLM call and adds no cost.
+It reads the model's own token probabilities. No second LLM call, no extra cost.
 
-**Guarantee:** if it doesn't do what this README says, [open an issue](https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/issues) and I'll fix it.
+If it doesn't do what this README says, [open an issue](https://github.com/Mattbusel/LLM-Hallucination-Detection-Script/issues) and I'll fix it.
 <!-- outcome-block -->
 
 English | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
 
-**Highlights the words an AI chatbot was unsure about, so you know which parts of its answer to double-check.**
+Rust CLI and library (`llm-token-visualizer`). Works with OpenAI, OpenRouter, Together, vLLM, Ollama and any OpenAI-compatible API that returns token logprobs.
 
-For anyone who ships or checks LLM answers: developers, evaluators, and CI pipelines. Works with OpenAI, OpenRouter, Together, vLLM, Ollama and any OpenAI-compatible API that returns token logprobs. Rust CLI and library (`llm-token-visualizer`).
-
-Works on answers in any language: words are found with Unicode word segmentation, so a single unsure character in a Chinese or Japanese answer is flagged on its own. Reads OpenAI-style, completions-style and Google Gemini (`logprobsResult`) responses.
+Works in any language. Words are split with Unicode word segmentation, so one unsure character in a Chinese or Japanese answer gets flagged on its own. Reads OpenAI-style, completions-style and Google Gemini (`logprobsResult`) responses.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/hero-dark.png">
@@ -39,19 +37,19 @@ mkdir -p ~/.local/bin && curl -fsSL https://gitlab.com/mattbusel/LLM-Hallucinati
 | **Any system with Rust** | `cargo binstall llm-token-visualizer` (prebuilt Linux and Windows binaries) or `cargo install --locked llm-token-visualizer` |
 | **As a library** | `cargo add llm-token-visualizer --no-default-features` (no HTTP client) |
 
-The release archives also include the sample answers under `samples/`. Every release, with SHA-256 checksums: [Releases](https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases).
+Release archives include the sample answers under `samples/`. All releases, with SHA-256 checksums: [Releases](https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases).
 
-**In GitLab CI:** fail a pipeline when a saved LLM answer has low-confidence words with the [`hallucination-gate`](https://gitlab.com/explore/catalog/mattbusel/llm-ci) CI/CD component.
+**In GitLab CI:** the [`hallucination-gate`](https://gitlab.com/explore/catalog/mattbusel/llm-ci) component fails a pipeline when a saved LLM answer has low-confidence words.
 
 ## How it works
 
 <img alt="Animated diagram of how the detector works on a real answer. Step 1: every token comes with a logprob, p equals e to the logprob, and each token is colored from red (unsure) to grey (sure); 'A' has p 0.49 and 'ord' has p 0.57. Step 2: tokens join into words and a word is flagged if any of its tokens is below the 0.6 threshold, so Aelbert and Dordrecht are flagged. Step 3: each flagged span shows the alternatives the model weighed: The 0.43 instead of A, üsseldorf 0.39 instead of ord." src="docs/img/how-it-works.svg" width="100%">
 
-When a model writes an answer, it picks each token (a word or piece of a word) from a list of candidates, each with a probability. APIs expose these as `logprobs`. Hallucinations often sit where that probability drops: a name, a date, a city the model half-remembers. This tool turns the numbers into a heatmap and flags the shaky words, with the alternatives the model almost said. No model of its own, no API calls unless you ask for `--live`.
+A model picks each token (a word or part of a word) from a list of options, each with a probability. APIs return these as `logprobs`. Hallucinations often sit where that probability drops: a name, a date, a city the model half-remembers. This tool turns the numbers into a heatmap, flags the shaky words, and shows what the model almost said instead. It has no model of its own. It makes no API calls unless you ask for `--live`.
 
 ## Examples
 
-Real answers from Llama 3.1 8B Instruct, bundled in `examples/logprobs/`. The first two of the four answers in the output of `cargo run --example detect` (threshold 0.6):
+Real Llama 3.1 8B Instruct answers, bundled in `examples/logprobs/`. First two of four from `cargo run --example detect` (threshold 0.6):
 
 ```text
 examples/logprobs/cuyp.json
@@ -65,9 +63,9 @@ examples/logprobs/tour-de-france.json
   flagged "-Vagabond": p=0.57 at "-V"; model also considered "–" (0.21), " -" (0.14)
 ```
 
-The Dordrecht answer is right, but the model gave Düsseldorf a 39% chance: exactly the kind of claim to double-check. The "Aelbert" flag is the model choosing between starting with the name or with "The": low probability can be about phrasing, not facts.
+Dordrecht is right, but the model gave Düsseldorf a 39% chance. That is the kind of claim to double-check. The "Aelbert" flag is the model choosing between the name and "The". Low probability can be about wording, not facts.
 
-The terminal report for the first one (`--logprobs-file examples/logprobs/cuyp.json --threshold 0.6`):
+Terminal report for the first one (`--logprobs-file examples/logprobs/cuyp.json --threshold 0.6`):
 
 <img alt="Terminal output of llm-token-visualizer on examples/logprobs/cuyp.json: the answer with Aelbert and Dordrecht underlined, then bars for the candidates at each weak token: A 0.49, The 0.43, D 0.08, and ord 0.57, üsseldorf 0.39, elf 0.03." src="docs/assets/terminal-cuyp.png" width="720">
 
@@ -78,21 +76,21 @@ The terminal report for the first one (`--logprobs-file examples/logprobs/cuyp.j
   <img alt="The moonwalk sample: 'Pete Conrad was the second person to walk on the Moon'. Pete Conrad is outlined as wrong but not flagged: P 0.72, ete 0.76, Conrad 1.00. Flagged instead: was 0.60, which 0.14, during 0.55." src="docs/assets/confidently-wrong-light.png" width="100%">
 </picture>
 
-Models can be confidently wrong. In `moonwalk.json` the model says "Pete Conrad was the second person to walk on the Moon" (it was Buzz Aldrin) with at least 72% probability on every token of the name, so the wrong name is not flagged. Use this to decide where to look first, not to certify an answer.
+Models can be confidently wrong. In `moonwalk.json` the model says "Pete Conrad was the second person to walk on the Moon" (it was Buzz Aldrin). Every token of the name is at 72% or higher, so it is not flagged. Use this to pick where to look first, not to prove an answer right.
 
 ## Why this tool
 
-There is no other Rust crate for logprob-based confidence checks. In Python, [LM-Polygraph](https://github.com/IINemo/lm-polygraph) and [UQLM](https://github.com/cvs-health/uqlm) offer many more uncertainty methods (sampling consistency, claim-level scoring, trained estimators), and need the model loaded or several generations per answer. This tool does one cheap thing from a single saved response: show which words had low probability and what else the model considered, as a terminal heatmap, an HTML page, Markdown for a merge request, JSON, or a CI exit code. Each report also gives the answer's perplexity, and each flagged span the entropy of the alternatives at its weakest token.
+No other Rust crate does logprob-based confidence checks. In Python, [LM-Polygraph](https://github.com/IINemo/lm-polygraph) and [UQLM](https://github.com/cvs-health/uqlm) have many more methods (sampling consistency, claim-level scoring, trained estimators). They need the model loaded or several generations per answer. This tool does one cheap thing from one saved response: shows the low-probability words and what else the model considered. Output as a terminal heatmap, HTML page, Markdown for a merge request, JSON, or a CI exit code. Each report gives the answer's perplexity. Each flagged span gives the entropy of the options at its weakest token.
 
 ## Use it in 3 steps
 
-1. **Get a response with logprobs.** Ask your API for `"logprobs": true, "top_logprobs": 3` and save the JSON, or let the tool do it: set `OPENAI_API_KEY` and run `llm-token-visualizer --live "your question" --save answer.json`.
+1. **Get a response with logprobs.** Ask your API for `"logprobs": true, "top_logprobs": 3` and save the JSON. Or set `OPENAI_API_KEY` and run `llm-token-visualizer --live "your question" --save answer.json`.
 2. **Run it:** `llm-token-visualizer --logprobs-file answer.json --threshold 0.6`
-3. **Share or gate it:** `--format html -o report.html` for a page you can send, `--format markdown` for a PR comment, `--fail-on-flag` to fail a CI job when anything is flagged.
+3. **Share or gate it:** `--format html -o report.html` for a page to send, `--format markdown` for a PR comment, `--fail-on-flag` to fail a CI job when anything is flagged.
 
 ## Providers
 
-`--live` asks a model and analyzes its answer. Pick where with `--provider` (default `openai`), and override the address with `--base-url`:
+`--live` asks a model and checks its answer. Pick the provider with `--provider` (default `openai`). Change the address with `--base-url`:
 
 | `--provider` | Default base URL | Key from | Default `--model` | How it was checked |
 |---|---|---|---|---|
@@ -108,11 +106,11 @@ llm-token-visualizer --live "Who painted The Night Watch?" --provider openrouter
 llm-token-visualizer --live "..." --provider vllm --model my-model --base-url http://gpu-box:8000/v1
 ```
 
-No hosted provider was called with a real key for this release. If a provider or model answers without logprobs, the CLI stops with an error that says so (and shows the answer) instead of printing an empty report. Anthropic's API does not return logprobs, so it has no preset.
+No hosted provider was called with a real key for this release. If an answer comes back without logprobs, the CLI stops with an error that says so and shows the answer. Anthropic's API does not return logprobs, so it has no preset.
 
-Google Gemini's native API returns logprobs too (`generationConfig: {responseLogprobs: true, logprobs: 3}`); save the response and pass it with `--logprobs-file`.
+Google Gemini's native API also returns logprobs (`generationConfig: {responseLogprobs: true, logprobs: 3}`). Save the response and pass it with `--logprobs-file`.
 
-No API key handy? Grab a sample first: `curl -LO https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/raw/main/examples/logprobs/cuyp.json`
+No API key? Grab a sample: `curl -LO https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/raw/main/examples/logprobs/cuyp.json`
 
 ## Library
 
@@ -135,11 +133,11 @@ println!("perplexity {:.2}", report.perplexity);
 
 Examples (`cargo run --example <name>`): `detect` (every bundled sample), `ci_gate` (a directory of answers, exit 2 when any is flagged), `html_report` (write the HTML page for one answer).
 
-Already using **async-openai**? Enable the feature and pass your `CreateChatCompletionResponse` to `interop::async_openai::tokens_from_response`, then `detect`. Using another client? Serialize its response to JSON and call `parse_logprobs`.
+Using **async-openai**? Turn on the feature, pass your `CreateChatCompletionResponse` to `interop::async_openai::tokens_from_response`, then `detect`. Another client? Turn its response into JSON and call `parse_logprobs`.
 
 ## Performance
 
-`cargo bench --bench vs_0_4` parses a 4,000-token response and flags spans: 9.0 ms with 0.5.0 against 14.6 ms with 0.4.0 (criterion medians, i7-13700KF, Windows 11, Rust 1.91). 0.5.0 deserializes the logprobs without copying the JSON first, which more than pays for the Unicode word segmentation.
+`cargo bench --bench vs_0_4` parses a 4,000-token response and flags spans: 9.0 ms on 0.5.0, 14.6 ms on 0.4.0 (criterion medians, i7-13700KF, Windows 11, Rust 1.91). 0.5.0 reads the logprobs without copying the JSON first. That saves more than the Unicode word segmentation costs.
 
 ## Documentation
 
