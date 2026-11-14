@@ -1,7 +1,6 @@
 use anyhow::Result;
-use colored::{ColoredString, Colorize};
 
-use crate::data::{ConfidenceLevel, FlagType, TokenAnalysis, TokenInfo, VisualizationConfig};
+use crate::data::{ConfidenceLevel, TokenAnalysis, VisualizationConfig};
 
 /// Renders a [`crate::TokenAnalysis`] as text.
 pub trait Renderer {
@@ -14,150 +13,163 @@ pub trait Renderer {
     ) -> Result<String>;
 }
 
-/// Colored terminal output.
-pub struct TerminalRenderer;
+#[cfg(feature = "terminal")]
+#[cfg_attr(docsrs, doc(cfg(feature = "terminal")))]
+pub use terminal_renderer::TerminalRenderer;
 
-impl Default for TerminalRenderer {
-    fn default() -> Self {
-        Self::new()
+#[cfg(feature = "terminal")]
+mod terminal_renderer {
+    use anyhow::Result;
+    use colored::{ColoredString, Colorize};
+
+    use super::Renderer;
+    use crate::data::{ConfidenceLevel, FlagType, TokenAnalysis, TokenInfo, VisualizationConfig};
+
+    /// Colored terminal output.
+    pub struct TerminalRenderer;
+
+    impl Default for TerminalRenderer {
+        fn default() -> Self {
+            Self::new()
+        }
     }
-}
 
-impl TerminalRenderer {
-    /// A terminal renderer.
-    pub fn new() -> Self {
-        Self
-    }
+    impl TerminalRenderer {
+        /// A terminal renderer.
+        pub fn new() -> Self {
+            Self
+        }
 
-    fn format_token(
-        &self,
-        token: &TokenInfo,
-        token_index: usize,
-        analysis: &TokenAnalysis,
-    ) -> ColoredString {
-        let confidence_level = ConfidenceLevel::from(token.confidence);
-        let flags = analysis.get_flags_for_token(token_index);
+        fn format_token(
+            &self,
+            token: &TokenInfo,
+            token_index: usize,
+            analysis: &TokenAnalysis,
+        ) -> ColoredString {
+            let confidence_level = ConfidenceLevel::from(token.confidence);
+            let flags = analysis.get_flags_for_token(token_index);
 
-        let mut formatted = match confidence_level {
-            ConfidenceLevel::VeryLow => token.text.red().bold(),
-            ConfidenceLevel::Low => token.text.yellow(),
-            ConfidenceLevel::Medium => token.text.normal(),
-            ConfidenceLevel::High => token.text.cyan(),
-            ConfidenceLevel::VeryHigh => token.text.green().bold(),
-        };
-
-        // Apply flag formatting
-        for flag in flags {
-            let flag_type = FlagType::from(flag.flag.as_str());
-            formatted = match flag_type {
-                FlagType::Fact => formatted.on_green(),
-                FlagType::Uncertain => formatted.underline(),
-                FlagType::Overconfident => formatted.on_yellow(),
-                FlagType::Hallucination => formatted.on_red().bold(),
-                FlagType::Other(_) => formatted.italic(),
+            let mut formatted = match confidence_level {
+                ConfidenceLevel::VeryLow => token.text.red().bold(),
+                ConfidenceLevel::Low => token.text.yellow(),
+                ConfidenceLevel::Medium => token.text.normal(),
+                ConfidenceLevel::High => token.text.cyan(),
+                ConfidenceLevel::VeryHigh => token.text.green().bold(),
             };
-        }
 
-        formatted
-    }
-}
-
-impl Renderer for TerminalRenderer {
-    fn render(
-        &self,
-        _text: &str,
-        analysis: &TokenAnalysis,
-        config: &VisualizationConfig,
-    ) -> Result<String> {
-        analysis.validate().map_err(|e| anyhow::anyhow!(e))?;
-
-        let mut output = String::new();
-
-        // Header
-        output.push_str("LLM Token Analysis\n");
-        output.push_str("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
-
-        if config.verbose {
-            let (min_conf, max_conf, avg_conf) = analysis.get_confidence_stats();
-            output.push_str(&format!(
-                "Confidence Stats: Min: {:.2}, Max: {:.2}, Avg: {:.2}\n",
-                min_conf, max_conf, avg_conf
-            ));
-            output.push_str(&format!("Flags: {}\n", analysis.flags.len()));
-            output.push_str("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
-        }
-
-        // Legend
-        output.push_str("Color Legend:\n");
-        output.push_str(&format!(
-            "   {} Very Low Confidence (0.0-0.3)\n",
-            "██".red().bold()
-        ));
-        output.push_str(&format!("   {} Low Confidence (0.3-0.5)\n", "██".yellow()));
-        output.push_str(&format!(
-            "   {} Medium Confidence (0.5-0.7)\n",
-            "██".normal()
-        ));
-        output.push_str(&format!("   {} High Confidence (0.7-0.9)\n", "██".cyan()));
-        output.push_str(&format!(
-            "   {} Very High Confidence (0.9-1.0)\n",
-            "██".green().bold()
-        ));
-        output.push_str("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
-
-        // Render tokens
-        output.push_str("Token Visualization:\n\n");
-        for (i, token) in analysis.tokens.iter().enumerate() {
-            let formatted_token = self.format_token(token, i, analysis);
-            output.push_str(&format!("{}", formatted_token));
-        }
-        output.push_str("\n\n");
-
-        // Show token details if verbose
-        if config.verbose && config.show_confidence_scores {
-            output.push_str("Token Details:\n");
-            output.push_str("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
-            for (i, token) in analysis.tokens.iter().enumerate() {
-                let flags = analysis.get_flags_for_token(i);
-                let flag_str = if flags.is_empty() {
-                    "None".to_string()
-                } else {
-                    flags
-                        .iter()
-                        .map(|f| f.flag.as_str())
-                        .collect::<Vec<_>>()
-                        .join(", ")
+            // Apply flag formatting
+            for flag in flags {
+                let flag_type = FlagType::from(flag.flag.as_str());
+                formatted = match flag_type {
+                    FlagType::Fact => formatted.on_green(),
+                    FlagType::Uncertain => formatted.underline(),
+                    FlagType::Overconfident => formatted.on_yellow(),
+                    FlagType::Hallucination => formatted.on_red().bold(),
+                    FlagType::Other(_) => formatted.italic(),
                 };
-                output.push_str(&format!(
-                    "{:3}: '{}' (conf: {:.3}, flags: {})\n",
-                    i, token.text, token.confidence, flag_str
-                ));
             }
-            output.push('\n');
-        }
 
-        // Show flags if enabled
-        if config.show_flags && !analysis.flags.is_empty() {
-            output.push_str("Flags:\n");
+            formatted
+        }
+    }
+
+    impl Renderer for TerminalRenderer {
+        fn render(
+            &self,
+            _text: &str,
+            analysis: &TokenAnalysis,
+            config: &VisualizationConfig,
+        ) -> Result<String> {
+            analysis.validate().map_err(|e| anyhow::anyhow!(e))?;
+
+            let mut output = String::new();
+
+            // Header
+            output.push_str("LLM Token Analysis\n");
             output.push_str("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
-            for flag in &analysis.flags {
-                let token_text: String = analysis.tokens[flag.start..flag.end]
-                    .iter()
-                    .map(|t| t.text.as_str())
-                    .collect();
-                let desc = flag.description.as_deref().unwrap_or("No description");
-                output.push_str(&format!(
-                    "  [{}] '{}' (tokens {}-{}): {}\n",
-                    flag.flag,
-                    token_text,
-                    flag.start,
-                    flag.end - 1,
-                    desc
-                ));
-            }
-        }
 
-        Ok(output)
+            if config.verbose {
+                let (min_conf, max_conf, avg_conf) = analysis.get_confidence_stats();
+                output.push_str(&format!(
+                    "Confidence Stats: Min: {:.2}, Max: {:.2}, Avg: {:.2}\n",
+                    min_conf, max_conf, avg_conf
+                ));
+                output.push_str(&format!("Flags: {}\n", analysis.flags.len()));
+                output.push_str("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+            }
+
+            // Legend
+            output.push_str("Color Legend:\n");
+            output.push_str(&format!(
+                "   {} Very Low Confidence (0.0-0.3)\n",
+                "██".red().bold()
+            ));
+            output.push_str(&format!("   {} Low Confidence (0.3-0.5)\n", "██".yellow()));
+            output.push_str(&format!(
+                "   {} Medium Confidence (0.5-0.7)\n",
+                "██".normal()
+            ));
+            output.push_str(&format!("   {} High Confidence (0.7-0.9)\n", "██".cyan()));
+            output.push_str(&format!(
+                "   {} Very High Confidence (0.9-1.0)\n",
+                "██".green().bold()
+            ));
+            output.push_str("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+
+            // Render tokens
+            output.push_str("Token Visualization:\n\n");
+            for (i, token) in analysis.tokens.iter().enumerate() {
+                let formatted_token = self.format_token(token, i, analysis);
+                output.push_str(&format!("{}", formatted_token));
+            }
+            output.push_str("\n\n");
+
+            // Show token details if verbose
+            if config.verbose && config.show_confidence_scores {
+                output.push_str("Token Details:\n");
+                output.push_str("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+                for (i, token) in analysis.tokens.iter().enumerate() {
+                    let flags = analysis.get_flags_for_token(i);
+                    let flag_str = if flags.is_empty() {
+                        "None".to_string()
+                    } else {
+                        flags
+                            .iter()
+                            .map(|f| f.flag.as_str())
+                            .collect::<Vec<_>>()
+                            .join(", ")
+                    };
+                    output.push_str(&format!(
+                        "{:3}: '{}' (conf: {:.3}, flags: {})\n",
+                        i, token.text, token.confidence, flag_str
+                    ));
+                }
+                output.push('\n');
+            }
+
+            // Show flags if enabled
+            if config.show_flags && !analysis.flags.is_empty() {
+                output.push_str("Flags:\n");
+                output.push_str("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+                for flag in &analysis.flags {
+                    let token_text: String = analysis.tokens[flag.start..flag.end]
+                        .iter()
+                        .map(|t| t.text.as_str())
+                        .collect();
+                    let desc = flag.description.as_deref().unwrap_or("No description");
+                    output.push_str(&format!(
+                        "  [{}] '{}' (tokens {}-{}): {}\n",
+                        flag.flag,
+                        token_text,
+                        flag.start,
+                        flag.end - 1,
+                        desc
+                    ));
+                }
+            }
+
+            Ok(output)
+        }
     }
 }
 

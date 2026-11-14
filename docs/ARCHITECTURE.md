@@ -19,14 +19,14 @@ The code is in [`src/detect.rs`](../src/detect.rs) (parsing and span detection) 
 
 ```
 src/
-  main.rs       CLI (clap)
-  lib.rs        public API: visualize_tokens, quick_analyze, analyze_with_issues
+  main.rs       CLI (clap; feature "cli")
+  lib.rs        crate docs and root re-exports of the detect API
   detect.rs     logprob parsing and low-confidence span detection
-  report.rs     detect-mode reports: terminal heatmap, HTML page, Markdown
+  report.rs     detect-mode reports: HTML page, Markdown, terminal heatmap (feature "terminal")
   live.rs       OpenAI-compatible API client for --live (feature "live")
-  data.rs       TokenAnalysis, TokenInfo, TokenFlag, ConfidenceLevel
-  renderer.rs   Terminal, HTML and Markdown renderers for the visualizer mode
-  utils.rs      tokenizer for demos, metrics, issue detection
+  data.rs       TokenAnalysis, TokenInfo, TokenFlag, ConfidenceLevel (deprecated, feature "legacy")
+  renderer.rs   renderers for the visualizer mode (deprecated, feature "legacy")
+  utils.rs      tokenizer for demos, metrics, issue detection (deprecated, feature "legacy")
   interop.rs    adapters for other crates (feature "async-openai")
 examples/logprobs/                real Llama 3.1 8B responses with logprobs
 examples/                         library examples over those samples

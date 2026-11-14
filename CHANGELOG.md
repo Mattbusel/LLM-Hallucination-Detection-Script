@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.6.0 (unreleased)
+
+A lean library core, a typed parse error, and a fix for `null` logprobs. This is a breaking release; migration notes are at the end of this entry.
+
+- **Lean core.** With `default-features = false` the crate depends only on serde, serde_json, unicode-segmentation and thiserror (`cargo tree -e normal --no-default-features`), and the library builds for `wasm32-unknown-unknown`. Before, clap (with its derive macros), colored and anyhow were always pulled in, plus ureq by default.
+- **New features:** `cli` (the binary: clap, anyhow), `terminal` (`report::terminal` and `renderer::TerminalRenderer`: colored) and `legacy` (the deprecated `data`, `renderer` and `utils` modules). `default = ["cli", "terminal", "legacy"]`. The `[[bin]]` requires `cli`.
+- **`live` is no longer on by default.** `cargo install llm-token-visualizer --features live` keeps `--live`; the GitLab release binaries are built with it. Without it, `--live` says how to install it.
+- **Typed error:** `parse_logprobs` and `interop::async_openai::tokens_from_response` return `ParseError` (`InvalidJson`, `ApiError`, `NoLogprobs`, `NullLogprobs`, `Empty`, `Malformed`) instead of `anyhow::Error`, so a caller can retry with `"logprobs": true` on `NoLogprobs` without matching on message text. The messages are the same as before, apart from small wording changes in the async-openai adapter. `ParseError` is `#[non_exhaustive]`.
+- **Fixed: a `null` logprob counted as probability 0.** Legacy completions with `echo: true` return `null` for the first token; that token was always flagged with p=0.00 and made the perplexity infinite. A `null` logprob (in the legacy shape and now also in the `content` array shape, where it used to be a parse error) is kept as `NaN`: the text stays complete, and `detect` never flags the token and leaves it out of `mean_prob` and `perplexity`. New `LogprobToken::has_logprob`.
+- **Hardened numerics:** `Candidate.prob` is clamped to 0..=1 (it was a bare `exp(logprob)`), alternatives with an unknown logprob are dropped, and a `NaN` token is never chosen as a span's weakest token. `detect` documents that it never panics: a threshold outside 0..=1 is clamped and a `NaN` threshold flags nothing (`Report::threshold` holds the value used). New `try_detect` returns `InvalidThreshold` for such a threshold instead.
+- **`Report`, `Span` and `Candidate` are `#[non_exhaustive]` and implement `Deserialize`,** so new metrics can ship in minor releases and a stored `--format json` report can be read back. An infinite perplexity (written as `null` by serde_json) reads back as infinity. New `Candidate::new`.
+- **The detect API is at the crate root:** `llm_token_visualizer::{parse_logprobs, detect, try_detect, Report, Span, LogprobToken, Alternative, Candidate, ParseError, InvalidThreshold, top_k_entropy_bits, DEFAULT_THRESHOLD}`. The `detect` module paths still work.
+- **Deprecated:** the `data`, `renderer` and `utils` modules, their root re-exports, `visualize_tokens`, `analyze_with_issues` and `detect::to_token_analysis` (the 0.1 visualizer model, which the detect API and `report` replace). They are behind the `legacy` feature, on by default for this release only. The CLI's `--text` / `--confidence` / `--demo` mode still works.
+- Crate docs: a "which API to use" section and a feature table. Keywords and categories now describe a library (`llm`, `logprobs`, `hallucination`, `uncertainty`, `openai`; `science`, `api-bindings`).
+- Property tests for unknown logprobs: `NaN` and `null` are never flagged and never make the mean or perplexity `NaN`; perplexity equals the one over the known tokens; any threshold is safe and `try_detect` accepts exactly 0..=1; reports round-trip through JSON.
+- GitLab CI checks the library with no default features, fails if clap, colored, anyhow or ureq reach the lean core, and checks it for `wasm32-unknown-unknown`.
+- Dependencies: removed the unused `thiserror` 1; added `thiserror` 2 for the error types. Minimum Rust version is still 1.88 (checked with `cargo +1.88.0 check --all-targets --all-features`).
+
+### Migrating from 0.5
+
+- Library users who only call `parse_logprobs` / `detect`: depend with `default-features = false`.
+- `parse_logprobs(..)?` inside a function returning `anyhow::Result` keeps working (`ParseError` implements `std::error::Error`). Code that named the return type as `anyhow::Result<Vec<LogprobToken>>` changes to `Result<Vec<LogprobToken>, ParseError>`.
+- Building `Report`, `Span` or `Candidate` with a struct literal outside the crate no longer compiles; get them from `detect`, deserialize them, or use `Candidate::new`.
+- `report::terminal` needs the `terminal` feature and `live` needs `features = ["live"]`.
+- A token with a `null` logprob now has `logprob.is_nan()`; check `has_logprob()` before using its probability.
+
+## 0.5.1 (2026-10-21)
+
+- No code changes. Republished so the crates.io page shows the rewritten README.
+
 ## 0.5.0 (2026-10-04)
 
 - **Fixed: answers without spaces were flagged as one span.** A word was "everything up to the next space or ASCII punctuation", so in a Chinese or Japanese answer one unsure character flagged the whole sentence. Words now come from Unicode word segmentation (UAX #29, `unicode-segmentation`). English results on the bundled samples are unchanged.

@@ -1,3 +1,7 @@
+// The visualizer mode (--text/--confidence/--demo) still uses the 0.1 data
+// model, which the library deprecated in 0.6.0.
+#![allow(deprecated)]
+
 use anyhow::{Context, Result};
 use clap::Parser;
 use std::io::Read;
@@ -292,7 +296,9 @@ fn fetch_live(prompt: &str, args: &Args) -> Result<String> {
 
 #[cfg(not(feature = "live"))]
 fn fetch_live(_prompt: &str, _args: &Args) -> Result<String> {
-    anyhow::bail!("this build has no live mode; rebuild with the default \"live\" feature")
+    anyhow::bail!(
+        "this build has no live mode; install with `cargo install llm-token-visualizer --features live`"
+    )
 }
 
 fn load_text(args: &Args) -> Result<String> {

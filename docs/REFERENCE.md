@@ -75,7 +75,7 @@ llm-token-visualizer --live "Who was the second person to walk on the Moon?" --s
 
 Flags: `--model` (default depends on the provider, see above), `--max-tokens` (default 200), and `--save <path>` to keep the raw response so you can re-run it offline with `--logprobs-file`. Anthropic's API does not return logprobs, so Claude models cannot be analyzed this way.
 
-The bundled samples were fetched through the Hugging Face router (`meta-llama/Llama-3.1-8B-Instruct:novita`). Build with `--no-default-features` for an offline-only binary without an HTTP client.
+The bundled samples were fetched through the Hugging Face router (`meta-llama/Llama-3.1-8B-Instruct:novita`). `--live` needs the `live` feature (`cargo install llm-token-visualizer --features live`; the release binaries have it). Without it the binary is offline-only and has no HTTP client.
 
 ## Visualizing your own confidence scores
 

@@ -4,7 +4,11 @@
 //! Three formats share one color scale ([`heat`]): a colored terminal report,
 //! a self-contained HTML page (no scripts, no external assets), and Markdown
 //! that reads well in a pull request or issue comment.
+//!
+//! [`html`] and [`markdown`] are always available; `terminal` needs the
+//! `terminal` feature (on by default), which adds the `colored` crate.
 
+#[cfg(feature = "terminal")]
 use colored::Colorize;
 use std::fmt::Write as _;
 
@@ -94,6 +98,7 @@ fn candidates(span: &Span) -> Vec<(String, f64, bool)> {
     out
 }
 
+#[cfg(feature = "terminal")]
 fn token_range(s: &Span) -> String {
     if s.end - s.start == 1 {
         format!("token {}", s.start)
@@ -111,6 +116,7 @@ fn show(token: &str) -> String {
 
 /// Confident tokens keep the terminal's own color so the answer stays
 /// readable on light and dark themes; only doubt gets a heat color.
+#[cfg(feature = "terminal")]
 fn piece_for(text: &str, p: f64) -> colored::ColoredString {
     if p >= 0.9 {
         text.normal()
@@ -121,6 +127,8 @@ fn piece_for(text: &str, p: f64) -> colored::ColoredString {
 }
 
 /// Colored terminal report. Honors `NO_COLOR` through the `colored` crate.
+#[cfg(feature = "terminal")]
+#[cfg_attr(docsrs, doc(cfg(feature = "terminal")))]
 pub fn terminal(tokens: &[LogprobToken], report: &Report, meta: &Meta) -> String {
     let mut out = String::new();
     let spans = span_index(tokens, report);
@@ -530,6 +538,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "terminal")]
     fn terminal_without_color_is_plain_and_complete() {
         colored::control::set_override(false);
         let (t, r, m) = sample();

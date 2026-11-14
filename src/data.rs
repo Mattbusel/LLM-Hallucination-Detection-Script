@@ -56,13 +56,13 @@ impl Default for VisualizationConfig {
 /// Confidence bucket used for colors.
 pub enum ConfidenceLevel {
     /// Below 0.3.
-    VeryLow,  // 0.0 - 0.3
+    VeryLow, // 0.0 - 0.3
     /// 0.3 to 0.5.
-    Low,      // 0.3 - 0.5
+    Low, // 0.3 - 0.5
     /// 0.5 to 0.7.
-    Medium,   // 0.5 - 0.7
+    Medium, // 0.5 - 0.7
     /// 0.7 to 0.9.
-    High,     // 0.7 - 0.9
+    High, // 0.7 - 0.9
     /// 0.9 and above.
     VeryHigh, // 0.9 - 1.0
 }
@@ -166,7 +166,10 @@ mod tests {
 
     #[test]
     fn stats_of_empty_analysis_are_zero_not_nan() {
-        let a = TokenAnalysis { tokens: vec![], flags: vec![] };
+        let a = TokenAnalysis {
+            tokens: vec![],
+            flags: vec![],
+        };
         assert_eq!(a.get_confidence_stats(), (0.0, 0.0, 0.0));
     }
 }

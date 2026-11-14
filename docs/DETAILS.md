@@ -40,8 +40,8 @@ mkdir -p ~/.local/bin && curl -fsSL https://gitlab.com/mattbusel/LLM-Hallucinati
 | Other systems | |
 |---|---|
 | **Windows** | [Download llm-token-visualizer-windows-x86_64.exe](https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases/permalink/latest/downloads/llm-token-visualizer-windows-x86_64.exe) and run it. (Unsigned, so SmartScreen may ask: *More info*, then *Run anyway*.) |
-| **Any system with Rust** | `cargo binstall llm-token-visualizer` (prebuilt Linux and Windows binaries) or `cargo install --locked llm-token-visualizer` |
-| **As a library** | `cargo add llm-token-visualizer --no-default-features` (no HTTP client) |
+| **Any system with Rust** | `cargo binstall llm-token-visualizer` (prebuilt Linux and Windows binaries) or `cargo install --locked llm-token-visualizer --features live` (drop `--features live` for an offline-only build) |
+| **As a library** | `cargo add llm-token-visualizer --no-default-features` (dependencies: serde, serde_json, unicode-segmentation, thiserror) |
 
 Release archives include the sample answers under `samples/`. All releases, with SHA-256 checksums: [Releases](https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/releases).
 
@@ -121,7 +121,7 @@ No API key? Grab a sample: `curl -LO https://gitlab.com/mattbusel/LLM-Hallucinat
 ## Library
 
 ```rust
-use llm_token_visualizer::detect::{detect, parse_logprobs};
+use llm_token_visualizer::{detect, parse_logprobs};
 
 let json = std::fs::read_to_string("examples/logprobs/cuyp.json")?;
 let report = detect(&parse_logprobs(&json)?, 0.6);
@@ -134,7 +134,10 @@ println!("perplexity {:.2}", report.perplexity);
 
 | Feature | Default | What it adds |
 |---|---|---|
-| `live` | on | `--live` and the `live` module: asks an OpenAI-compatible API (ureq, rustls; 120 s timeout) |
+| `cli` | on | the `llm-token-visualizer` binary (clap, anyhow) |
+| `terminal` | on | `report::terminal`, the colored terminal heatmap (colored) |
+| `legacy` | on (0.6 only) | the deprecated visualizer model: `data`, `renderer`, `utils` |
+| `live` | off since 0.6.0 | `--live` and the `live` module: asks an OpenAI-compatible API (ureq, rustls; 120 s timeout) |
 | `async-openai` | off | `interop::async_openai::tokens_from_response` for `async_openai` chat completion responses (types only, no HTTP client) |
 
 Examples (`cargo run --example <name>`): `detect` (every bundled sample), `ci_gate` (a directory of answers, exit 2 when any is flagged), `html_report` (write the HTML page for one answer).

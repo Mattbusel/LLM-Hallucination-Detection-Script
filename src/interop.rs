@@ -2,7 +2,7 @@
 //!
 //! | Feature | Adds |
 //! |---|---|
-//! | `async-openai` | [`async_openai`]: tokens from an `async_openai` chat completion response |
+//! | `async-openai` | `async_openai`: tokens from an `async_openai` chat completion response |
 //!
 //! Any other client works through JSON: [`crate::detect::parse_logprobs`]
 //! reads OpenAI-style, legacy completions-style and Gemini-style responses.
@@ -12,10 +12,8 @@
 #[cfg(feature = "async-openai")]
 #[cfg_attr(docsrs, doc(cfg(feature = "async-openai")))]
 pub mod async_openai {
+    use crate::detect::{is_special_token, Alternative, LogprobToken, ParseError};
     use ::async_openai::types::chat::{ChatCompletionTokenLogprob, CreateChatCompletionResponse};
-    use anyhow::{bail, Result};
-
-    use crate::detect::{Alternative, LogprobToken};
 
     impl From<&ChatCompletionTokenLogprob> for LogprobToken {
         fn from(t: &ChatCompletionTokenLogprob) -> Self {
@@ -42,22 +40,28 @@ pub mod async_openai {
     ///
     /// # Errors
     ///
-    /// When the response has no choices or no logprobs (request the
-    /// completion with `logprobs(true)` and `top_logprobs(3)`).
-    pub fn tokens_from_response(resp: &CreateChatCompletionResponse) -> Result<Vec<LogprobToken>> {
+    /// [`ParseError::Malformed`] when the response has no choices,
+    /// [`ParseError::NoLogprobs`] when the first choice has no logprobs
+    /// (request the completion with `logprobs(true)` and `top_logprobs(3)`),
+    /// and [`ParseError::Empty`] when they hold no tokens.
+    pub fn tokens_from_response(
+        resp: &CreateChatCompletionResponse,
+    ) -> Result<Vec<LogprobToken>, ParseError> {
         let Some(choice) = resp.choices.first() else {
-            bail!("the response has no choices");
+            return Err(ParseError::Malformed(
+                "the response has no choices".to_string(),
+            ));
         };
         let Some(content) = choice.logprobs.as_ref().and_then(|l| l.content.as_ref()) else {
-            bail!("no token logprobs; request the completion with logprobs(true)");
+            return Err(ParseError::NoLogprobs);
         };
         let tokens: Vec<LogprobToken> = content
             .iter()
             .map(LogprobToken::from)
-            .filter(|t| !(t.token.starts_with("<|") && t.token.ends_with("|>")))
+            .filter(|t| !is_special_token(&t.token))
             .collect();
         if tokens.is_empty() {
-            bail!("logprobs contain no tokens");
+            return Err(ParseError::Empty);
         }
         Ok(tokens)
     }

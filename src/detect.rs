@@ -9,13 +9,64 @@
 //!
 //! Low probability is a signal, not proof: a model can be confidently wrong,
 //! and it can be unsure about phrasing while the facts are right.
+//!
+//! # Unknown logprobs
+//!
+//! Some servers return `null` for a token's logprob (legacy completions with
+//! `echo: true` do this for the first prompt token). Such a token is kept, so
+//! the answer text stays complete, but its `logprob` is `NaN`: [`detect`]
+//! never flags it and leaves it out of [`Report::mean_prob`] and
+//! [`Report::perplexity`]. See [`LogprobToken::has_logprob`].
 
-use anyhow::{bail, Context, Result};
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
 use unicode_segmentation::UnicodeSegmentation;
 
-use crate::data::{TokenAnalysis, TokenFlag, TokenInfo};
+/// Why [`parse_logprobs`] could not read token logprobs from a response.
+///
+/// Match on it to react to a specific failure, for example to retry the
+/// request with `"logprobs": true` on [`ParseError::NoLogprobs`] or
+/// [`ParseError::NullLogprobs`]. New variants may be added in minor releases.
+#[derive(Debug, thiserror::Error)]
+#[non_exhaustive]
+pub enum ParseError {
+    /// The input is not JSON.
+    #[error("input is not valid JSON")]
+    InvalidJson(#[source] serde_json::Error),
+    /// The provider answered with an `error` object instead of a completion.
+    /// Holds that object.
+    #[error("the API returned an error: {0}")]
+    ApiError(Value),
+    /// The response has no logprobs block at all (the request did not ask
+    /// for logprobs, or the model does not return them).
+    #[error(
+        "no token logprobs found; expected choices[0].logprobs.content \
+         (request the completion with \"logprobs\": true)"
+    )]
+    NoLogprobs,
+    /// The logprobs block is present but `null`.
+    #[error("logprobs are null; request the completion with \"logprobs\": true")]
+    NullLogprobs,
+    /// The logprobs block holds no tokens (after dropping special tokens
+    /// such as `<|eot_id|>`).
+    #[error("logprobs contain no tokens")]
+    Empty,
+    /// The logprobs block is there but does not have the expected shape.
+    /// The message says what was wrong.
+    #[error("{0}")]
+    Malformed(String),
+}
+
+/// A threshold that is `NaN` or outside `0..=1`, rejected by [`try_detect`].
+#[derive(Debug, Clone, Copy, PartialEq, thiserror::Error)]
+#[error("threshold must be a probability between 0 and 1, got {0}")]
+pub struct InvalidThreshold(pub f64);
+
+/// A logprob that may be `null` in the JSON; `null` becomes `NaN`, which
+/// serde_json writes back as `null`.
+fn logprob_or_nan<'de, D: Deserializer<'de>>(d: D) -> Result<f64, D::Error> {
+    Ok(Option::<f64>::deserialize(d)?.unwrap_or(f64::NAN))
+}
 
 /// Default probability below which a token counts as low confidence.
 pub const DEFAULT_THRESHOLD: f64 = 0.5;
@@ -28,7 +79,8 @@ pub const FLAG_LABEL: &str = "uncertain";
 pub struct Alternative {
     /// Candidate token text.
     pub token: String,
-    /// Natural-log probability.
+    /// Natural-log probability (`NaN` when the response had `null`).
+    #[serde(deserialize_with = "logprob_or_nan")]
     pub logprob: f64,
 }
 
@@ -37,7 +89,9 @@ pub struct Alternative {
 pub struct LogprobToken {
     /// Token text, including any leading space.
     pub token: String,
-    /// Natural-log probability of this token.
+    /// Natural-log probability of this token, or `NaN` when the response had
+    /// `null` (see the [module docs](self#unknown-logprobs)).
+    #[serde(deserialize_with = "logprob_or_nan")]
     pub logprob: f64,
     #[serde(default)]
     /// Top alternatives at this position, most likely first.
@@ -45,14 +99,26 @@ pub struct LogprobToken {
 }
 
 impl LogprobToken {
-    /// Probability, `exp(logprob)` clamped to 0..=1.
+    /// Probability, `exp(logprob)` clamped to 0..=1. `NaN` when the logprob
+    /// is unknown.
     pub fn prob(&self) -> f64 {
         self.logprob.exp().clamp(0.0, 1.0)
+    }
+
+    /// Whether the response gave this token a logprob (`false` for `null`,
+    /// which is stored as `NaN`). Tokens without one are never flagged and do
+    /// not count towards the mean probability or perplexity.
+    pub fn has_logprob(&self) -> bool {
+        !self.logprob.is_nan()
     }
 }
 
 /// A run of low-confidence words.
-#[derive(Debug, Clone, Serialize, PartialEq)]
+///
+/// `#[non_exhaustive]`: new metrics can be added in minor releases, so build
+/// one with [`detect`] (or deserialize a stored one) rather than by hand.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[non_exhaustive]
 pub struct Span {
     /// First token index (inclusive).
     pub start: usize,
@@ -75,17 +141,33 @@ pub struct Span {
     pub entropy_bits: Option<f64>,
 }
 
-#[derive(Debug, Clone, Serialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[non_exhaustive]
 /// An alternative with its probability.
 pub struct Candidate {
     /// Token text.
     pub token: String,
-    /// Probability, `exp(logprob)`.
+    /// Probability, `exp(logprob)` clamped to 0..=1.
     pub prob: f64,
 }
 
-#[derive(Debug, Clone, Serialize, PartialEq)]
+impl Candidate {
+    /// A candidate with `prob` clamped to 0..=1 (`NaN` stays `NaN`).
+    pub fn new(token: impl Into<String>, prob: f64) -> Self {
+        Candidate {
+            token: token.into(),
+            prob: prob.clamp(0.0, 1.0),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[non_exhaustive]
 /// Result of [`detect`].
+///
+/// Serializes to JSON (the CLI's `--format json`) and reads back. A
+/// non-finite `perplexity` (an answer with a token of probability 0) is
+/// written as `null` and read back as infinity.
 pub struct Report {
     /// Probability below which a word is flagged.
     pub threshold: f64,
@@ -93,13 +175,20 @@ pub struct Report {
     pub text: String,
     /// Number of tokens.
     pub token_count: usize,
-    /// Mean token probability.
+    /// Mean token probability, over tokens that have a logprob.
     pub mean_prob: f64,
-    /// Perplexity of the answer, `exp(-mean logprob)`: 1.0 when the model was
-    /// certain of every token, higher when it was less sure overall.
+    /// Perplexity of the answer, `exp(-mean logprob)` over tokens that have a
+    /// logprob: 1.0 when the model was certain of every token, higher when it
+    /// was less sure overall.
+    #[serde(deserialize_with = "perplexity_or_inf")]
     pub perplexity: f64,
     /// Flagged spans, in order.
     pub spans: Vec<Span>,
+}
+
+/// serde_json writes an infinite perplexity as `null`.
+fn perplexity_or_inf<'de, D: Deserializer<'de>>(d: D) -> Result<f64, D::Error> {
+    Ok(Option::<f64>::deserialize(d)?.unwrap_or(f64::INFINITY))
 }
 
 impl Report {
@@ -112,10 +201,27 @@ impl Report {
 /// Extract the token list from any of these shapes:
 /// a full Chat Completions response (`choices[0].logprobs.content`),
 /// a `logprobs` object (`{"content": [...]}`), or a bare token array.
-pub fn parse_logprobs(json: &str) -> Result<Vec<LogprobToken>> {
-    let value: Value = serde_json::from_str(json).context("input is not valid JSON")?;
+/// Also reads the legacy completions shape (`tokens` + `token_logprobs`)
+/// and Gemini's `logprobsResult`.
+///
+/// Special tokens such as `<|eot_id|>` are dropped. A `null` logprob is kept
+/// as `NaN` (see the [module docs](self#unknown-logprobs)).
+///
+/// # Errors
+///
+/// A [`ParseError`] saying what was wrong, for example
+/// [`ParseError::NoLogprobs`] when the request did not ask for logprobs.
+///
+/// ```
+/// use llm_token_visualizer::{parse_logprobs, ParseError};
+///
+/// let no_logprobs = r#"{"choices":[{"message":{"content":"Paris"}}]}"#;
+/// assert!(matches!(parse_logprobs(no_logprobs), Err(ParseError::NoLogprobs)));
+/// ```
+pub fn parse_logprobs(json: &str) -> Result<Vec<LogprobToken>, ParseError> {
+    let value: Value = serde_json::from_str(json).map_err(ParseError::InvalidJson)?;
     if let Some(err) = value.get("error") {
-        bail!("the API returned an error: {}", err);
+        return Err(ParseError::ApiError(err.clone()));
     }
     // Completions-style shape (`tokens` + `token_logprobs`), which some
     // servers return from Chat Completions too.
@@ -127,7 +233,7 @@ pub fn parse_logprobs(json: &str) -> Result<Vec<LogprobToken>> {
         let mut tokens = parse_legacy(l)?;
         tokens.retain(|t| !is_special_token(&t.token));
         if tokens.is_empty() {
-            bail!("logprobs contain no tokens");
+            return Err(ParseError::Empty);
         }
         return Ok(tokens);
     }
@@ -140,24 +246,26 @@ pub fn parse_logprobs(json: &str) -> Result<Vec<LogprobToken>> {
         c
     } else if let Some(c) = value.get("content") {
         c
+    } else if value
+        .pointer("/choices/0/logprobs")
+        .is_some_and(Value::is_null)
+    {
+        return Err(ParseError::NullLogprobs);
     } else {
-        bail!(
-            "no token logprobs found; expected choices[0].logprobs.content \
-             (request the completion with \"logprobs\": true)"
-        );
+        return Err(ParseError::NoLogprobs);
     };
     if content.is_null() {
-        bail!("logprobs are null; request the completion with \"logprobs\": true");
+        return Err(ParseError::NullLogprobs);
     }
     // Deserialize from the borrowed value: cloning a large `content` array
     // first cost more than the detection itself.
-    let mut tokens: Vec<LogprobToken> =
-        Vec::<LogprobToken>::deserialize(content).context("could not read logprobs tokens")?;
+    let mut tokens: Vec<LogprobToken> = Vec::<LogprobToken>::deserialize(content)
+        .map_err(|e| ParseError::Malformed(format!("could not read logprobs tokens: {e}")))?;
     // Drop end-of-turn and other special tokens (e.g. "<|eot_id|>") that some
     // servers include in the logprobs but not in the message text.
     tokens.retain(|t| !is_special_token(&t.token));
     if tokens.is_empty() {
-        bail!("logprobs contain no tokens");
+        return Err(ParseError::Empty);
     }
     Ok(tokens)
 }
@@ -165,24 +273,31 @@ pub fn parse_logprobs(json: &str) -> Result<Vec<LogprobToken>> {
 /// Read `{"tokens": [..], "token_logprobs": [..], "top_logprobs": [..]}`,
 /// where each `top_logprobs` entry is either a `{token: logprob}` map or a
 /// list of `{"token", "logprob"}` objects.
-fn parse_legacy(l: &Value) -> Result<Vec<LogprobToken>> {
+///
+/// A `null` entry in `token_logprobs` (the first token of an `echo: true`
+/// completion) becomes `NaN`, so [`detect`] skips it. Before 0.6.0 it became
+/// `-inf`: probability 0, always flagged, and an infinite perplexity.
+fn parse_legacy(l: &Value) -> Result<Vec<LogprobToken>, ParseError> {
+    let malformed = |m: &str| ParseError::Malformed(m.to_string());
     let toks = l["tokens"]
         .as_array()
-        .context("logprobs.tokens is not a list")?;
+        .ok_or_else(|| malformed("logprobs.tokens is not a list"))?;
     let lps = l["token_logprobs"]
         .as_array()
-        .context("logprobs.token_logprobs is not a list")?;
+        .ok_or_else(|| malformed("logprobs.token_logprobs is not a list"))?;
     if toks.len() != lps.len() {
-        bail!("logprobs.tokens and logprobs.token_logprobs have different lengths");
+        return Err(malformed(
+            "logprobs.tokens and logprobs.token_logprobs have different lengths",
+        ));
     }
     let tops = l.get("top_logprobs").and_then(Value::as_array);
     let mut out = Vec::with_capacity(toks.len());
     for (i, (t, lp)) in toks.iter().zip(lps).enumerate() {
         let token = t
             .as_str()
-            .context("a logprobs token is not a string")?
+            .ok_or_else(|| malformed("a logprobs token is not a string"))?
             .to_string();
-        let logprob = lp.as_f64().unwrap_or(f64::NEG_INFINITY);
+        let logprob = lp.as_f64().unwrap_or(f64::NAN);
         let mut top_logprobs: Vec<Alternative> = match tops.and_then(|a| a.get(i)) {
             Some(Value::Object(m)) => m
                 .iter()
@@ -210,7 +325,7 @@ fn parse_legacy(l: &Value) -> Result<Vec<LogprobToken>> {
 /// `responseLogprobs: true`: `candidates[0].logprobsResult` holds
 /// `chosenCandidates` (`{token, logProbability}`) and, per position,
 /// `topCandidates[i].candidates`. Also accepts a bare `logprobsResult`.
-fn parse_gemini(value: &Value) -> Result<Option<Vec<LogprobToken>>> {
+fn parse_gemini(value: &Value) -> Result<Option<Vec<LogprobToken>>, ParseError> {
     let lr = value
         .pointer("/candidates/0/logprobsResult")
         .or_else(|| value.get("logprobsResult"));
@@ -220,7 +335,9 @@ fn parse_gemini(value: &Value) -> Result<Option<Vec<LogprobToken>>> {
     let chosen = lr
         .get("chosenCandidates")
         .and_then(Value::as_array)
-        .context("logprobsResult has no chosenCandidates list")?;
+        .ok_or_else(|| {
+            ParseError::Malformed("logprobsResult has no chosenCandidates list".to_string())
+        })?;
     let tops = lr.get("topCandidates").and_then(Value::as_array);
     let cand = |c: &Value| -> Option<Alternative> {
         Some(Alternative {
@@ -231,7 +348,9 @@ fn parse_gemini(value: &Value) -> Result<Option<Vec<LogprobToken>>> {
     let mut out = Vec::with_capacity(chosen.len());
     for (i, c) in chosen.iter().enumerate() {
         let Some(a) = cand(c) else {
-            bail!("chosenCandidates[{i}] needs a token and a logProbability");
+            return Err(ParseError::Malformed(format!(
+                "chosenCandidates[{i}] needs a token and a logProbability"
+            )));
         };
         let mut top: Vec<Alternative> = tops
             .and_then(|t| t.get(i))
@@ -248,12 +367,12 @@ fn parse_gemini(value: &Value) -> Result<Option<Vec<LogprobToken>>> {
     }
     out.retain(|t| !is_special_token(&t.token));
     if out.is_empty() {
-        bail!("logprobs contain no tokens");
+        return Err(ParseError::Empty);
     }
     Ok(Some(out))
 }
 
-fn is_special_token(s: &str) -> bool {
+pub(crate) fn is_special_token(s: &str) -> bool {
     s.starts_with("<|") && s.ends_with("|>")
 }
 
@@ -289,18 +408,35 @@ fn words(tokens: &[LogprobToken]) -> Vec<(usize, usize)> {
     out
 }
 
-/// Flag low-confidence spans.
+/// Flag low-confidence spans: words with a token whose probability is
+/// strictly below `threshold`.
+///
+/// Never panics, whatever the input. A `threshold` outside `0..=1` is
+/// clamped into it and a `NaN` threshold flags nothing; the threshold that
+/// was used is in [`Report::threshold`]. Use [`try_detect`] to get an error
+/// for such a threshold instead. Tokens without a logprob (`NaN`) are never
+/// flagged and are left out of the mean probability and perplexity.
 pub fn detect(tokens: &[LogprobToken], threshold: f64) -> Report {
-    let text: String = tokens.iter().map(|t| t.token.as_str()).collect();
-    let mean_prob = if tokens.is_empty() {
+    let threshold = if threshold.is_nan() {
         0.0
     } else {
-        tokens.iter().map(|t| t.prob()).sum::<f64>() / tokens.len() as f64
+        threshold.clamp(0.0, 1.0)
     };
-    let perplexity = if tokens.is_empty() {
+    let text: String = tokens.iter().map(|t| t.token.as_str()).collect();
+    let known: Vec<f64> = tokens
+        .iter()
+        .filter(|t| t.has_logprob())
+        .map(|t| t.logprob)
+        .collect();
+    let mean_prob = if known.is_empty() {
+        0.0
+    } else {
+        known.iter().map(|lp| lp.exp().clamp(0.0, 1.0)).sum::<f64>() / known.len() as f64
+    };
+    let perplexity = if known.is_empty() {
         1.0
     } else {
-        let mean_lp = tokens.iter().map(|t| t.logprob).sum::<f64>() / tokens.len() as f64;
+        let mean_lp = known.iter().sum::<f64>() / known.len() as f64;
         (-mean_lp).exp()
     };
 
@@ -331,17 +467,15 @@ pub fn detect(tokens: &[LogprobToken], threshold: f64) -> Report {
         .into_iter()
         .map(|(start, end)| {
             let weakest = (start..end)
-                .filter(|&i| has_word_chars(&tokens[i].token))
+                .filter(|&i| has_word_chars(&tokens[i].token) && tokens[i].has_logprob())
                 .min_by(|&a, &b| tokens[a].prob().total_cmp(&tokens[b].prob()))
                 .unwrap_or(start);
             let w = &tokens[weakest];
             let alternatives: Vec<Candidate> = w
                 .top_logprobs
                 .iter()
-                .map(|a| Candidate {
-                    token: a.token.clone(),
-                    prob: a.logprob.exp(),
-                })
+                .filter(|a| !a.logprob.is_nan())
+                .map(|a| Candidate::new(a.token.clone(), a.logprob.exp()))
                 .collect();
             let entropy_bits = top_k_entropy_bits(&alternatives);
             Span {
@@ -369,10 +503,31 @@ pub fn detect(tokens: &[LogprobToken], threshold: f64) -> Report {
     }
 }
 
+/// Like [`detect`], but returns an error for a threshold that is `NaN` or
+/// outside `0..=1` instead of clamping it.
+///
+/// ```
+/// use llm_token_visualizer::{try_detect, InvalidThreshold};
+///
+/// assert_eq!(try_detect(&[], 1.5).unwrap_err(), InvalidThreshold(1.5));
+/// assert!(try_detect(&[], 0.5).is_ok());
+/// ```
+pub fn try_detect(tokens: &[LogprobToken], threshold: f64) -> Result<Report, InvalidThreshold> {
+    if (0.0..=1.0).contains(&threshold) {
+        Ok(detect(tokens, threshold))
+    } else {
+        Err(InvalidThreshold(threshold))
+    }
+}
+
 /// Entropy in bits of `alternatives` renormalised to sum to 1. `None` when
 /// there are none (or their probabilities sum to 0).
 pub fn top_k_entropy_bits(alternatives: &[Candidate]) -> Option<f64> {
-    let total: f64 = alternatives.iter().map(|c| c.prob).filter(|p| p.is_finite() && *p > 0.0).sum();
+    let total: f64 = alternatives
+        .iter()
+        .map(|c| c.prob)
+        .filter(|p| p.is_finite() && *p > 0.0)
+        .sum();
     if alternatives.is_empty() || total <= 0.0 {
         return None;
     }
@@ -407,8 +562,16 @@ impl Span {
 }
 
 /// Convert tokens plus a report into the visualizer's input format, so the
-/// terminal, HTML and Markdown renderers can display the result.
-pub fn to_token_analysis(tokens: &[LogprobToken], report: &Report) -> TokenAnalysis {
+/// legacy terminal, HTML and Markdown renderers can display the result.
+#[cfg(feature = "legacy")]
+#[cfg_attr(docsrs, doc(cfg(feature = "legacy")))]
+#[deprecated(
+    since = "0.6.0",
+    note = "the data/renderer visualizer model is deprecated; render a Report with the report module"
+)]
+#[allow(deprecated)]
+pub fn to_token_analysis(tokens: &[LogprobToken], report: &Report) -> crate::data::TokenAnalysis {
+    use crate::data::{TokenAnalysis, TokenFlag, TokenInfo};
     TokenAnalysis {
         tokens: tokens
             .iter()
@@ -483,9 +646,97 @@ mod tests {
     #[test]
     fn missing_or_null_logprobs_is_a_clear_error() {
         let e = parse_logprobs(r#"{"choices":[{"logprobs":null}]}"#).unwrap_err();
+        assert!(matches!(e, ParseError::NullLogprobs), "{e:?}");
         assert!(e.to_string().contains("logprobs"));
+        let e = parse_logprobs(r#"{"choices":[{"message":{"content":"Hi"}}]}"#).unwrap_err();
+        assert!(matches!(e, ParseError::NoLogprobs), "{e:?}");
         let e = parse_logprobs(r#"{"error":{"message":"bad key"}}"#).unwrap_err();
+        assert!(matches!(e, ParseError::ApiError(ref v) if v["message"] == "bad key"));
         assert!(e.to_string().contains("bad key"));
+        assert!(matches!(
+            parse_logprobs("{oops"),
+            Err(ParseError::InvalidJson(_))
+        ));
+        assert!(matches!(parse_logprobs("[]"), Err(ParseError::Empty)));
+        let e = parse_logprobs(r#"[{"token":1,"logprob":-0.1}]"#).unwrap_err();
+        assert!(matches!(e, ParseError::Malformed(_)), "{e:?}");
+    }
+
+    #[test]
+    fn null_legacy_logprob_is_skipped_not_flagged() {
+        // `echo: true` completions return null for the first token.
+        let json = r#"{"choices":[{"logprobs":{"tokens":["The"," cat"," sat"],
+            "token_logprobs":[null,-0.1,-0.2],"top_logprobs":[null,{" cat":-0.1},{" sat":-0.2}]}}]}"#;
+        let t = parse_logprobs(json).unwrap();
+        assert_eq!(t.len(), 3);
+        assert!(!t[0].has_logprob());
+        let r = detect(&t, 0.5);
+        assert_eq!(r.text, "The cat sat");
+        assert!(!r.flagged(), "{:?}", r.spans);
+        let expected = (-(-0.1f64 - 0.2) / 2.0).exp();
+        assert!((r.perplexity - expected).abs() < 1e-12, "{}", r.perplexity);
+        // The same null in the content-array shape.
+        let t = parse_logprobs(r#"[{"token":"Hi","logprob":null},{"token":"!","logprob":-0.1}]"#)
+            .unwrap();
+        assert!(!t[0].has_logprob());
+        assert!(!detect(&t, 0.5).flagged());
+    }
+
+    #[test]
+    fn report_round_trips_through_json() {
+        let json = include_str!("../examples/logprobs/cuyp.json");
+        let r = detect(&parse_logprobs(json).unwrap(), 0.6);
+        let back: Report = serde_json::from_str(&serde_json::to_string(&r).unwrap()).unwrap();
+        // serde_json's default float parser can be off by one ulp, so
+        // compare the numbers approximately.
+        let close = |a: f64, b: f64| (a - b).abs() <= 1e-12 * a.abs().max(1.0);
+        assert_eq!((&back.text, back.token_count), (&r.text, r.token_count));
+        assert!(close(back.perplexity, r.perplexity) && close(back.mean_prob, r.mean_prob));
+        assert_eq!(back.spans.len(), r.spans.len());
+        for (a, b) in back.spans.iter().zip(&r.spans) {
+            assert_eq!(
+                (a.start, a.end, &a.text, &a.weakest_token),
+                (b.start, b.end, &b.text, &b.weakest_token)
+            );
+            assert!(close(a.min_prob, b.min_prob));
+            assert_eq!(a.alternatives.len(), b.alternatives.len());
+        }
+        let zero = detect(&[tok("a", 0.0)], 0.5);
+        assert!(zero.perplexity.is_infinite());
+        let back: Report = serde_json::from_str(&serde_json::to_string(&zero).unwrap()).unwrap();
+        assert!(back.perplexity.is_infinite());
+    }
+
+    #[test]
+    fn threshold_is_checked_or_clamped() {
+        let t = vec![tok("a", 0.3)];
+        assert!(try_detect(&t, f64::NAN).unwrap_err().0.is_nan());
+        assert!(try_detect(&t, -0.1).is_err());
+        assert!(try_detect(&t, 1.1).is_err());
+        assert!(try_detect(&t, 0.5).unwrap().flagged());
+        let r = detect(&t, f64::NAN);
+        assert!(!r.flagged());
+        assert_eq!(r.threshold, 0.0);
+        assert_eq!(detect(&t, 7.0).threshold, 1.0);
+        assert!(detect(&t, 7.0).flagged());
+    }
+
+    #[test]
+    fn candidate_prob_is_clamped() {
+        let mut w = tok("x", 0.2);
+        w.top_logprobs = vec![
+            Alternative {
+                token: "x".into(),
+                logprob: 0.5,
+            },
+            Alternative {
+                token: "y".into(),
+                logprob: f64::NAN,
+            },
+        ];
+        let r = detect(&[w], 0.5);
+        assert_eq!(r.spans[0].alternatives.len(), 1);
+        assert_eq!(r.spans[0].alternatives[0].prob, 1.0);
     }
 
     #[test]
@@ -591,7 +842,13 @@ mod tests {
 
     #[test]
     fn contractions_and_hyphens_follow_unicode_rules() {
-        let t = vec![tok(" don", 0.9), tok("'t", 0.2), tok(" well", 0.9), tok("-", 0.9), tok("known", 0.9)];
+        let t = vec![
+            tok(" don", 0.9),
+            tok("'t", 0.2),
+            tok(" well", 0.9),
+            tok("-", 0.9),
+            tok("known", 0.9),
+        ];
         let r = detect(&t, 0.5);
         assert_eq!(r.spans.len(), 1);
         assert_eq!(r.spans[0].text, " don't");
@@ -604,8 +861,14 @@ mod tests {
         let t = vec![tok("a", 0.5), tok("b", 0.5)];
         assert!((detect(&t, 0.5).perplexity - 2.0).abs() < 1e-9);
         let two = [
-            Candidate { token: "x".into(), prob: 0.4 },
-            Candidate { token: "y".into(), prob: 0.4 },
+            Candidate {
+                token: "x".into(),
+                prob: 0.4,
+            },
+            Candidate {
+                token: "y".into(),
+                prob: 0.4,
+            },
         ];
         assert!((top_k_entropy_bits(&two).unwrap() - 1.0).abs() < 1e-12);
         assert_eq!(top_k_entropy_bits(&[]), None);
@@ -636,7 +899,11 @@ mod tests {
             "Aelbert Cuyp died in 1691 in Dordrecht, Netherlands."
         );
         assert!(r.spans.iter().any(|s| s.text == " Dordrecht"));
-        let a = to_token_analysis(&tokens, &r);
-        assert!(a.validate().is_ok());
+        #[cfg(feature = "legacy")]
+        #[allow(deprecated)]
+        {
+            let a = to_token_analysis(&tokens, &r);
+            assert!(a.validate().is_ok());
+        }
     }
 }

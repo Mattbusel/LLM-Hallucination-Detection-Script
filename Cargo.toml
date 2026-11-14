@@ -1,6 +1,6 @@
 [package]
 name = "llm-token-visualizer"
-version = "0.5.0"
+version = "0.6.0"
 edition = "2021"
 rust-version = "1.88"
 description = "Flag low-confidence spans in LLM output from token logprobs, and render per-token confidence as terminal, HTML or Markdown"
@@ -9,8 +9,8 @@ repository = "https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script"
 readme = "README.md"
 documentation = "https://docs.rs/llm-token-visualizer"
 include = ["src/**/*", "examples/**/*", "tests/**/*", "benches/**/*", "README.md", "CHANGELOG.md", "LICENSE", "Cargo.toml", "Cargo.lock"]
-keywords = ["llm", "hallucination", "logprobs", "confidence", "cli"]
-categories = ["command-line-utilities", "text-processing"]
+keywords = ["llm", "logprobs", "hallucination", "uncertainty", "openai"]
+categories = ["science", "api-bindings", "text-processing", "command-line-utilities"]
 
 [package.metadata.docs.rs]
 all-features = true
@@ -28,31 +28,47 @@ pkg-url = "{ repo }/-/releases/v{ version }/downloads/llm-token-visualizer-windo
 pkg-fmt = "bin"
 
 [features]
-default = ["live"]
-# Live mode: call an OpenAI-compatible API. Disable with --no-default-features
-# for an offline-only build without an HTTP client.
-live = ["dep:ureq"]
+default = ["cli", "terminal", "legacy"]
+# The `llm-token-visualizer` binary. Library users can turn it off with
+# `default-features = false`, which leaves serde, serde_json,
+# unicode-segmentation and thiserror as the only dependencies.
+cli = ["dep:clap", "dep:anyhow", "terminal", "legacy"]
+# Colored terminal output: `report::terminal` and `renderer::TerminalRenderer`.
+terminal = ["dep:colored"]
+# The 0.1-era visualizer model (`data`, `renderer`, `utils`), deprecated in
+# 0.6.0. On by default for this release only.
+legacy = ["dep:anyhow"]
+# Live mode: call an OpenAI-compatible API with a blocking HTTP client
+# (`live` module, `--live` in the CLI). Not on by default since 0.6.0:
+# `cargo install llm-token-visualizer --features live`.
+live = ["dep:ureq", "dep:anyhow"]
 # Interop: tokens from async-openai chat completion responses (types only).
 async-openai = ["dep:async-openai"]
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-clap = { version = "4.0", features = ["derive"] }
-colored = "2.0"
-anyhow = "1.0"
 # Unicode word boundaries (UAX #29) for grouping tokens into words.
 unicode-segmentation = "1.12"
-thiserror = "1.0"
+thiserror = "2"
+clap = { version = "4.0", features = ["derive"], optional = true }
+colored = { version = "2.0", optional = true }
+anyhow = { version = "1.0", optional = true }
 ureq = { version = "2", optional = true }
 async-openai = { version = "0.42", default-features = false, features = ["chat-completion-types"], optional = true }
 
 [dev-dependencies]
+anyhow = "1.0"
 tempfile = "3.0"
 proptest = "1"
 criterion = "0.5"
 # The previous release, for benches/vs_0_4.rs.
 llm-token-visualizer-prev = { package = "llm-token-visualizer", version = "=0.4.0", default-features = false }
+
+[[bin]]
+name = "llm-token-visualizer"
+path = "src/main.rs"
+required-features = ["cli"]
 
 [[bench]]
 name = "vs_0_4"
