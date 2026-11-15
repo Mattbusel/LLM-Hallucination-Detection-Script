@@ -13,7 +13,7 @@ Raise the threshold to catch more (and noisier) spans, lower it to see only the 
 
 The colors in the terminal, HTML and Markdown reports come from `report::heat`, which interpolates between four stops: red at p 0.25 and below, orange at 0.55, yellow at 0.80, and a neutral grey at 0.97 and above.
 
-The code is in [`src/detect.rs`](../src/detect.rs) (parsing and span detection) and [`src/report.rs`](../src/report.rs) (colors and reports).
+The code is in [`src/formats.rs`](../src/formats.rs) (reading each provider's response), [`src/detect.rs`](../src/detect.rs) (span detection), [`src/stream.rs`](../src/stream.rs) (the same detection over a stream) and [`src/report.rs`](../src/report.rs) (colors and reports).
 
 ## Repository layout
 
@@ -21,7 +21,9 @@ The code is in [`src/detect.rs`](../src/detect.rs) (parsing and span detection) 
 src/
   main.rs       CLI (clap; feature "cli")
   lib.rs        crate docs and root re-exports of the detect API
-  detect.rs     logprob parsing and low-confidence span detection
+  detect.rs     low-confidence span detection (parse_logprobs is formats::parse_any)
+  formats.rs    reading logprobs from each provider's response shape (parse_any, Format)
+  stream.rs     StreamDetector: spans flagged while a response streams in (SSE / NDJSON)
   report.rs     detect-mode reports: HTML page, Markdown, terminal heatmap (feature "terminal")
   live.rs       OpenAI-compatible API client for --live (feature "live")
   data.rs       TokenAnalysis, TokenInfo, TokenFlag, ConfidenceLevel (deprecated, feature "legacy")
@@ -30,7 +32,8 @@ src/
   interop.rs    adapters for other crates (feature "async-openai")
 examples/logprobs/                real Llama 3.1 8B responses with logprobs
 examples/                         library examples over those samples
-tests/properties.rs               property tests (proptest) for the parser and detector
+tests/properties.rs               property tests (proptest) for the parser, detector and stream detector
+tests/providers.rs, stream.rs     every provider shape and recorded streams (tests/fixtures/providers/)
 benches/vs_0_4.rs                 criterion benchmark against the 0.4.0 release
 docs/                             project site, README images and these docs
 demo_data.json, sample_text.txt   example input for the visualizer

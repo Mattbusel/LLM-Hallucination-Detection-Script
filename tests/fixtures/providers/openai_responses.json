@@ -1,0 +1,628 @@
+{
+ "id": "resp_0a1b2c3d4e5f",
+ "object": "response",
+ "created_at": 1794718146,
+ "status": "completed",
+ "error": null,
+ "incomplete_details": null,
+ "model": "gpt-4.1-mini-2025-04-14",
+ "output": [
+  {
+   "id": "rs_0a1b2c3d4e5f",
+   "type": "reasoning",
+   "summary": []
+  },
+  {
+   "id": "msg_0a1b2c3d4e5f",
+   "type": "message",
+   "status": "completed",
+   "role": "assistant",
+   "content": [
+    {
+     "type": "output_text",
+     "annotations": [],
+     "logprobs": [
+      {
+       "token": "A",
+       "logprob": -0.4466412663459778,
+       "bytes": [
+        65
+       ],
+       "top_logprobs": [
+        {
+         "token": "A",
+         "logprob": -0.4466412663459778,
+         "bytes": [
+          65
+         ]
+        },
+        {
+         "token": "The",
+         "logprob": -1.3236783742904663,
+         "bytes": [
+          84,
+          104,
+          101
+         ]
+        },
+        {
+         "token": "In",
+         "logprob": -3.5048744678497314,
+         "bytes": [
+          73,
+          110
+         ]
+        }
+       ]
+      },
+      {
+       "token": "el",
+       "logprob": -0.000296338606858626,
+       "bytes": [
+        101,
+        108
+       ],
+       "top_logprobs": [
+        {
+         "token": "el",
+         "logprob": -0.000296338606858626,
+         "bytes": [
+          101,
+          108
+         ]
+        },
+        {
+         "token": "al",
+         "logprob": -9.937664985656738,
+         "bytes": [
+          97,
+          108
+         ]
+        },
+        {
+         "token": ".",
+         "logprob": -11.178414344787598,
+         "bytes": [
+          46
+         ]
+        }
+       ]
+      },
+      {
+       "token": "bert",
+       "logprob": -0.00014771122368983924,
+       "bytes": [
+        98,
+        101,
+        114,
+        116
+       ],
+       "top_logprobs": [
+        {
+         "token": "bert",
+         "logprob": -0.00014771122368983924,
+         "bytes": [
+          98,
+          101,
+          114,
+          116
+         ]
+        },
+        {
+         "token": "ber",
+         "logprob": -9.052667617797852,
+         "bytes": [
+          98,
+          101,
+          114
+         ]
+        },
+        {
+         "token": "berts",
+         "logprob": -11.712077140808105,
+         "bytes": [
+          98,
+          101,
+          114,
+          116,
+          115
+         ]
+        }
+       ]
+      },
+      {
+       "token": " Cu",
+       "logprob": -0.00025484233628958464,
+       "bytes": [
+        32,
+        67,
+        117
+       ],
+       "top_logprobs": [
+        {
+         "token": " Cu",
+         "logprob": -0.00025484233628958464,
+         "bytes": [
+          32,
+          67,
+          117
+         ]
+        },
+        {
+         "token": " Ku",
+         "logprob": -9.54832649230957,
+         "bytes": [
+          32,
+          75,
+          117
+         ]
+        },
+        {
+         "token": " van",
+         "logprob": -10.72208309173584,
+         "bytes": [
+          32,
+          118,
+          97,
+          110
+         ]
+        }
+       ]
+      },
+      {
+       "token": "yp",
+       "logprob": -0.0001465189561713487,
+       "bytes": [
+        121,
+        112
+       ],
+       "top_logprobs": [
+        {
+         "token": "yp",
+         "logprob": -0.0001465189561713487,
+         "bytes": [
+          121,
+          112
+         ]
+        },
+        {
+         "token": "yd",
+         "logprob": -9.831300735473633,
+         "bytes": [
+          121,
+          100
+         ]
+        },
+        {
+         "token": "ysen",
+         "logprob": -10.761224746704102,
+         "bytes": [
+          121,
+          115,
+          101,
+          110
+         ]
+        }
+       ]
+      },
+      {
+       "token": " died",
+       "logprob": -0.00431022746488452,
+       "bytes": [
+        32,
+        100,
+        105,
+        101,
+        100
+       ],
+       "top_logprobs": [
+        {
+         "token": " died",
+         "logprob": -0.00431022746488452,
+         "bytes": [
+          32,
+          100,
+          105,
+          101,
+          100
+         ]
+        },
+        {
+         "token": " lived",
+         "logprob": -6.915128231048584,
+         "bytes": [
+          32,
+          108,
+          105,
+          118,
+          101,
+          100
+         ]
+        },
+        {
+         "token": " (",
+         "logprob": -6.995555400848389,
+         "bytes": [
+          32,
+          40
+         ]
+        }
+       ]
+      },
+      {
+       "token": " in",
+       "logprob": -0.0006338577950373292,
+       "bytes": [
+        32,
+        105,
+        110
+       ],
+       "top_logprobs": [
+        {
+         "token": " in",
+         "logprob": -0.0006338577950373292,
+         "bytes": [
+          32,
+          105,
+          110
+         ]
+        },
+        {
+         "token": " on",
+         "logprob": -7.930172443389893,
+         "bytes": [
+          32,
+          111,
+          110
+         ]
+        },
+        {
+         "token": " at",
+         "logprob": -9.20976734161377,
+         "bytes": [
+          32,
+          97,
+          116
+         ]
+        }
+       ]
+      },
+      {
+       "token": " ",
+       "logprob": -0.035835132002830505,
+       "bytes": [
+        32
+       ],
+       "top_logprobs": [
+        {
+         "token": " ",
+         "logprob": -0.035835132002830505,
+         "bytes": [
+          32
+         ]
+        },
+        {
+         "token": " **",
+         "logprob": -4.215280532836914,
+         "bytes": [
+          32,
+          42,
+          42
+         ]
+        },
+        {
+         "token": " the",
+         "logprob": -4.584897994995117,
+         "bytes": [
+          32,
+          116,
+          104,
+          101
+         ]
+        }
+       ]
+      },
+      {
+       "token": "1",
+       "logprob": -0.00021000920969527215,
+       "bytes": [
+        49
+       ],
+       "top_logprobs": [
+        {
+         "token": "1",
+         "logprob": -0.00021000920969527215,
+         "bytes": [
+          49
+         ]
+        },
+        {
+         "token": "2",
+         "logprob": -9.672004699707031,
+         "bytes": [
+          50
+         ]
+        },
+        {
+         "token": "0",
+         "logprob": -9.884542465209961,
+         "bytes": [
+          48
+         ]
+        }
+       ]
+      },
+      {
+       "token": "6",
+       "logprob": -0.034181125462055206,
+       "bytes": [
+        54
+       ],
+       "top_logprobs": [
+        {
+         "token": "6",
+         "logprob": -0.034181125462055206,
+         "bytes": [
+          54
+         ]
+        },
+        {
+         "token": "7",
+         "logprob": -3.829860210418701,
+         "bytes": [
+          55
+         ]
+        },
+        {
+         "token": "9",
+         "logprob": -4.944131374359131,
+         "bytes": [
+          57
+         ]
+        }
+       ]
+      },
+      {
+       "token": "3",
+       "logprob": -2.2485766410827637,
+       "bytes": [
+        51
+       ],
+       "top_logprobs": [
+        {
+         "token": "6",
+         "logprob": -0.5077815651893616,
+         "bytes": [
+          54
+         ]
+        },
+        {
+         "token": "2",
+         "logprob": -1.5595394372940063,
+         "bytes": [
+          50
+         ]
+        },
+        {
+         "token": "3",
+         "logprob": -2.2485766410827637,
+         "bytes": [
+          51
+         ]
+        }
+       ]
+      },
+      {
+       "token": "0",
+       "logprob": -0.4885367453098297,
+       "bytes": [
+        48
+       ],
+       "top_logprobs": [
+        {
+         "token": "0",
+         "logprob": -0.4885367453098297,
+         "bytes": [
+          48
+         ]
+        },
+        {
+         "token": "8",
+         "logprob": -1.1609495878219604,
+         "bytes": [
+          56
+         ]
+        },
+        {
+         "token": "3",
+         "logprob": -3.941476583480835,
+         "bytes": [
+          51
+         ]
+        }
+       ]
+      },
+      {
+       "token": " in",
+       "logprob": -0.05963817238807678,
+       "bytes": [
+        32,
+        105,
+        110
+       ],
+       "top_logprobs": [
+        {
+         "token": " in",
+         "logprob": -0.05963817238807678,
+         "bytes": [
+          32,
+          105,
+          110
+         ]
+        },
+        {
+         "token": ".",
+         "logprob": -3.385043144226074,
+         "bytes": [
+          46
+         ]
+        },
+        {
+         "token": " at",
+         "logprob": -4.14888858795166,
+         "bytes": [
+          32,
+          97,
+          116
+         ]
+        }
+       ]
+      },
+      {
+       "token": " The",
+       "logprob": -2.571065664291382,
+       "bytes": [
+        32,
+        84,
+        104,
+        101
+       ],
+       "top_logprobs": [
+        {
+         "token": " Amsterdam",
+         "logprob": -1.2274367809295654,
+         "bytes": [
+          32,
+          65,
+          109,
+          115,
+          116,
+          101,
+          114,
+          100,
+          97,
+          109
+         ]
+        },
+        {
+         "token": " Haar",
+         "logprob": -1.4883447885513306,
+         "bytes": [
+          32,
+          72,
+          97,
+          97,
+          114
+         ]
+        },
+        {
+         "token": " Delft",
+         "logprob": -2.458571195602417,
+         "bytes": [
+          32,
+          68,
+          101,
+          108,
+          102,
+          116
+         ]
+        }
+       ]
+      },
+      {
+       "token": " Hague",
+       "logprob": -0.0002636660938151181,
+       "bytes": [
+        32,
+        72,
+        97,
+        103,
+        117,
+        101
+       ],
+       "top_logprobs": [
+        {
+         "token": " Hague",
+         "logprob": -0.0002636660938151181,
+         "bytes": [
+          32,
+          72,
+          97,
+          103,
+          117,
+          101
+         ]
+        },
+        {
+         "token": " Netherlands",
+         "logprob": -8.308940887451172,
+         "bytes": [
+          32,
+          78,
+          101,
+          116,
+          104,
+          101,
+          114,
+          108,
+          97,
+          110,
+          100,
+          115
+         ]
+        },
+        {
+         "token": "at",
+         "logprob": -11.899736404418945,
+         "bytes": [
+          97,
+          116
+         ]
+        }
+       ]
+      },
+      {
+       "token": ".",
+       "logprob": -0.05204661563038826,
+       "bytes": [
+        46
+       ],
+       "top_logprobs": [
+        {
+         "token": ".",
+         "logprob": -0.05204661563038826,
+         "bytes": [
+          46
+         ]
+        },
+        {
+         "token": ",",
+         "logprob": -3.0624797344207764,
+         "bytes": [
+          44
+         ]
+        },
+        {
+         "token": " (",
+         "logprob": -7.124100685119629,
+         "bytes": [
+          32,
+          40
+         ]
+        }
+       ]
+      }
+     ],
+     "text": "Aelbert Cuyp died in 1630 in The Hague."
+    }
+   ]
+  }
+ ],
+ "top_logprobs": 3,
+ "temperature": 1.0,
+ "usage": {
+  "input_tokens": 30,
+  "output_tokens": 16,
+  "total_tokens": 46
+ }
+}

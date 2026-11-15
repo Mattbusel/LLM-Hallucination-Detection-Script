@@ -40,8 +40,9 @@ pub enum ParseError {
     /// The response has no logprobs block at all (the request did not ask
     /// for logprobs, or the model does not return them).
     #[error(
-        "no token logprobs found; expected choices[0].logprobs.content \
-         (request the completion with \"logprobs\": true)"
+        "no token logprobs found in the response (request them: \"logprobs\": true for \
+         OpenAI-compatible APIs and Ollama, \"n_probs\" for llama.cpp's /completion, \
+         \"responseLogprobs\": true for Gemini)"
     )]
     NoLogprobs,
     /// The logprobs block is present but `null`.
@@ -198,11 +199,15 @@ impl Report {
     }
 }
 
-/// Extract the token list from any of these shapes:
-/// a full Chat Completions response (`choices[0].logprobs.content`),
-/// a `logprobs` object (`{"content": [...]}`), or a bare token array.
-/// Also reads the legacy completions shape (`tokens` + `token_logprobs`)
-/// and Gemini's `logprobsResult`.
+/// Extract the token list from a provider response, for the first choice.
+///
+/// Since 0.7.0 this is [`parse_any`](crate::formats::parse_any): it reads
+/// a full Chat Completions response (`choices[0].logprobs.content`), a
+/// `logprobs` object (`{"content": [...]}`) or a bare token array, the legacy
+/// completions shape (`tokens` + `token_logprobs`), the OpenAI Responses API,
+/// Ollama's native API, the llama.cpp server's `completion_probabilities`,
+/// Gemini's `logprobsResult` and Hugging Face TGI's `details.tokens`. See
+/// [`crate::formats`] for the list.
 ///
 /// Special tokens such as `<|eot_id|>` are dropped. A `null` logprob is kept
 /// as `NaN` (see the [module docs](self#unknown-logprobs)).
@@ -219,157 +224,7 @@ impl Report {
 /// assert!(matches!(parse_logprobs(no_logprobs), Err(ParseError::NoLogprobs)));
 /// ```
 pub fn parse_logprobs(json: &str) -> Result<Vec<LogprobToken>, ParseError> {
-    let value: Value = serde_json::from_str(json).map_err(ParseError::InvalidJson)?;
-    if let Some(err) = value.get("error") {
-        return Err(ParseError::ApiError(err.clone()));
-    }
-    // Completions-style shape (`tokens` + `token_logprobs`), which some
-    // servers return from Chat Completions too.
-    let legacy = value
-        .pointer("/choices/0/logprobs")
-        .or_else(|| Some(&value).filter(|v| v.get("token_logprobs").is_some()))
-        .filter(|l| l.get("tokens").is_some() && l.get("token_logprobs").is_some());
-    if let Some(l) = legacy {
-        let mut tokens = parse_legacy(l)?;
-        tokens.retain(|t| !is_special_token(&t.token));
-        if tokens.is_empty() {
-            return Err(ParseError::Empty);
-        }
-        return Ok(tokens);
-    }
-    if let Some(tokens) = parse_gemini(&value)? {
-        return Ok(tokens);
-    }
-    let content = if value.is_array() {
-        &value
-    } else if let Some(c) = value.pointer("/choices/0/logprobs/content") {
-        c
-    } else if let Some(c) = value.get("content") {
-        c
-    } else if value
-        .pointer("/choices/0/logprobs")
-        .is_some_and(Value::is_null)
-    {
-        return Err(ParseError::NullLogprobs);
-    } else {
-        return Err(ParseError::NoLogprobs);
-    };
-    if content.is_null() {
-        return Err(ParseError::NullLogprobs);
-    }
-    // Deserialize from the borrowed value: cloning a large `content` array
-    // first cost more than the detection itself.
-    let mut tokens: Vec<LogprobToken> = Vec::<LogprobToken>::deserialize(content)
-        .map_err(|e| ParseError::Malformed(format!("could not read logprobs tokens: {e}")))?;
-    // Drop end-of-turn and other special tokens (e.g. "<|eot_id|>") that some
-    // servers include in the logprobs but not in the message text.
-    tokens.retain(|t| !is_special_token(&t.token));
-    if tokens.is_empty() {
-        return Err(ParseError::Empty);
-    }
-    Ok(tokens)
-}
-
-/// Read `{"tokens": [..], "token_logprobs": [..], "top_logprobs": [..]}`,
-/// where each `top_logprobs` entry is either a `{token: logprob}` map or a
-/// list of `{"token", "logprob"}` objects.
-///
-/// A `null` entry in `token_logprobs` (the first token of an `echo: true`
-/// completion) becomes `NaN`, so [`detect`] skips it. Before 0.6.0 it became
-/// `-inf`: probability 0, always flagged, and an infinite perplexity.
-fn parse_legacy(l: &Value) -> Result<Vec<LogprobToken>, ParseError> {
-    let malformed = |m: &str| ParseError::Malformed(m.to_string());
-    let toks = l["tokens"]
-        .as_array()
-        .ok_or_else(|| malformed("logprobs.tokens is not a list"))?;
-    let lps = l["token_logprobs"]
-        .as_array()
-        .ok_or_else(|| malformed("logprobs.token_logprobs is not a list"))?;
-    if toks.len() != lps.len() {
-        return Err(malformed(
-            "logprobs.tokens and logprobs.token_logprobs have different lengths",
-        ));
-    }
-    let tops = l.get("top_logprobs").and_then(Value::as_array);
-    let mut out = Vec::with_capacity(toks.len());
-    for (i, (t, lp)) in toks.iter().zip(lps).enumerate() {
-        let token = t
-            .as_str()
-            .ok_or_else(|| malformed("a logprobs token is not a string"))?
-            .to_string();
-        let logprob = lp.as_f64().unwrap_or(f64::NAN);
-        let mut top_logprobs: Vec<Alternative> = match tops.and_then(|a| a.get(i)) {
-            Some(Value::Object(m)) => m
-                .iter()
-                .filter_map(|(k, v)| {
-                    v.as_f64().map(|lp| Alternative {
-                        token: k.clone(),
-                        logprob: lp,
-                    })
-                })
-                .collect(),
-            Some(v @ Value::Array(_)) => serde_json::from_value(v.clone()).unwrap_or_default(),
-            _ => Vec::new(),
-        };
-        top_logprobs.sort_by(|a, b| b.logprob.total_cmp(&a.logprob));
-        out.push(LogprobToken {
-            token,
-            logprob,
-            top_logprobs,
-        });
-    }
-    Ok(out)
-}
-
-/// Google Gemini's native `generateContent` response with
-/// `responseLogprobs: true`: `candidates[0].logprobsResult` holds
-/// `chosenCandidates` (`{token, logProbability}`) and, per position,
-/// `topCandidates[i].candidates`. Also accepts a bare `logprobsResult`.
-fn parse_gemini(value: &Value) -> Result<Option<Vec<LogprobToken>>, ParseError> {
-    let lr = value
-        .pointer("/candidates/0/logprobsResult")
-        .or_else(|| value.get("logprobsResult"));
-    let Some(lr) = lr else {
-        return Ok(None);
-    };
-    let chosen = lr
-        .get("chosenCandidates")
-        .and_then(Value::as_array)
-        .ok_or_else(|| {
-            ParseError::Malformed("logprobsResult has no chosenCandidates list".to_string())
-        })?;
-    let tops = lr.get("topCandidates").and_then(Value::as_array);
-    let cand = |c: &Value| -> Option<Alternative> {
-        Some(Alternative {
-            token: c.get("token")?.as_str()?.to_string(),
-            logprob: c.get("logProbability")?.as_f64()?,
-        })
-    };
-    let mut out = Vec::with_capacity(chosen.len());
-    for (i, c) in chosen.iter().enumerate() {
-        let Some(a) = cand(c) else {
-            return Err(ParseError::Malformed(format!(
-                "chosenCandidates[{i}] needs a token and a logProbability"
-            )));
-        };
-        let mut top: Vec<Alternative> = tops
-            .and_then(|t| t.get(i))
-            .and_then(|t| t.get("candidates"))
-            .and_then(Value::as_array)
-            .map(|v| v.iter().filter_map(cand).collect())
-            .unwrap_or_default();
-        top.sort_by(|a, b| b.logprob.total_cmp(&a.logprob));
-        out.push(LogprobToken {
-            token: a.token,
-            logprob: a.logprob,
-            top_logprobs: top,
-        });
-    }
-    out.retain(|t| !is_special_token(&t.token));
-    if out.is_empty() {
-        return Err(ParseError::Empty);
-    }
-    Ok(Some(out))
+    crate::formats::parse_any(json)
 }
 
 pub(crate) fn is_special_token(s: &str) -> bool {
@@ -417,11 +272,7 @@ fn words(tokens: &[LogprobToken]) -> Vec<(usize, usize)> {
 /// for such a threshold instead. Tokens without a logprob (`NaN`) are never
 /// flagged and are left out of the mean probability and perplexity.
 pub fn detect(tokens: &[LogprobToken], threshold: f64) -> Report {
-    let threshold = if threshold.is_nan() {
-        0.0
-    } else {
-        threshold.clamp(0.0, 1.0)
-    };
+    let threshold = effective_threshold(threshold);
     let text: String = tokens.iter().map(|t| t.token.as_str()).collect();
     let known: Vec<f64> = tokens
         .iter()
@@ -440,6 +291,28 @@ pub fn detect(tokens: &[LogprobToken], threshold: f64) -> Report {
         (-mean_lp).exp()
     };
 
+    Report {
+        threshold,
+        text,
+        token_count: tokens.len(),
+        mean_prob,
+        perplexity,
+        spans: find_spans(tokens, threshold),
+    }
+}
+
+/// The threshold [`detect`] uses for `threshold`: clamped to `0..=1`, and 0
+/// (nothing flagged) for `NaN`.
+pub(crate) fn effective_threshold(threshold: f64) -> f64 {
+    if threshold.is_nan() {
+        0.0
+    } else {
+        threshold.clamp(0.0, 1.0)
+    }
+}
+
+/// The flagged spans of [`detect`], for an already effective threshold.
+pub(crate) fn find_spans(tokens: &[LogprobToken], threshold: f64) -> Vec<Span> {
     // A word is flagged when any of its tokens with letters or digits is
     // below the threshold. Pure whitespace/punctuation never triggers a flag.
     let flagged_words: Vec<(usize, usize)> = words(tokens)
@@ -463,7 +336,7 @@ pub fn detect(tokens: &[LogprobToken], threshold: f64) -> Report {
         ranges.push((s, e));
     }
 
-    let spans = ranges
+    ranges
         .into_iter()
         .map(|(start, end)| {
             let weakest = (start..end)
@@ -491,16 +364,7 @@ pub fn detect(tokens: &[LogprobToken], threshold: f64) -> Report {
                 entropy_bits,
             }
         })
-        .collect();
-
-    Report {
-        threshold,
-        text,
-        token_count: tokens.len(),
-        mean_prob,
-        perplexity,
-        spans,
-    }
+        .collect()
 }
 
 /// Like [`detect`], but returns an error for a threshold that is `NaN` or

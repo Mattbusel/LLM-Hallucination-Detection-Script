@@ -1,0 +1,349 @@
+{
+ "candidates": [
+  {
+   "content": {
+    "parts": [
+     {
+      "text": "Aelbert Cuyp died in 1630 in The Hague."
+     }
+    ],
+    "role": "model"
+   },
+   "finishReason": "STOP",
+   "avgLogprobs": -0.3714240333874841,
+   "logprobsResult": {
+    "topCandidates": [
+     {
+      "candidates": [
+       {
+        "token": "A",
+        "logProbability": -0.4466412663459778
+       },
+       {
+        "token": "The",
+        "logProbability": -1.3236783742904663
+       },
+       {
+        "token": "In",
+        "logProbability": -3.5048744678497314
+       }
+      ]
+     },
+     {
+      "candidates": [
+       {
+        "token": "el",
+        "logProbability": -0.000296338606858626
+       },
+       {
+        "token": "al",
+        "logProbability": -9.937664985656738
+       },
+       {
+        "token": ".",
+        "logProbability": -11.178414344787598
+       }
+      ]
+     },
+     {
+      "candidates": [
+       {
+        "token": "bert",
+        "logProbability": -0.00014771122368983924
+       },
+       {
+        "token": "ber",
+        "logProbability": -9.052667617797852
+       },
+       {
+        "token": "berts",
+        "logProbability": -11.712077140808105
+       }
+      ]
+     },
+     {
+      "candidates": [
+       {
+        "token": " Cu",
+        "logProbability": -0.00025484233628958464
+       },
+       {
+        "token": " Ku",
+        "logProbability": -9.54832649230957
+       },
+       {
+        "token": " van",
+        "logProbability": -10.72208309173584
+       }
+      ]
+     },
+     {
+      "candidates": [
+       {
+        "token": "yp",
+        "logProbability": -0.0001465189561713487
+       },
+       {
+        "token": "yd",
+        "logProbability": -9.831300735473633
+       },
+       {
+        "token": "ysen",
+        "logProbability": -10.761224746704102
+       }
+      ]
+     },
+     {
+      "candidates": [
+       {
+        "token": " died",
+        "logProbability": -0.00431022746488452
+       },
+       {
+        "token": " lived",
+        "logProbability": -6.915128231048584
+       },
+       {
+        "token": " (",
+        "logProbability": -6.995555400848389
+       }
+      ]
+     },
+     {
+      "candidates": [
+       {
+        "token": " in",
+        "logProbability": -0.0006338577950373292
+       },
+       {
+        "token": " on",
+        "logProbability": -7.930172443389893
+       },
+       {
+        "token": " at",
+        "logProbability": -9.20976734161377
+       }
+      ]
+     },
+     {
+      "candidates": [
+       {
+        "token": " ",
+        "logProbability": -0.035835132002830505
+       },
+       {
+        "token": " **",
+        "logProbability": -4.215280532836914
+       },
+       {
+        "token": " the",
+        "logProbability": -4.584897994995117
+       }
+      ]
+     },
+     {
+      "candidates": [
+       {
+        "token": "1",
+        "logProbability": -0.00021000920969527215
+       },
+       {
+        "token": "2",
+        "logProbability": -9.672004699707031
+       },
+       {
+        "token": "0",
+        "logProbability": -9.884542465209961
+       }
+      ]
+     },
+     {
+      "candidates": [
+       {
+        "token": "6",
+        "logProbability": -0.034181125462055206
+       },
+       {
+        "token": "7",
+        "logProbability": -3.829860210418701
+       },
+       {
+        "token": "9",
+        "logProbability": -4.944131374359131
+       }
+      ]
+     },
+     {
+      "candidates": [
+       {
+        "token": "6",
+        "logProbability": -0.5077815651893616
+       },
+       {
+        "token": "2",
+        "logProbability": -1.5595394372940063
+       },
+       {
+        "token": "3",
+        "logProbability": -2.2485766410827637
+       }
+      ]
+     },
+     {
+      "candidates": [
+       {
+        "token": "0",
+        "logProbability": -0.4885367453098297
+       },
+       {
+        "token": "8",
+        "logProbability": -1.1609495878219604
+       },
+       {
+        "token": "3",
+        "logProbability": -3.941476583480835
+       }
+      ]
+     },
+     {
+      "candidates": [
+       {
+        "token": " in",
+        "logProbability": -0.05963817238807678
+       },
+       {
+        "token": ".",
+        "logProbability": -3.385043144226074
+       },
+       {
+        "token": " at",
+        "logProbability": -4.14888858795166
+       }
+      ]
+     },
+     {
+      "candidates": [
+       {
+        "token": " Amsterdam",
+        "logProbability": -1.2274367809295654
+       },
+       {
+        "token": " Haar",
+        "logProbability": -1.4883447885513306
+       },
+       {
+        "token": " Delft",
+        "logProbability": -2.458571195602417
+       }
+      ]
+     },
+     {
+      "candidates": [
+       {
+        "token": " Hague",
+        "logProbability": -0.0002636660938151181
+       },
+       {
+        "token": " Netherlands",
+        "logProbability": -8.308940887451172
+       },
+       {
+        "token": "at",
+        "logProbability": -11.899736404418945
+       }
+      ]
+     },
+     {
+      "candidates": [
+       {
+        "token": ".",
+        "logProbability": -0.05204661563038826
+       },
+       {
+        "token": ",",
+        "logProbability": -3.0624797344207764
+       },
+       {
+        "token": " (",
+        "logProbability": -7.124100685119629
+       }
+      ]
+     }
+    ],
+    "chosenCandidates": [
+     {
+      "token": "A",
+      "logProbability": -0.4466412663459778
+     },
+     {
+      "token": "el",
+      "logProbability": -0.000296338606858626
+     },
+     {
+      "token": "bert",
+      "logProbability": -0.00014771122368983924
+     },
+     {
+      "token": " Cu",
+      "logProbability": -0.00025484233628958464
+     },
+     {
+      "token": "yp",
+      "logProbability": -0.0001465189561713487
+     },
+     {
+      "token": " died",
+      "logProbability": -0.00431022746488452
+     },
+     {
+      "token": " in",
+      "logProbability": -0.0006338577950373292
+     },
+     {
+      "token": " ",
+      "logProbability": -0.035835132002830505
+     },
+     {
+      "token": "1",
+      "logProbability": -0.00021000920969527215
+     },
+     {
+      "token": "6",
+      "logProbability": -0.034181125462055206
+     },
+     {
+      "token": "3",
+      "logProbability": -2.2485766410827637
+     },
+     {
+      "token": "0",
+      "logProbability": -0.4885367453098297
+     },
+     {
+      "token": " in",
+      "logProbability": -0.05963817238807678
+     },
+     {
+      "token": " The",
+      "logProbability": -2.571065664291382
+     },
+     {
+      "token": " Hague",
+      "logProbability": -0.0002636660938151181
+     },
+     {
+      "token": ".",
+      "logProbability": -0.05204661563038826
+     }
+    ]
+   }
+  }
+ ],
+ "usageMetadata": {
+  "promptTokenCount": 20,
+  "candidatesTokenCount": 16,
+  "totalTokenCount": 36
+ },
+ "modelVersion": "gemini-2.0-flash",
+ "responseId": "kB3mZ0a1b2c3d4e5f"
+}

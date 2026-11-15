@@ -1,0 +1,1 @@
+{"id":"cmpl-913","object":"text_completion","created":1794718147,"model":"gemma4:e2b-it-qat","system_fingerprint":"fp_ollama","choices":[{"text":"","index":0,"finish_reason":"length"}],"usage":{"prompt_tokens":37,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":32,"total_tokens":69}}

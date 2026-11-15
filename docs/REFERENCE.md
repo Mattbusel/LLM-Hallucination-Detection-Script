@@ -8,7 +8,7 @@ Run `llm-token-visualizer --help` for the same list.
 
 | Flag | Default | What it does |
 |---|---|---|
-| `--logprobs-file <PATH>` | | Detect: a Chat Completions response (or its logprobs) saved as JSON; `-` reads stdin |
+| `--logprobs-file <PATH>` | | Detect: a response with token logprobs saved as JSON (any shape listed below), or a recorded SSE / NDJSON stream; `-` reads stdin |
 | `--live <PROMPT>` | | Detect: send this prompt to an OpenAI-compatible API (needs `OPENAI_API_KEY`) and analyze the answer |
 | `--model <MODEL>` | `gpt-4o-mini` | Model for `--live` |
 | `--max-tokens <N>` | `200` | Max tokens for `--live` |
@@ -50,7 +50,19 @@ llm-token-visualizer --logprobs-file answer.json --format markdown >> "$GITHUB_S
 
 ## Input formats
 
-`--logprobs-file` accepts a full Chat Completions response saved as JSON, just its `logprobs` object (`{"content": [...]}`), or a bare array of `{"token", "logprob", "top_logprobs"}` entries. Use `-` to read stdin. Request completions with `"logprobs": true` and, for alternatives, `"top_logprobs": 3` or more. Special tokens such as `<|eot_id|>` are ignored.
+`--logprobs-file` (and `parse_any` in the library) reads the response as saved, whichever API it came from; the shape is detected from its keys. Use `-` to read stdin. Special tokens such as `<|eot_id|>` are ignored.
+
+| API | Ask for logprobs with | Where they are |
+|---|---|---|
+| OpenAI Chat Completions, and vLLM, SGLang, Fireworks, Groq, DeepSeek, OpenRouter, Together, Ollama `/v1`, llama.cpp `/v1`, TGI `/v1` | `"logprobs": true, "top_logprobs": 3` | `choices[i].logprobs.content` |
+| OpenAI legacy completions, vLLM `/v1/completions`, Together | `"logprobs": 3` | `choices[i].logprobs.tokens` / `token_logprobs` / `top_logprobs` |
+| OpenAI Responses API | `"include": ["message.output_text.logprobs"], "top_logprobs": 3` | `output[].content[].logprobs` |
+| Ollama `/api/chat`, `/api/generate` | `"logprobs": true, "top_logprobs": 3` | top-level `logprobs` |
+| llama.cpp server `/completion` | `"n_probs": 3` (optionally `"post_sampling_probs": true`) | `completion_probabilities` |
+| Google Gemini / Vertex AI `generateContent` | `"generationConfig": {"responseLogprobs": true, "logprobs": 3}` | `candidates[i].logprobsResult` |
+| Hugging Face TGI `/generate` | `"parameters": {"details": true, "top_n_tokens": 3}` | `details.tokens`, `details.top_tokens` |
+
+A bare `logprobs` object (`{"content": [...]}`) or array of `{"token", "logprob", "top_logprobs"}` entries works too. A recorded stream (the output of `curl -N` against any of these APIs with `"stream": true`: SSE `data:` lines, or Ollama's one JSON object per line) is read as well. JSON written by Python with `-Infinity` logprobs (vLLM) is accepted; `-Infinity` counts as probability 0.
 
 ## Live mode
 
@@ -116,14 +128,14 @@ Confidence file format:
 
 ```toml
 [dependencies]
-llm-token-visualizer = "0.3"
+llm-token-visualizer = { version = "0.7", default-features = false }
 ```
 
 ```rust
-use llm_token_visualizer::detect::{detect, parse_logprobs};
+use llm_token_visualizer::{detect, parse_any};
 use llm_token_visualizer::report::{self, Meta};
 
-let tokens = parse_logprobs(&response_json)?;
+let tokens = parse_any(&response_json)?;
 let report = detect(&tokens, 0.5);
 for span in &report.spans {
     println!("{}: {}", span.text, span.describe());
@@ -134,6 +146,27 @@ let meta = Meta::from_response("answer.json", &response_json);
 let html = report::html(&tokens, &report, &meta);
 let md = report::markdown(&tokens, &report, &meta);
 ```
+
+### Streaming
+
+`StreamDetector` flags spans while the answer streams in. Feed it the response body as it arrives (SSE or NDJSON bytes, cut anywhere) and each call returns the spans that just became final, usually a few tokens after the model wrote them. Over the whole stream they are exactly the spans `detect` finds in the complete answer.
+
+```rust
+use llm_token_visualizer::StreamDetector;
+
+let mut det = StreamDetector::new(0.5);
+for chunk in response_body_chunks {
+    for span in det.push_sse(&chunk)? {
+        println!("unsure: {}", span.describe());
+    }
+}
+for span in det.finish()? {
+    println!("unsure: {}", span.describe());
+}
+let report = det.report(); // the same Report `detect` returns
+```
+
+`push_event` takes one chunk's JSON instead, and `push_tokens` takes tokens you already parsed. `missing_logprobs()` says whether the chunks had text but no logprobs (the request did not ask for them).
 
 `detect::to_token_analysis` plus `visualize_tokens` still render detections with the visualizer's renderers, and `analyze_with_issues` and `quick_analyze` are still available. Full API docs: [docs.rs/llm-token-visualizer](https://docs.rs/llm-token-visualizer).
 

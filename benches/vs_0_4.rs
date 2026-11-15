@@ -1,5 +1,6 @@
 //! This release against 0.4.0 on the same input: parse a 4,000-token Chat
-//! Completions response and flag low-confidence spans.
+//! Completions response and flag low-confidence spans. Also the cost of
+//! following that answer as a stream with `StreamDetector`.
 //!
 //! Run: `cargo bench --bench vs_0_4`
 
@@ -47,6 +48,29 @@ fn bench(c: &mut Criterion) {
         0.6,
     );
     assert_eq!(a.spans.len(), b.spans.len());
+
+    // Following the same answer as a stream, one token per push, against
+    // one `detect` call on the finished answer.
+    let tokens = llm_token_visualizer::parse_any(&json).unwrap();
+    let mut g = c.benchmark_group("stream_4k_tokens");
+    g.bench_function("StreamDetector, one token per push", |b| {
+        b.iter(|| {
+            let mut det = llm_token_visualizer::StreamDetector::new(0.6);
+            let mut n = 0;
+            for t in black_box(&tokens) {
+                n += det.push_token(t.clone()).len();
+            }
+            n + det.finish().unwrap().len()
+        })
+    });
+    g.bench_function("detect once at the end", |b| {
+        b.iter(|| {
+            llm_token_visualizer::detect(black_box(&tokens), 0.6)
+                .spans
+                .len()
+        })
+    });
+    g.finish();
 }
 
 criterion_group!(benches, bench);

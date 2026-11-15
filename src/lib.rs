@@ -34,14 +34,24 @@
 //!
 //! # Which API to use
 //!
-//! - [`parse_logprobs`] reads a provider response (OpenAI-style Chat
-//!   Completions, legacy completions, Gemini, or a bare token array) into
-//!   [`LogprobToken`]s. Failures are a typed [`ParseError`], so you can tell
-//!   "the request did not ask for logprobs" ([`ParseError::NoLogprobs`]) from
-//!   bad JSON or a provider error.
+//! - [`parse_any`] (also reachable as [`parse_logprobs`]) reads a provider
+//!   response into [`LogprobToken`]s, detecting its shape: OpenAI Chat
+//!   Completions and the servers that copy it (vLLM, Together, Fireworks,
+//!   OpenRouter, Groq, Ollama and llama.cpp `/v1`), legacy completions, the
+//!   OpenAI Responses API, Ollama's native `/api/chat`, the llama.cpp
+//!   server's `/completion` with `n_probs`, Google Gemini, Hugging Face TGI,
+//!   or a bare token array. [`formats`] lists the shapes ([`Format`]) and
+//!   has [`parse_choice`] for `n` > 1. Failures are a typed [`ParseError`],
+//!   so you can tell "the request did not ask for logprobs"
+//!   ([`ParseError::NoLogprobs`]) from bad JSON or a provider error.
 //! - [`detect()`] turns the tokens into a [`Report`]: flagged [`Span`]s,
 //!   mean probability and perplexity. It never panics; [`try_detect`] also
 //!   rejects a `NaN` or out-of-range threshold.
+//! - [`StreamDetector`] flags spans while a response streams in: feed it SSE
+//!   or NDJSON bytes as they arrive (any of the shapes above, chunked), and
+//!   each call returns the spans that just became final. Together they are
+//!   exactly the spans `detect` gives for the whole answer.
+//!   [`parse_stream`] reads a recorded stream into tokens.
 //! - [`report`] renders a report as a self-contained HTML page or Markdown,
 //!   and as a colored terminal heatmap with the `terminal` feature.
 //! - [`interop`] takes tokens straight from other crates' response types.
@@ -66,7 +76,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! llm-token-visualizer = { version = "0.6", default-features = false }
+//! llm-token-visualizer = { version = "0.7", default-features = false }
 //! ```
 //!
 //! The command-line tool is `llm-token-visualizer`
@@ -89,16 +99,20 @@
 pub struct ReadmeDoctests;
 
 pub mod detect;
+pub mod formats;
 pub mod interop;
 #[cfg(feature = "live")]
 #[cfg_attr(docsrs, doc(cfg(feature = "live")))]
 pub mod live;
 pub mod report;
+pub mod stream;
 
 pub use detect::{
     detect, parse_logprobs, top_k_entropy_bits, try_detect, Alternative, Candidate,
     InvalidThreshold, LogprobToken, ParseError, Report, Span, DEFAULT_THRESHOLD,
 };
+pub use formats::{parse_any, parse_choice, Format};
+pub use stream::{parse_stream, StreamDetector};
 
 /// Input types for the visualizer renderers.
 #[cfg(feature = "legacy")]

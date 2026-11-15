@@ -1,6 +1,34 @@
 # Changelog
 
-## 0.6.1 (unreleased)
+## 0.7.0 (unreleased)
+
+Logprobs from every major provider's own response format, and detection while the answer is still streaming. No breaking changes to the API; the lean core (`default-features = false`) still depends only on serde, serde_json, unicode-segmentation and thiserror and still builds for `wasm32-unknown-unknown`.
+
+- **New: `parse_any(json)`** reads token logprobs from whichever API produced the response, detecting the shape from its keys (`formats::Format`):
+  - OpenAI Chat Completions and the servers that copy it (vLLM, SGLang, Fireworks, Groq, DeepSeek, OpenRouter, Ollama `/v1`, llama.cpp `/v1`, TGI `/v1`, Gemini's OpenAI-compatible endpoint);
+  - legacy completions (`tokens` + `token_logprobs`: OpenAI, vLLM `/v1/completions`, Together);
+  - **OpenAI Responses API** (`output[].content[].logprobs`, requested with `include: ["message.output_text.logprobs"]`), a `response.completed` event, or a single `response.output_text.delta` event;
+  - **Ollama's native API** (`/api/chat` and `/api/generate` with `"logprobs": true`: a top-level `logprobs` list);
+  - **llama.cpp server `/completion` with `n_probs`** (`completion_probabilities`, as `logprob` / `top_logprobs`, as `prob` / `top_probs` with `post_sampling_probs`, and the older `content` / `probs: [{tok_str, prob}]` form; end-of-turn tokens, which llama.cpp writes as empty text, are dropped);
+  - **Google Gemini / Vertex AI** `candidates[i].logprobsResult` (already read since 0.5.0), now also when Gemini leaves out a `logProbability` of 0 (its JSON omits default values; this was a parse error);
+  - **Hugging Face TGI** `/generate` with `details: true` (`details.tokens` and `details.top_tokens`, also inside the Inference API's one-element list; tokens marked `special` are dropped);
+  - Together's stream chunks, whose `logprobs` is a single number;
+  - a bare token list or `{"content": [...]}` as before.
+- `parse_logprobs` is now `parse_any`, so the CLI's `--logprobs-file` and the Python package read all of these too. Responses that parsed in 0.6 give the same tokens (the 0.6 unit, property and Python tests pass unchanged), except that a `choices` entry is now found by its `index` field when one names the requested choice.
+- **New: `parse_choice(json, n)`** for responses made with `n` > 1 (and Gemini `candidateCount`): the choice whose `index` is `n`, or the `n`th entry. `formats::parse_value` also returns the `Format`, `formats::detect_format` names the shape without parsing, and `formats::parse_as` reads a response as a given format.
+- **New: `StreamDetector`** (`stream` module) flags spans while a response streams in. `push_sse(bytes)` takes the raw body of an SSE or NDJSON stream in whatever pieces the network delivers (cut inside a line or a UTF-8 character is fine), `push_event(json)` one chunk's JSON, `push_tokens` tokens you already have. Each call returns the spans that just became final; `finish()` returns the rest. A span is returned once a later word with a non-whitespace token is settled, so in the recorded Ollama stream in the tests the flagged year in "died in 1620 in The Hague" comes out when " The" arrives, not at the end. All chunk shapes above work, including Responses API events (deltas only; the `.done` and `response.completed` events that repeat the text are not counted twice), Ollama's NDJSON, llama.cpp `/completion` streams, Gemini `streamGenerateContent?alt=sse` and TGI `/generate_stream`.
+  - The spans returned over a stream are exactly the spans `detect` gives for the whole answer, in order, and `report()` after `finish()` equals `detect`'s report. Checked by property tests over random token streams cut at random points (2,048 cases per run; 60,000 run once while developing) with spaces, line breaks, numbers like `3.5`, contractions, CJK, emoji and combining marks, and over every recorded stream cut into chunks of 1 byte to the whole file.
+  - Only the tokens after the last settled word boundary are re-read on each push: following a 4,000-token answer one token at a time takes about 2.8 ms, against 0.3 ms for one `detect` call on the finished answer (`benches/vs_0_4.rs`, new `stream_4k_tokens` group).
+  - `missing_logprobs()` says when chunks carried text but no logprobs (the request did not ask for them), `is_done()` when the stream said it ended (`[DONE]`, `response.completed`, `"done": true`, `"stop": true`). Error events (`{"error": ...}`, Responses `error` and `response.failed`) are `ParseError::ApiError`. `with_choice(n)` follows another choice; chunks for other choices are skipped.
+  - **New: `parse_stream(text)`** reads a whole recorded stream (`curl -N` output) into tokens.
+- CLI: `--logprobs-file` also reads a recorded SSE or NDJSON stream.
+- JSON with the `NaN`, `Infinity` and `-Infinity` literals Python's `json` module writes (vLLM writes `-inf` logprobs that way) is read instead of failing as invalid JSON: `-Infinity` is a probability of 0, `NaN` an unknown logprob.
+- Fixed: a response with `"error": null` (every OpenAI Responses API object has one) was reported as `ParseError::ApiError(null)`.
+- `ParseError::NoLogprobs`'s message no longer points at `choices[0].logprobs.content` only; it says how to request logprobs from OpenAI-compatible APIs, Ollama, llama.cpp and Gemini. A llama.cpp `/completion` response without `n_probs` is now `NoLogprobs` (it was `Malformed`).
+- Test fixtures (`tests/fixtures/providers/`): captured on 2026-11-15 from a local Ollama 0.40.16 (`gemma4:e2b-it-qat`: `/api/chat`, streamed and not, `/api/generate`, `/v1/chat/completions` streamed and not, and `/v1/completions` and `/v1/responses`, which ignore the logprobs parameters) and from the llama.cpp server bundled with it (`/completion` with `n_probs`, with `post_sampling_probs`, streamed, plus `/v1/completions` and a streamed `/v1/chat/completions`). The OpenAI Responses, Gemini, TGI, Together, Fireworks and vLLM fixtures are hand-written in each provider's documented shape, using the token logprobs of the Ollama capture, and are checked to give back exactly those tokens.
+- Python package: the same new formats through `score()` and `gate()` (it calls the Rust parser); version 0.7.0 to match.
+
+## 0.6.1 (2026-11-15)
 
 A Python package, and character offsets for spans. No breaking changes.
 

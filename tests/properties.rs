@@ -3,7 +3,8 @@
 //! never flagged and never poison the perplexity.
 
 use llm_token_visualizer::{
-    detect, parse_logprobs, try_detect, Alternative, LogprobToken, ParseError, Report,
+    detect, parse_any, parse_logprobs, try_detect, Alternative, LogprobToken, ParseError, Report,
+    StreamDetector,
 };
 use proptest::prelude::*;
 
@@ -200,5 +201,128 @@ proptest! {
         prop_assert_eq!(back.spans.len(), r.spans.len());
         prop_assert_eq!(&back.text, &r.text);
         prop_assert!((back.perplexity - r.perplexity).abs() <= 1e-9 * r.perplexity.max(1.0));
+    }
+}
+
+/// Token text for stream tests: words, subwords, numbers, spaces, line
+/// breaks, punctuation that can join words ("3.5", "don't"), CJK, emoji,
+/// combining marks, special tokens and arbitrary characters.
+fn stream_token() -> impl Strategy<Value = LogprobToken> {
+    (
+        prop_oneof![
+            Just(" ".to_string()),
+            Just("  ".to_string()),
+            Just("\n".to_string()),
+            Just("\r\n".to_string()),
+            Just(".".to_string()),
+            Just(",".to_string()),
+            Just("'".to_string()),
+            Just("-".to_string()),
+            Just("3".to_string()),
+            Just(" 16".to_string()),
+            Just("e\u{301}".to_string()),
+            Just("\u{301}".to_string()),
+            Just("\u{200d}".to_string()),
+            Just("😀".to_string()),
+            Just("🇳🇱".to_string()),
+            Just("埃".to_string()),
+            Just("黎".to_string()),
+            Just("。".to_string()),
+            Just("カ".to_string()),
+            Just("<|eot_id|>".to_string()),
+            "[ a-z]{1,5}",
+            "[ a-z0-9.,'\n-]{1,4}",
+            r"\PC{1,3}",
+        ],
+        prop_oneof![
+            4 => 0.0f64..1.0,
+            1 => Just(1.0),
+            1 => Just(f64::NAN),
+            1 => Just(0.0),
+        ],
+        prop::collection::vec(("[a-z ]{1,4}", -10.0f64..0.0), 0..3),
+    )
+        .prop_map(|(token, p, alts)| LogprobToken {
+            token,
+            logprob: p.ln(),
+            top_logprobs: alts
+                .into_iter()
+                .map(|(token, logprob)| Alternative { token, logprob })
+                .collect(),
+        })
+}
+
+proptest! {
+    #![proptest_config(ProptestConfig::with_cases(2048))]
+
+    /// Feeding tokens to a `StreamDetector` in any batches gives exactly the
+    /// spans and report of `detect` on the whole list, each span once.
+    #[test]
+    fn stream_detector_equals_detect(
+        tokens in prop::collection::vec(stream_token(), 0..80),
+        cuts in prop::collection::vec(0usize..80, 0..12),
+        threshold in prop_oneof![0.0f64..=1.0, Just(0.5), Just(1.0)],
+    ) {
+        let mut cuts: Vec<usize> = cuts.into_iter().filter(|&c| c <= tokens.len()).collect();
+        cuts.push(0);
+        cuts.push(tokens.len());
+        cuts.sort_unstable();
+        let mut det = StreamDetector::new(threshold);
+        let mut spans = Vec::new();
+        for w in cuts.windows(2) {
+            spans.extend(det.push_tokens(tokens[w[0]..w[1]].iter().cloned()));
+        }
+        spans.extend(det.finish().unwrap());
+        let kept: Vec<LogprobToken> = tokens
+            .iter()
+            .filter(|t| !(t.token.starts_with("<|") && t.token.ends_with("|>")))
+            .cloned()
+            .collect();
+        let want = detect(&kept, threshold);
+        prop_assert_eq!(&spans, &want.spans);
+        prop_assert_eq!(det.report(), want);
+    }
+
+    /// The same tokens sent as an SSE stream, cut at any byte, give the same
+    /// spans.
+    #[test]
+    fn sse_bytes_cut_anywhere(
+        tokens in prop::collection::vec(stream_token(), 1..30),
+        size in 1usize..40,
+        threshold in 0.0f64..=1.0,
+    ) {
+        let tokens: Vec<LogprobToken> = tokens
+            .into_iter()
+            .filter(|t| t.logprob.is_finite() && !(t.token.starts_with("<|") && t.token.ends_with("|>")))
+            .collect();
+        let mut sse = String::new();
+        for t in &tokens {
+            let chunk = serde_json::json!({"choices": [{"index": 0,
+                "delta": {"content": t.token},
+                "logprobs": {"content": [t]}}]});
+            sse.push_str(&format!("data: {chunk}\n\n"));
+        }
+        sse.push_str("data: [DONE]\n\n");
+        let mut det = StreamDetector::new(threshold);
+        let mut spans = Vec::new();
+        for piece in sse.as_bytes().chunks(size) {
+            spans.extend(det.push_sse(piece).unwrap());
+        }
+        spans.extend(det.finish().unwrap());
+        prop_assert!(det.is_done());
+        prop_assert_eq!(det.tokens().len(), tokens.len());
+        let want = detect(det.tokens(), threshold);
+        prop_assert_eq!(&spans, &want.spans);
+    }
+
+    /// The stream reader never panics on arbitrary input.
+    #[test]
+    fn stream_reader_never_panics(s in r"(data: |\{|\[|\n|[ -~]|\PC){0,200}", size in 1usize..20) {
+        let mut det = StreamDetector::new(0.5);
+        for piece in s.as_bytes().chunks(size) {
+            let _ = det.push_sse(piece);
+        }
+        let _ = det.finish();
+        let _ = parse_any(&s);
     }
 }

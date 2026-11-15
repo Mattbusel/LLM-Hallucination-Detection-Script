@@ -1,0 +1,36 @@
+data: {"id":"8f5e0a1b2c3d4e5f","object":"chat.completion.chunk","created":1794718146,"model":"meta-llama/Llama-3.3-70B-Instruct-Turbo","choices":[{"index":0,"text":"A","logprobs":-0.4466412663459778,"finish_reason":null,"seed":null,"delta":{"token_id":1000,"role":"assistant","content":"A","tool_calls":null}}]}
+
+data: {"id":"8f5e0a1b2c3d4e5f","object":"chat.completion.chunk","created":1794718146,"model":"meta-llama/Llama-3.3-70B-Instruct-Turbo","choices":[{"index":0,"text":"el","logprobs":-0.000296338606858626,"finish_reason":null,"seed":null,"delta":{"token_id":1001,"role":"assistant","content":"el","tool_calls":null}}]}
+
+data: {"id":"8f5e0a1b2c3d4e5f","object":"chat.completion.chunk","created":1794718146,"model":"meta-llama/Llama-3.3-70B-Instruct-Turbo","choices":[{"index":0,"text":"bert","logprobs":-0.00014771122368983924,"finish_reason":null,"seed":null,"delta":{"token_id":1002,"role":"assistant","content":"bert","tool_calls":null}}]}
+
+data: {"id":"8f5e0a1b2c3d4e5f","object":"chat.completion.chunk","created":1794718146,"model":"meta-llama/Llama-3.3-70B-Instruct-Turbo","choices":[{"index":0,"text":" Cu","logprobs":-0.00025484233628958464,"finish_reason":null,"seed":null,"delta":{"token_id":1003,"role":"assistant","content":" Cu","tool_calls":null}}]}
+
+data: {"id":"8f5e0a1b2c3d4e5f","object":"chat.completion.chunk","created":1794718146,"model":"meta-llama/Llama-3.3-70B-Instruct-Turbo","choices":[{"index":0,"text":"yp","logprobs":-0.0001465189561713487,"finish_reason":null,"seed":null,"delta":{"token_id":1004,"role":"assistant","content":"yp","tool_calls":null}}]}
+
+data: {"id":"8f5e0a1b2c3d4e5f","object":"chat.completion.chunk","created":1794718146,"model":"meta-llama/Llama-3.3-70B-Instruct-Turbo","choices":[{"index":0,"text":" died","logprobs":-0.00431022746488452,"finish_reason":null,"seed":null,"delta":{"token_id":1005,"role":"assistant","content":" died","tool_calls":null}}]}
+
+data: {"id":"8f5e0a1b2c3d4e5f","object":"chat.completion.chunk","created":1794718146,"model":"meta-llama/Llama-3.3-70B-Instruct-Turbo","choices":[{"index":0,"text":" in","logprobs":-0.0006338577950373292,"finish_reason":null,"seed":null,"delta":{"token_id":1006,"role":"assistant","content":" in","tool_calls":null}}]}
+
+data: {"id":"8f5e0a1b2c3d4e5f","object":"chat.completion.chunk","created":1794718146,"model":"meta-llama/Llama-3.3-70B-Instruct-Turbo","choices":[{"index":0,"text":" ","logprobs":-0.035835132002830505,"finish_reason":null,"seed":null,"delta":{"token_id":1007,"role":"assistant","content":" ","tool_calls":null}}]}
+
+data: {"id":"8f5e0a1b2c3d4e5f","object":"chat.completion.chunk","created":1794718146,"model":"meta-llama/Llama-3.3-70B-Instruct-Turbo","choices":[{"index":0,"text":"1","logprobs":-0.00021000920969527215,"finish_reason":null,"seed":null,"delta":{"token_id":1008,"role":"assistant","content":"1","tool_calls":null}}]}
+
+data: {"id":"8f5e0a1b2c3d4e5f","object":"chat.completion.chunk","created":1794718146,"model":"meta-llama/Llama-3.3-70B-Instruct-Turbo","choices":[{"index":0,"text":"6","logprobs":-0.034181125462055206,"finish_reason":null,"seed":null,"delta":{"token_id":1009,"role":"assistant","content":"6","tool_calls":null}}]}
+
+data: {"id":"8f5e0a1b2c3d4e5f","object":"chat.completion.chunk","created":1794718146,"model":"meta-llama/Llama-3.3-70B-Instruct-Turbo","choices":[{"index":0,"text":"3","logprobs":-2.2485766410827637,"finish_reason":null,"seed":null,"delta":{"token_id":1010,"role":"assistant","content":"3","tool_calls":null}}]}
+
+data: {"id":"8f5e0a1b2c3d4e5f","object":"chat.completion.chunk","created":1794718146,"model":"meta-llama/Llama-3.3-70B-Instruct-Turbo","choices":[{"index":0,"text":"0","logprobs":-0.4885367453098297,"finish_reason":null,"seed":null,"delta":{"token_id":1011,"role":"assistant","content":"0","tool_calls":null}}]}
+
+data: {"id":"8f5e0a1b2c3d4e5f","object":"chat.completion.chunk","created":1794718146,"model":"meta-llama/Llama-3.3-70B-Instruct-Turbo","choices":[{"index":0,"text":" in","logprobs":-0.05963817238807678,"finish_reason":null,"seed":null,"delta":{"token_id":1012,"role":"assistant","content":" in","tool_calls":null}}]}
+
+data: {"id":"8f5e0a1b2c3d4e5f","object":"chat.completion.chunk","created":1794718146,"model":"meta-llama/Llama-3.3-70B-Instruct-Turbo","choices":[{"index":0,"text":" The","logprobs":-2.571065664291382,"finish_reason":null,"seed":null,"delta":{"token_id":1013,"role":"assistant","content":" The","tool_calls":null}}]}
+
+data: {"id":"8f5e0a1b2c3d4e5f","object":"chat.completion.chunk","created":1794718146,"model":"meta-llama/Llama-3.3-70B-Instruct-Turbo","choices":[{"index":0,"text":" Hague","logprobs":-0.0002636660938151181,"finish_reason":null,"seed":null,"delta":{"token_id":1014,"role":"assistant","content":" Hague","tool_calls":null}}]}
+
+data: {"id":"8f5e0a1b2c3d4e5f","object":"chat.completion.chunk","created":1794718146,"model":"meta-llama/Llama-3.3-70B-Instruct-Turbo","choices":[{"index":0,"text":".","logprobs":-0.05204661563038826,"finish_reason":null,"seed":null,"delta":{"token_id":1015,"role":"assistant","content":".","tool_calls":null}}]}
+
+data: {"id":"8f5e0a1b2c3d4e5f","object":"chat.completion.chunk","created":1794718146,"model":"meta-llama/Llama-3.3-70B-Instruct-Turbo","choices":[{"index":0,"text":"","logprobs":null,"finish_reason":"eos","seed":7,"delta":{"token_id":2,"role":"assistant","content":"","tool_calls":null}}],"usage":{"prompt_tokens":30,"completion_tokens":16,"total_tokens":46}}
+
+data: [DONE]
+

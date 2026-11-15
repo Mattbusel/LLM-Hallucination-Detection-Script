@@ -1,0 +1,34 @@
+data: {"index":1,"token":{"id":1000,"text":"A","logprob":-0.4466412663459778,"special":false},"top_tokens":[{"id":2000,"text":"A","logprob":-0.4466412663459778,"special":false},{"id":2001,"text":"The","logprob":-1.3236783742904663,"special":false},{"id":2002,"text":"In","logprob":-3.5048744678497314,"special":false}],"generated_text":null,"details":null}
+
+data: {"index":2,"token":{"id":1001,"text":"el","logprob":-0.000296338606858626,"special":false},"top_tokens":[{"id":2000,"text":"el","logprob":-0.000296338606858626,"special":false},{"id":2001,"text":"al","logprob":-9.937664985656738,"special":false},{"id":2002,"text":".","logprob":-11.178414344787598,"special":false}],"generated_text":null,"details":null}
+
+data: {"index":3,"token":{"id":1002,"text":"bert","logprob":-0.00014771122368983924,"special":false},"top_tokens":[{"id":2000,"text":"bert","logprob":-0.00014771122368983924,"special":false},{"id":2001,"text":"ber","logprob":-9.052667617797852,"special":false},{"id":2002,"text":"berts","logprob":-11.712077140808105,"special":false}],"generated_text":null,"details":null}
+
+data: {"index":4,"token":{"id":1003,"text":" Cu","logprob":-0.00025484233628958464,"special":false},"top_tokens":[{"id":2000,"text":" Cu","logprob":-0.00025484233628958464,"special":false},{"id":2001,"text":" Ku","logprob":-9.54832649230957,"special":false},{"id":2002,"text":" van","logprob":-10.72208309173584,"special":false}],"generated_text":null,"details":null}
+
+data: {"index":5,"token":{"id":1004,"text":"yp","logprob":-0.0001465189561713487,"special":false},"top_tokens":[{"id":2000,"text":"yp","logprob":-0.0001465189561713487,"special":false},{"id":2001,"text":"yd","logprob":-9.831300735473633,"special":false},{"id":2002,"text":"ysen","logprob":-10.761224746704102,"special":false}],"generated_text":null,"details":null}
+
+data: {"index":6,"token":{"id":1005,"text":" died","logprob":-0.00431022746488452,"special":false},"top_tokens":[{"id":2000,"text":" died","logprob":-0.00431022746488452,"special":false},{"id":2001,"text":" lived","logprob":-6.915128231048584,"special":false},{"id":2002,"text":" (","logprob":-6.995555400848389,"special":false}],"generated_text":null,"details":null}
+
+data: {"index":7,"token":{"id":1006,"text":" in","logprob":-0.0006338577950373292,"special":false},"top_tokens":[{"id":2000,"text":" in","logprob":-0.0006338577950373292,"special":false},{"id":2001,"text":" on","logprob":-7.930172443389893,"special":false},{"id":2002,"text":" at","logprob":-9.20976734161377,"special":false}],"generated_text":null,"details":null}
+
+data: {"index":8,"token":{"id":1007,"text":" ","logprob":-0.035835132002830505,"special":false},"top_tokens":[{"id":2000,"text":" ","logprob":-0.035835132002830505,"special":false},{"id":2001,"text":" **","logprob":-4.215280532836914,"special":false},{"id":2002,"text":" the","logprob":-4.584897994995117,"special":false}],"generated_text":null,"details":null}
+
+data: {"index":9,"token":{"id":1008,"text":"1","logprob":-0.00021000920969527215,"special":false},"top_tokens":[{"id":2000,"text":"1","logprob":-0.00021000920969527215,"special":false},{"id":2001,"text":"2","logprob":-9.672004699707031,"special":false},{"id":2002,"text":"0","logprob":-9.884542465209961,"special":false}],"generated_text":null,"details":null}
+
+data: {"index":10,"token":{"id":1009,"text":"6","logprob":-0.034181125462055206,"special":false},"top_tokens":[{"id":2000,"text":"6","logprob":-0.034181125462055206,"special":false},{"id":2001,"text":"7","logprob":-3.829860210418701,"special":false},{"id":2002,"text":"9","logprob":-4.944131374359131,"special":false}],"generated_text":null,"details":null}
+
+data: {"index":11,"token":{"id":1010,"text":"3","logprob":-2.2485766410827637,"special":false},"top_tokens":[{"id":2000,"text":"6","logprob":-0.5077815651893616,"special":false},{"id":2001,"text":"2","logprob":-1.5595394372940063,"special":false},{"id":2002,"text":"3","logprob":-2.2485766410827637,"special":false}],"generated_text":null,"details":null}
+
+data: {"index":12,"token":{"id":1011,"text":"0","logprob":-0.4885367453098297,"special":false},"top_tokens":[{"id":2000,"text":"0","logprob":-0.4885367453098297,"special":false},{"id":2001,"text":"8","logprob":-1.1609495878219604,"special":false},{"id":2002,"text":"3","logprob":-3.941476583480835,"special":false}],"generated_text":null,"details":null}
+
+data: {"index":13,"token":{"id":1012,"text":" in","logprob":-0.05963817238807678,"special":false},"top_tokens":[{"id":2000,"text":" in","logprob":-0.05963817238807678,"special":false},{"id":2001,"text":".","logprob":-3.385043144226074,"special":false},{"id":2002,"text":" at","logprob":-4.14888858795166,"special":false}],"generated_text":null,"details":null}
+
+data: {"index":14,"token":{"id":1013,"text":" The","logprob":-2.571065664291382,"special":false},"top_tokens":[{"id":2000,"text":" Amsterdam","logprob":-1.2274367809295654,"special":false},{"id":2001,"text":" Haar","logprob":-1.4883447885513306,"special":false},{"id":2002,"text":" Delft","logprob":-2.458571195602417,"special":false}],"generated_text":null,"details":null}
+
+data: {"index":15,"token":{"id":1014,"text":" Hague","logprob":-0.0002636660938151181,"special":false},"top_tokens":[{"id":2000,"text":" Hague","logprob":-0.0002636660938151181,"special":false},{"id":2001,"text":" Netherlands","logprob":-8.308940887451172,"special":false},{"id":2002,"text":"at","logprob":-11.899736404418945,"special":false}],"generated_text":null,"details":null}
+
+data: {"index":16,"token":{"id":1015,"text":".","logprob":-0.05204661563038826,"special":false},"top_tokens":[{"id":2000,"text":".","logprob":-0.05204661563038826,"special":false},{"id":2001,"text":",","logprob":-3.0624797344207764,"special":false},{"id":2002,"text":" (","logprob":-7.124100685119629,"special":false}],"generated_text":null,"details":null}
+
+data: {"index":17,"token":{"id":1,"text":"<eos>","logprob":-0.012,"special":true},"top_tokens":[{"id":1,"text":"<eos>","logprob":-0.012,"special":true}],"generated_text":"Aelbert Cuyp died in 1630 in The Hague.","details":{"finish_reason":"eos_token","generated_tokens":17,"seed":7}}
+

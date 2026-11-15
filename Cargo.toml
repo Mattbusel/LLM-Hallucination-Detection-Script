@@ -1,6 +1,6 @@
 [package]
 name = "llm-token-visualizer"
-version = "0.6.1"
+version = "0.7.0"
 edition = "2021"
 rust-version = "1.88"
 description = "Flag low-confidence spans in LLM output from token logprobs, and render per-token confidence as terminal, HTML or Markdown"

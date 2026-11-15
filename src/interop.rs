@@ -4,8 +4,9 @@
 //! |---|---|
 //! | `async-openai` | `async_openai`: tokens from an `async_openai` chat completion response |
 //!
-//! Any other client works through JSON: [`crate::detect::parse_logprobs`]
-//! reads OpenAI-style, legacy completions-style and Gemini-style responses.
+//! Any other client works through JSON: [`crate::formats::parse_any`]
+//! reads the response shapes of OpenAI, vLLM, Ollama, llama.cpp, Gemini, TGI
+//! and the other OpenAI-compatible servers.
 
 /// Adapter for [async-openai](https://crates.io/crates/async-openai) (types
 /// only, no HTTP client).

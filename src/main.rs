@@ -9,6 +9,7 @@ use std::path::PathBuf;
 
 use llm_token_visualizer::detect;
 use llm_token_visualizer::report;
+use llm_token_visualizer::stream;
 use llm_token_visualizer::{
     HtmlRenderer, MarkdownRenderer, Renderer, TerminalRenderer, TokenAnalysis, VisualizationConfig,
 };
@@ -28,7 +29,8 @@ Sample responses with logprobs are in examples/logprobs/ (samples/ in release ar
     about = "Flag low-confidence spans in LLM output from token logprobs, and visualize per-token confidence"
 )]
 struct Args {
-    /// Detect: path to a Chat Completions response (or its logprobs) saved as JSON; "-" reads stdin
+    /// Detect: path to a response with token logprobs saved as JSON (OpenAI, vLLM, Ollama, llama.cpp,
+    /// Gemini, TGI and others), or a recorded SSE/NDJSON stream; "-" reads stdin
     #[arg(long, value_name = "PATH")]
     logprobs_file: Option<PathBuf>,
 
@@ -194,6 +196,22 @@ fn write_output(args: &Args, output: &str) -> Result<()> {
     }
 }
 
+/// Tokens from a saved response, or from a recorded stream (`curl -N`
+/// output: SSE `data:` lines or Ollama's NDJSON), which is not one JSON value.
+fn read_tokens(text: &str) -> Result<Vec<detect::LogprobToken>> {
+    match detect::parse_logprobs(text) {
+        Err(detect::ParseError::InvalidJson(e)) => match stream::parse_stream(text) {
+            Ok(tokens) => Ok(tokens),
+            // Not a stream either: report the JSON error.
+            Err(detect::ParseError::Empty | detect::ParseError::InvalidJson(_)) => {
+                Err(detect::ParseError::InvalidJson(e).into())
+            }
+            Err(other) => Err(other.into()),
+        },
+        other => Ok(other?),
+    }
+}
+
 fn run_detect(args: &Args) -> Result<i32> {
     let json = if let Some(prompt) = &args.live {
         fetch_live(prompt, args)?
@@ -213,7 +231,7 @@ fn run_detect(args: &Args) -> Result<i32> {
         }
     };
 
-    let tokens = detect::parse_logprobs(&json)?;
+    let tokens = read_tokens(&json)?;
     let report = detect::detect(&tokens, args.threshold);
     let source = match (&args.live, &args.logprobs_file) {
         (Some(_), _) => "live".to_string(),
@@ -380,4 +398,39 @@ fn load_demo_data() -> Result<(String, TokenAnalysis)> {
 
     let token_analysis: TokenAnalysis = serde_json::from_str(demo_json)?;
     Ok((text, token_analysis))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn fixture(name: &str) -> String {
+        let path = format!(
+            "{}/tests/fixtures/providers/{name}",
+            env!("CARGO_MANIFEST_DIR")
+        );
+        std::fs::read_to_string(path).unwrap()
+    }
+
+    #[test]
+    fn reads_saved_responses_and_recorded_streams() {
+        let whole = read_tokens(&fixture("llamacpp_completion.json")).unwrap();
+        let streamed = read_tokens(&fixture("llamacpp_completion_stream.sse")).unwrap();
+        assert_eq!(whole, streamed);
+        assert_eq!(
+            read_tokens(&fixture("ollama_chat_stream.ndjson"))
+                .unwrap()
+                .len(),
+            16
+        );
+    }
+
+    #[test]
+    fn bad_input_keeps_a_clear_error() {
+        let e = read_tokens("{oops").unwrap_err();
+        assert!(e.to_string().contains("not valid JSON"), "{e}");
+        // A stream without logprobs says so instead of "not JSON".
+        let e = read_tokens(&fixture("ollama_v1_responses_stream.sse")).unwrap_err();
+        assert!(e.to_string().contains("no token logprobs"), "{e}");
+    }
 }
