@@ -1,6 +1,6 @@
 [package]
 name = "llm-token-visualizer"
-version = "0.6.0"
+version = "0.6.1"
 edition = "2021"
 rust-version = "1.88"
 description = "Flag low-confidence spans in LLM output from token logprobs, and render per-token confidence as terminal, HTML or Markdown"
@@ -8,7 +8,7 @@ license = "MIT"
 repository = "https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script"
 readme = "README.md"
 documentation = "https://docs.rs/llm-token-visualizer"
-include = ["src/**/*", "examples/**/*", "tests/**/*", "benches/**/*", "README.md", "CHANGELOG.md", "LICENSE", "Cargo.toml", "Cargo.lock"]
+include = ["src/**/*", "examples/**/*", "tests/**/*", "benches/**/*", "/README.md", "/CHANGELOG.md", "/LICENSE", "/Cargo.toml", "/Cargo.lock"]
 keywords = ["llm", "logprobs", "hallucination", "uncertainty", "openai"]
 categories = ["science", "api-bindings", "text-processing", "command-line-utilities"]
 

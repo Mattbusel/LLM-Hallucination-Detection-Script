@@ -1,0 +1,46 @@
+# The Python package (PyPI: llm-token-visualizer). The Rust bindings live in
+# python/ (python/Cargo.toml); the Rust crate itself is the Cargo.toml next
+# to this file. Build a wheel with `maturin build --release`.
+[build-system]
+requires = ["maturin>=1.9,<2"]
+build-backend = "maturin"
+
+[project]
+name = "llm-token-visualizer"
+dynamic = ["version"]
+description = "Flag the words an LLM answer was unsure about, from OpenAI or vLLM token logprobs. Spans, HTML report, CI gate."
+readme = "docs/python.md"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["llm", "logprobs", "hallucination", "openai", "vllm", "uncertainty"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Rust",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Typing :: Typed",
+]
+# No runtime dependencies.
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[project.urls]
+Documentation = "https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/blob/main/docs/python.md"
+Source = "https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script"
+Changelog = "https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script/-/blob/main/CHANGELOG.md"
+Rust-crate = "https://crates.io/crates/llm-token-visualizer"
+
+[tool.maturin]
+manifest-path = "python/Cargo.toml"
+python-source = "python"
+module-name = "llm_token_visualizer._native"
+# Local virtualenvs and caches are never part of the sdist.
+exclude = [{ path = ".venv*/**/*", format = "sdist" }, { path = ".pytest_cache/**/*", format = "sdist" }]
+
+[tool.pytest.ini_options]
+testpaths = ["python/tests"]

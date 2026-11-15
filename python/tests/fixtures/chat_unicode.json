@@ -1,0 +1,292 @@
+{
+ "id": "chatcmpl-Cbridge",
+ "object": "chat.completion",
+ "created": 1794691200,
+ "model": "gpt-4.1-mini-2025-04-14",
+ "choices": [
+  {
+   "index": 0,
+   "message": {
+    "role": "assistant",
+    "content": "Die Brücke wurde 1932 eröffnet.",
+    "refusal": null,
+    "annotations": []
+   },
+   "logprobs": {
+    "content": [
+     {
+      "token": "Die",
+      "logprob": -0.003,
+      "bytes": [
+       68,
+       105,
+       101
+      ],
+      "top_logprobs": [
+       {
+        "token": "Die",
+        "logprob": -0.003,
+        "bytes": [
+         68,
+         105,
+         101
+        ]
+       }
+      ]
+     },
+     {
+      "token": " Br",
+      "logprob": -1.2,
+      "bytes": [
+       32,
+       66,
+       114
+      ],
+      "top_logprobs": [
+       {
+        "token": " Br",
+        "logprob": -1.2,
+        "bytes": [
+         32,
+         66,
+         114
+        ]
+       },
+       {
+        "token": " Golden",
+        "logprob": -0.9,
+        "bytes": [
+         32,
+         71,
+         111,
+         108,
+         100,
+         101,
+         110
+        ]
+       },
+       {
+        "token": " Stra",
+        "logprob": -2.0,
+        "bytes": [
+         32,
+         83,
+         116,
+         114,
+         97
+        ]
+       }
+      ]
+     },
+     {
+      "token": "ücke",
+      "logprob": -0.0002,
+      "bytes": [
+       195,
+       188,
+       99,
+       107,
+       101
+      ],
+      "top_logprobs": [
+       {
+        "token": "ücke",
+        "logprob": -0.0002,
+        "bytes": [
+         195,
+         188,
+         99,
+         107,
+         101
+        ]
+       }
+      ]
+     },
+     {
+      "token": " wurde",
+      "logprob": -0.004,
+      "bytes": [
+       32,
+       119,
+       117,
+       114,
+       100,
+       101
+      ],
+      "top_logprobs": [
+       {
+        "token": " wurde",
+        "logprob": -0.004,
+        "bytes": [
+         32,
+         119,
+         117,
+         114,
+         100,
+         101
+        ]
+       }
+      ]
+     },
+     {
+      "token": " ",
+      "logprob": -0.001,
+      "bytes": [
+       32
+      ],
+      "top_logprobs": [
+       {
+        "token": " ",
+        "logprob": -0.001,
+        "bytes": [
+         32
+        ]
+       }
+      ]
+     },
+     {
+      "token": "193",
+      "logprob": -1.05,
+      "bytes": [
+       49,
+       57,
+       51
+      ],
+      "top_logprobs": [
+       {
+        "token": "193",
+        "logprob": -1.05,
+        "bytes": [
+         49,
+         57,
+         51
+        ]
+       },
+       {
+        "token": "192",
+        "logprob": -1.3,
+        "bytes": [
+         49,
+         57,
+         50
+        ]
+       },
+       {
+        "token": "194",
+        "logprob": -1.9,
+        "bytes": [
+         49,
+         57,
+         52
+        ]
+       }
+      ]
+     },
+     {
+      "token": "2",
+      "logprob": -0.2,
+      "bytes": [
+       50
+      ],
+      "top_logprobs": [
+       {
+        "token": "2",
+        "logprob": -0.2,
+        "bytes": [
+         50
+        ]
+       }
+      ]
+     },
+     {
+      "token": " er",
+      "logprob": -0.01,
+      "bytes": [
+       32,
+       101,
+       114
+      ],
+      "top_logprobs": [
+       {
+        "token": " er",
+        "logprob": -0.01,
+        "bytes": [
+         32,
+         101,
+         114
+        ]
+       }
+      ]
+     },
+     {
+      "token": "öff",
+      "logprob": 0.0,
+      "bytes": [
+       195,
+       182,
+       102,
+       102
+      ],
+      "top_logprobs": [
+       {
+        "token": "öff",
+        "logprob": 0.0,
+        "bytes": [
+         195,
+         182,
+         102,
+         102
+        ]
+       }
+      ]
+     },
+     {
+      "token": "net",
+      "logprob": -0.0001,
+      "bytes": [
+       110,
+       101,
+       116
+      ],
+      "top_logprobs": [
+       {
+        "token": "net",
+        "logprob": -0.0001,
+        "bytes": [
+         110,
+         101,
+         116
+        ]
+       }
+      ]
+     },
+     {
+      "token": ".",
+      "logprob": -0.0005,
+      "bytes": [
+       46
+      ],
+      "top_logprobs": [
+       {
+        "token": ".",
+        "logprob": -0.0005,
+        "bytes": [
+         46
+        ]
+       }
+      ]
+     }
+    ],
+    "refusal": null
+   },
+   "finish_reason": "stop"
+  }
+ ],
+ "usage": {
+  "prompt_tokens": 16,
+  "completion_tokens": 11,
+  "total_tokens": 27
+ },
+ "service_tier": "default",
+ "system_fingerprint": "fp_6f2eabb9a5"
+}

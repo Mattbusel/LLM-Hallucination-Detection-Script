@@ -138,3 +138,7 @@ let md = report::markdown(&tokens, &report, &meta);
 `detect::to_token_analysis` plus `visualize_tokens` still render detections with the visualizer's renderers, and `analyze_with_issues` and `quick_analyze` are still available. Full API docs: [docs.rs/llm-token-visualizer](https://docs.rs/llm-token-visualizer).
 
 `cargo run --example detect` runs the detector over every bundled sample (output in the README).
+
+## Python
+
+`pip install llm-token-visualizer` gives the same detector in Python, built from this crate (no Python dependencies). `llm_token_visualizer.score(resp)` takes an OpenAI `ChatCompletion` or `Completion` made with `logprobs=True`, the same response as a dict or JSON string (vLLM and other OpenAI-compatible servers), or a vLLM `RequestOutput`, and returns the spans with character offsets, an HTML report and a summary; `gate(resp, threshold)` is the yes/no check for CI. See [python.md](python.md).

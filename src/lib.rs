@@ -72,6 +72,14 @@
 //! The command-line tool is `llm-token-visualizer`
 //! (`cargo install llm-token-visualizer`, plus `--features live` for
 //! `--live`).
+//!
+//! # Python
+//!
+//! The same detector ships on PyPI as `llm-token-visualizer`
+//! (`import llm_token_visualizer`): `score(resp)` takes an OpenAI
+//! `ChatCompletion` made with `logprobs=True` (or a vLLM output) and returns
+//! the spans with character offsets ([`Span::char_range`]), an HTML report and
+//! a summary. The bindings are in the repository's `python/` directory.
 
 #![deny(missing_docs)]
 

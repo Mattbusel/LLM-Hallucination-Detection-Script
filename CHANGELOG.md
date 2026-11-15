@@ -1,6 +1,22 @@
 # Changelog
 
-## 0.6.0 (unreleased)
+## 0.6.1 (unreleased)
+
+A Python package, and character offsets for spans. No breaking changes.
+
+- **Python package `llm-token-visualizer`** (`import llm_token_visualizer`), built from this crate with pyo3 and maturin as one abi3 wheel per platform (CPython 3.9 and newer). No runtime Python dependencies. Docs: `docs/python.md`.
+  - `score(resp, threshold=0.5, *, choice=0)` takes an OpenAI SDK `ChatCompletion` or `Completion` made with `logprobs=True`, a single `Choice` or its `logprobs`, the same response as a dict, JSON string or bytes (vLLM's OpenAI-compatible server and the other providers `parse_logprobs` reads), or a vLLM `RequestOutput` / `CompletionOutput` from offline generation. It returns a `Score` with `.spans()` (character offsets into `.text`, text, min and mean logprob, the weakest token and its alternatives), `.to_html()`, `.to_markdown()`, `.summary()`, `.to_json()`, `.flagged`, `.mean_prob` and `.perplexity`.
+  - `gate(resp, threshold)` returns `True` when nothing is below the threshold, for CI and eval scripts.
+  - Missing or `None` logprobs raise `NoLogprobsError` with a message saying to request `logprobs=True` and naming the choice that was scored (`choices[1]` for `choice=1`); API error bodies, invalid JSON, bytes that are not UTF-8 and malformed logprobs raise `LogprobsError`. Both are `ValueError`s. A threshold outside 0 to 1 is a `ValueError`.
+  - SDK objects inside a list or dict are dumped too, so the token list `resp.choices[0].logprobs.content` (a list of `ChatCompletionTokenLogprob`) scores the same as the whole response.
+  - `Span` compares equal by value (`score(r).spans() == score(r).spans()`), and is not hashable.
+  - `-inf` logprobs (vLLM) are read as probability 0 instead of failing as invalid JSON.
+  - The bindings are in `python/` (a separate, unpublished crate, `llm-token-visualizer-python`); `pyproject.toml` is at the repository root. Tests: `python/tests` (pytest) against hand-written responses in the OpenAI Chat Completions, Completions and vLLM shapes, plus OpenAI SDK objects when `openai` is installed.
+  - `.github/workflows/python.yml` builds wheels for Linux (manylinux and musllinux, x86_64 and aarch64), macOS (x86_64 and arm64) and Windows x86_64 plus an sdist on tags named `py-v*`, tests them on Linux, macOS and Windows, and publishes to PyPI with trusted publishing.
+- Packaging: the crate's `include` list anchors `README.md`, `LICENSE` and the other top-level files to the crate root. The bare patterns matched files of that name at any depth, so packaging from a checkout with a local Python virtualenv picked up its `LICENSE` and `README.md` files (`cargo package --list` now lists only the crate's own 25 files).
+- **New: `Span::char_range(&tokens)`**, where a span sits in `Report::text` in characters (Unicode scalar values), the unit Python indexes strings by. `Span::start` / `end` stay token indices.
+
+## 0.6.0 (2026-11-14)
 
 A lean library core, a typed parse error, and a fix for `null` logprobs. This is a breaking release; migration notes are at the end of this entry.
 

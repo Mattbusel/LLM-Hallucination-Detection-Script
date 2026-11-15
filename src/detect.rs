@@ -559,6 +559,34 @@ impl Span {
         }
         s
     }
+
+    /// Where the span sits in [`Report::text`], in Unicode scalar values
+    /// (`char`s), the unit Python indexes strings by.
+    ///
+    /// `tokens` must be the token list the report was built from. Never
+    /// panics: token indices past the end of `tokens` are cut to its length.
+    ///
+    /// ```
+    /// use llm_token_visualizer::{detect, parse_logprobs};
+    ///
+    /// let tokens = parse_logprobs(r#"[
+    ///   {"token": "Café", "logprob": -0.01},
+    ///   {"token": " Zürich", "logprob": -1.5}
+    /// ]"#)?;
+    /// let report = detect(&tokens, 0.5);
+    /// let r = report.spans[0].char_range(&tokens);
+    /// assert_eq!(r, 4..11);
+    /// let chars: Vec<char> = report.text.chars().collect();
+    /// assert_eq!(chars[r].iter().collect::<String>(), " Zürich");
+    /// # Ok::<(), llm_token_visualizer::ParseError>(())
+    /// ```
+    pub fn char_range(&self, tokens: &[LogprobToken]) -> std::ops::Range<usize> {
+        let end = self.end.min(tokens.len());
+        let start = self.start.min(end);
+        let count = |ts: &[LogprobToken]| ts.iter().map(|t| t.token.chars().count()).sum::<usize>();
+        let s = count(&tokens[..start]);
+        s..s + count(&tokens[start..end])
+    }
 }
 
 /// Convert tokens plus a report into the visualizer's input format, so the
@@ -603,6 +631,17 @@ mod tests {
             logprob: p.ln(),
             top_logprobs: vec![],
         }
+    }
+
+    #[test]
+    fn char_range_counts_chars_and_never_panics() {
+        let tokens = vec![tok("Ä", 0.99), tok("é", 0.99), tok(" 日本", 0.1)];
+        let report = detect(&tokens, 0.5);
+        assert_eq!(report.spans.len(), 1);
+        assert_eq!(report.spans[0].char_range(&tokens), 2..5);
+        // A token list shorter than the span: cut, not a panic.
+        assert_eq!(report.spans[0].char_range(&tokens[..1]), 1..1);
+        assert_eq!(report.spans[0].char_range(&[]), 0..0);
     }
 
     #[test]

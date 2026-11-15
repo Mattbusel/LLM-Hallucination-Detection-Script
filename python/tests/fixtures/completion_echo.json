@@ -1,0 +1,63 @@
+{
+ "id": "cmpl-Cecho",
+ "object": "text_completion",
+ "created": 1794691200,
+ "model": "gpt-3.5-turbo-instruct",
+ "choices": [
+  {
+   "index": 0,
+   "text": "Paris is the capital of France",
+   "finish_reason": "length",
+   "logprobs": {
+    "tokens": [
+     "Paris",
+     " is",
+     " the",
+     " capital",
+     " of",
+     " France"
+    ],
+    "token_logprobs": [
+     null,
+     -0.9,
+     -0.01,
+     -0.02,
+     -0.001,
+     -0.0002
+    ],
+    "top_logprobs": [
+     null,
+     {
+      " is": -0.9,
+      " was": -0.6
+     },
+     {
+      " the": -0.01
+     },
+     {
+      " capital": -0.02
+     },
+     {
+      " of": -0.001
+     },
+     {
+      " France": -0.0002
+     }
+    ],
+    "text_offset": [
+     0,
+     5,
+     8,
+     12,
+     20,
+     23
+    ]
+   }
+  }
+ ],
+ "usage": {
+  "prompt_tokens": 1,
+  "completion_tokens": 5,
+  "total_tokens": 6
+ }
+}

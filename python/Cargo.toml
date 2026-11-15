@@ -1,0 +1,22 @@
+# Python bindings for llm-token-visualizer (PyPI: llm-token-visualizer,
+# import name: llm_token_visualizer). Built with maturin from the
+# pyproject.toml at the repository root; not published to crates.io.
+[package]
+name = "llm-token-visualizer-python"
+version = "0.6.1"
+edition = "2021"
+rust-version = "1.88"
+description = "Python bindings for llm-token-visualizer"
+license = "MIT"
+repository = "https://gitlab.com/mattbusel/LLM-Hallucination-Detection-Script"
+publish = false
+
+[lib]
+name = "_native"
+crate-type = ["cdylib"]
+
+[dependencies]
+llm-token-visualizer = { version = "0.6.1", path = "..", default-features = false }
+# One abi3 wheel per platform covers CPython 3.9 and newer.
+pyo3 = { version = "0.30.1", features = ["abi3-py39"] }
+serde_json = "1.0"

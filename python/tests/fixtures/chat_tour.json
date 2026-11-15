@@ -1,0 +1,384 @@
+{
+ "id": "chatcmpl-Ctour1998",
+ "object": "chat.completion",
+ "created": 1794691200,
+ "model": "gpt-4.1-mini-2025-04-14",
+ "choices": [
+  {
+   "index": 0,
+   "message": {
+    "role": "assistant",
+    "content": "The 1998 Tour de France was won by Marco Pantani.",
+    "refusal": null,
+    "annotations": []
+   },
+   "logprobs": {
+    "content": [
+     {
+      "token": "The",
+      "logprob": -0.0021,
+      "bytes": [
+       84,
+       104,
+       101
+      ],
+      "top_logprobs": [
+       {
+        "token": "The",
+        "logprob": -0.0021,
+        "bytes": [
+         84,
+         104,
+         101
+        ]
+       },
+       {
+        "token": "Marco",
+        "logprob": -6.4,
+        "bytes": [
+         77,
+         97,
+         114,
+         99,
+         111
+        ]
+       }
+      ]
+     },
+     {
+      "token": " ",
+      "logprob": -0.0007,
+      "bytes": [
+       32
+      ],
+      "top_logprobs": [
+       {
+        "token": " ",
+        "logprob": -0.0007,
+        "bytes": [
+         32
+        ]
+       }
+      ]
+     },
+     {
+      "token": "199",
+      "logprob": -0.0001,
+      "bytes": [
+       49,
+       57,
+       57
+      ],
+      "top_logprobs": [
+       {
+        "token": "199",
+        "logprob": -0.0001,
+        "bytes": [
+         49,
+         57,
+         57
+        ]
+       }
+      ]
+     },
+     {
+      "token": "8",
+      "logprob": 0.0,
+      "bytes": [
+       56
+      ],
+      "top_logprobs": [
+       {
+        "token": "8",
+        "logprob": 0.0,
+        "bytes": [
+         56
+        ]
+       }
+      ]
+     },
+     {
+      "token": " Tour",
+      "logprob": -0.0004,
+      "bytes": [
+       32,
+       84,
+       111,
+       117,
+       114
+      ],
+      "top_logprobs": [
+       {
+        "token": " Tour",
+        "logprob": -0.0004,
+        "bytes": [
+         32,
+         84,
+         111,
+         117,
+         114
+        ]
+       }
+      ]
+     },
+     {
+      "token": " de",
+      "logprob": 0.0,
+      "bytes": [
+       32,
+       100,
+       101
+      ],
+      "top_logprobs": [
+       {
+        "token": " de",
+        "logprob": 0.0,
+        "bytes": [
+         32,
+         100,
+         101
+        ]
+       }
+      ]
+     },
+     {
+      "token": " France",
+      "logprob": -0.0001,
+      "bytes": [
+       32,
+       70,
+       114,
+       97,
+       110,
+       99,
+       101
+      ],
+      "top_logprobs": [
+       {
+        "token": " France",
+        "logprob": -0.0001,
+        "bytes": [
+         32,
+         70,
+         114,
+         97,
+         110,
+         99,
+         101
+        ]
+       }
+      ]
+     },
+     {
+      "token": " was",
+      "logprob": -0.0019,
+      "bytes": [
+       32,
+       119,
+       97,
+       115
+      ],
+      "top_logprobs": [
+       {
+        "token": " was",
+        "logprob": -0.0019,
+        "bytes": [
+         32,
+         119,
+         97,
+         115
+        ]
+       }
+      ]
+     },
+     {
+      "token": " won",
+      "logprob": -0.0003,
+      "bytes": [
+       32,
+       119,
+       111,
+       110
+      ],
+      "top_logprobs": [
+       {
+        "token": " won",
+        "logprob": -0.0003,
+        "bytes": [
+         32,
+         119,
+         111,
+         110
+        ]
+       }
+      ]
+     },
+     {
+      "token": " by",
+      "logprob": -0.0002,
+      "bytes": [
+       32,
+       98,
+       121
+      ],
+      "top_logprobs": [
+       {
+        "token": " by",
+        "logprob": -0.0002,
+        "bytes": [
+         32,
+         98,
+         121
+        ]
+       }
+      ]
+     },
+     {
+      "token": " Marco",
+      "logprob": -0.89,
+      "bytes": [
+       32,
+       77,
+       97,
+       114,
+       99,
+       111
+      ],
+      "top_logprobs": [
+       {
+        "token": " Marco",
+        "logprob": -0.89,
+        "bytes": [
+         32,
+         77,
+         97,
+         114,
+         99,
+         111
+        ]
+       },
+       {
+        "token": " Jan",
+        "logprob": -0.97,
+        "bytes": [
+         32,
+         74,
+         97,
+         110
+        ]
+       },
+       {
+        "token": " Bjarne",
+        "logprob": -2.12,
+        "bytes": [
+         32,
+         66,
+         106,
+         97,
+         114,
+         110,
+         101
+        ]
+       },
+       {
+        "token": " Marc",
+        "logprob": -4.3,
+        "bytes": [
+         32,
+         77,
+         97,
+         114,
+         99
+        ]
+       }
+      ]
+     },
+     {
+      "token": " Pant",
+      "logprob": -0.012,
+      "bytes": [
+       32,
+       80,
+       97,
+       110,
+       116
+      ],
+      "top_logprobs": [
+       {
+        "token": " Pant",
+        "logprob": -0.012,
+        "bytes": [
+         32,
+         80,
+         97,
+         110,
+         116
+        ]
+       },
+       {
+        "token": " P",
+        "logprob": -4.6,
+        "bytes": [
+         32,
+         80
+        ]
+       }
+      ]
+     },
+     {
+      "token": "ani",
+      "logprob": -0.0001,
+      "bytes": [
+       97,
+       110,
+       105
+      ],
+      "top_logprobs": [
+       {
+        "token": "ani",
+        "logprob": -0.0001,
+        "bytes": [
+         97,
+         110,
+         105
+        ]
+       }
+      ]
+     },
+     {
+      "token": ".",
+      "logprob": -0.0008,
+      "bytes": [
+       46
+      ],
+      "top_logprobs": [
+       {
+        "token": ".",
+        "logprob": -0.0008,
+        "bytes": [
+         46
+        ]
+       },
+       {
+        "token": ",",
+        "logprob": -7.2,
+        "bytes": [
+         44
+        ]
+       }
+      ]
+     }
+    ],
+    "refusal": null
+   },
+   "finish_reason": "stop"
+  }
+ ],
+ "usage": {
+  "prompt_tokens": 16,
+  "completion_tokens": 14,
+  "total_tokens": 30
+ },
+ "service_tier": "default",
+ "system_fingerprint": "fp_6f2eabb9a5"
+}

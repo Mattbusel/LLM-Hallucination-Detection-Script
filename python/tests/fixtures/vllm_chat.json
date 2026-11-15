@@ -1,0 +1,146 @@
+{
+ "id": "chatcmpl-6b3c0f3d9b8e4a7f",
+ "object": "chat.completion",
+ "created": 1794691200,
+ "model": "Qwen/Qwen2.5-7B-Instruct",
+ "choices": [
+  {
+   "index": 0,
+   "message": {
+    "role": "assistant",
+    "content": "Water boils at 90 degrees on Everest.",
+    "reasoning_content": null,
+    "tool_calls": []
+   },
+   "logprobs": {
+    "content": [
+     {
+      "token": "Water",
+      "logprob": -0.02,
+      "top_logprobs": [
+       {
+        "token": "Water",
+        "logprob": -0.02
+       }
+      ]
+     },
+     {
+      "token": " boils",
+      "logprob": -0.001,
+      "top_logprobs": [
+       {
+        "token": " boils",
+        "logprob": -0.001
+       }
+      ]
+     },
+     {
+      "token": " at",
+      "logprob": 0.0,
+      "top_logprobs": [
+       {
+        "token": " at",
+        "logprob": 0.0
+       }
+      ]
+     },
+     {
+      "token": " ",
+      "logprob": -0.0003,
+      "top_logprobs": [
+       {
+        "token": " ",
+        "logprob": -0.0003
+       }
+      ]
+     },
+     {
+      "token": "9",
+      "logprob": -1.6,
+      "top_logprobs": [
+       {
+        "token": "1",
+        "logprob": -0.25
+       },
+       {
+        "token": "9",
+        "logprob": -1.6
+       },
+       {
+        "token": "2",
+        "logprob": -9999.0
+       }
+      ]
+     },
+     {
+      "token": "0",
+      "logprob": -0.05,
+      "top_logprobs": [
+       {
+        "token": "0",
+        "logprob": -0.05
+       }
+      ]
+     },
+     {
+      "token": " degrees",
+      "logprob": -0.4,
+      "top_logprobs": [
+       {
+        "token": " degrees",
+        "logprob": -0.4
+       },
+       {
+        "token": "°C",
+        "logprob": -1.1
+       }
+      ]
+     },
+     {
+      "token": " on",
+      "logprob": -0.7,
+      "top_logprobs": [
+       {
+        "token": " on",
+        "logprob": -0.7
+       },
+       {
+        "token": " at",
+        "logprob": -0.9
+       }
+      ]
+     },
+     {
+      "token": " Everest",
+      "logprob": -0.03,
+      "top_logprobs": [
+       {
+        "token": " Everest",
+        "logprob": -0.03
+       }
+      ]
+     },
+     {
+      "token": ".",
+      "logprob": 0.0,
+      "top_logprobs": [
+       {
+        "token": ".",
+        "logprob": 0.0
+       }
+      ]
+     }
+    ]
+   },
+   "finish_reason": "stop",
+   "stop_reason": null
+  }
+ ],
+ "usage": {
+  "prompt_tokens": 16,
+  "completion_tokens": 10,
+  "total_tokens": 26,
+  "prompt_tokens_details": null
+ },
+ "prompt_logprobs": null
+}

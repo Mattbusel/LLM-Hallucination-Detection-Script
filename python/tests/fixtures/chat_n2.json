@@ -1,0 +1,147 @@
+{
+ "id": "chatcmpl-Cn2",
+ "object": "chat.completion",
+ "created": 1794691200,
+ "model": "gpt-4.1-mini-2025-04-14",
+ "choices": [
+  {
+   "index": 0,
+   "message": {
+    "role": "assistant",
+    "content": "Canberra.",
+    "refusal": null,
+    "annotations": []
+   },
+   "logprobs": {
+    "content": [
+     {
+      "token": "Canberra",
+      "logprob": -0.0004,
+      "bytes": [
+       67,
+       97,
+       110,
+       98,
+       101,
+       114,
+       114,
+       97
+      ],
+      "top_logprobs": [
+       {
+        "token": "Canberra",
+        "logprob": -0.0004,
+        "bytes": [
+         67,
+         97,
+         110,
+         98,
+         101,
+         114,
+         114,
+         97
+        ]
+       }
+      ]
+     },
+     {
+      "token": ".",
+      "logprob": -0.0001,
+      "bytes": [
+       46
+      ],
+      "top_logprobs": [
+       {
+        "token": ".",
+        "logprob": -0.0001,
+        "bytes": [
+         46
+        ]
+       }
+      ]
+     }
+    ],
+    "refusal": null
+   },
+   "finish_reason": "stop"
+  },
+  {
+   "index": 1,
+   "message": {
+    "role": "assistant",
+    "content": "Sydney.",
+    "refusal": null,
+    "annotations": []
+   },
+   "logprobs": {
+    "content": [
+     {
+      "token": "Sydney",
+      "logprob": -1.4,
+      "bytes": [
+       83,
+       121,
+       100,
+       110,
+       101,
+       121
+      ],
+      "top_logprobs": [
+       {
+        "token": "Canberra",
+        "logprob": -0.4,
+        "bytes": [
+         67,
+         97,
+         110,
+         98,
+         101,
+         114,
+         114,
+         97
+        ]
+       },
+       {
+        "token": "Sydney",
+        "logprob": -1.4,
+        "bytes": [
+         83,
+         121,
+         100,
+         110,
+         101,
+         121
+        ]
+       }
+      ]
+     },
+     {
+      "token": ".",
+      "logprob": -0.0001,
+      "bytes": [
+       46
+      ],
+      "top_logprobs": [
+       {
+        "token": ".",
+        "logprob": -0.0001,
+        "bytes": [
+         46
+        ]
+       }
+      ]
+     }
+    ],
+    "refusal": null
+   },
+   "finish_reason": "stop"
+  }
+ ],
+ "usage": {
+  "prompt_tokens": 16,
+  "completion_tokens": 4,
+  "total_tokens": 18
+ },
+ "service_tier": "default",
+ "system_fingerprint": "fp_6f2eabb9a5"
+}

@@ -1,0 +1,8 @@
+{
+ "error": {
+  "message": "Invalid value for 'top_logprobs': must be between 0 and 20.",
+  "type": "invalid_request_error",
+  "param": "top_logprobs",
+  "code": "invalid_value"
+ }
+}
