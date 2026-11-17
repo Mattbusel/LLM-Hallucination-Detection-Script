@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.7.1] - 2026-11-16
+
+- Package metadata only: `repository` points at https://github.com/Mattbusel/LLM-Hallucination-Detection-Script (the GitHub repository, where issues, releases and the dependents graph are), no code change from 0.7.0.
+
 ## 0.7.0 (unreleased)
 
 Logprobs from every major provider's own response format, and detection while the answer is still streaming. No breaking changes to the API; the lean core (`default-features = false`) still depends only on serde, serde_json, unicode-segmentation and thiserror and still builds for `wasm32-unknown-unknown`.
