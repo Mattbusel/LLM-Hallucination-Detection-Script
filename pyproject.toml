@@ -8,7 +8,7 @@ build-backend = "maturin"
 [project]
 name = "llm-token-visualizer"
 dynamic = ["version"]
-description = "Flag the words an LLM answer was unsure about, from OpenAI or vLLM token logprobs. Spans, HTML report, CI gate."
+description = "Your LLM already says which words it guessed. Flag them from OpenAI or vLLM token logprobs, no second model call. Spans, HTML report, CI gate."
 readme = "docs/python.md"
 requires-python = ">=3.9"
 license = "MIT"
